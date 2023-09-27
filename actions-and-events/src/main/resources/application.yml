@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db # This property specifies the JDBC URL for connecting to the database.
+    username: root # This property specifies the username to use when connecting to the database.
+    password: root # This property specifies the password associated with the provided username.
+  jpa:
+    hibernate:
+      ddl-auto: create # This property determines how Hibernate should handle the database schema.
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect # This property specifies the Hibernate dialect for the database being used.
