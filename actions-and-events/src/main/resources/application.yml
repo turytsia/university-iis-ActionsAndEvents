@@ -1,4 +1,6 @@
 spring:
+  main:
+      allow-circular-references: true
   datasource:
     url: jdbc:postgresql://localhost:5432/db # This property specifies the JDBC URL for connecting to the database.
     username: root # This property specifies the username to use when connecting to the database.
