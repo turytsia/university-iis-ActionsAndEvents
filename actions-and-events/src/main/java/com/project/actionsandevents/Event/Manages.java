@@ -1,10 +1,10 @@
 /**
- * This file contains class that implements Administers class.
+ * This file contains class that implements Manages class.
  *
  * @author Vadim Goncearenco (xgonce00)
  */
 
-package com.project.actionsandevents.User;
+package com.project.actionsandevents.Event;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
@@ -25,37 +24,30 @@ import lombok.Setter;
 import java.util.Date;
 import java.util.Set;
 
+import com.project.actionsandevents.User.User;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(AdministersId.class)
-public class Administers {
+@IdClass(ManagesId.class)
+public class Manages {
     // @Id
     // @GeneratedValue
     // private Long id;
-
     @Id
     @ManyToOne
-    private User admin;
+    private User manager;
     
     @Id
     @ManyToOne
-    private User user;
-
-    // @ManyToOne
-    // private User admin;
-    
-    // @ManyToOne
-    // private User user;
-
-    // @ManyToMany
-    // private Set<User> users;
+    private Event event;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
+
+    private String status;
 
     @Column(nullable = true)
     private String text;

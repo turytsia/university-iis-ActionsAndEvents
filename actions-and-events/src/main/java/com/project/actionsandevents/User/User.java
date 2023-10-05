@@ -12,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,8 +30,11 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    @ManyToMany(mappedBy = "users")
+    //@ManyToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private Set<Administers> administrators;
+
+    //TODO: @OneToMany(mappedBy = "admin") ?
 
     @Column(unique = true)
     private String login;
