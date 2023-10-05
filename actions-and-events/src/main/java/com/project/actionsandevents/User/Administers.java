@@ -22,23 +22,23 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="_administers")
 public class Administers {
     @Id
     @GeneratedValue
     private Long id;
 
     @ManyToOne
-    private Long admin;
+    private User admin;
     
     @ManyToMany
-    private Long user;
+    private Set<User> users;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
