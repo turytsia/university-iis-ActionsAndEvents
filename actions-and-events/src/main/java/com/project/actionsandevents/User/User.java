@@ -5,10 +5,14 @@
  */
 package com.project.actionsandevents.User;
 
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +29,12 @@ public class User {
     @Id
     @GeneratedValue
     private Long id;
+
+    //@ManyToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
+    private Set<Administers> administrators;
+
+    //TODO: @OneToMany(mappedBy = "admin") ?
 
     @Column(unique = true)
     private String login;
