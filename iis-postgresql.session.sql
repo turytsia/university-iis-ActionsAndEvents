@@ -1,5 +1,4 @@
-INSERT INTO _administers 
-VALUES (0, 1, '2021-01-01', "aboba");
+INSERT INTO _place
+VALUES (1, 'ke', 'k', 'lol', 'ee');
 
-INSERT INTO _
-VALUES (0, 1, '2021-01-01', "aboba");
+SELECT * FROM _place;
