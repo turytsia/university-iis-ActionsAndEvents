@@ -1,11 +1,13 @@
 /**
- * This file contains class that represents Category in SQL database.
+ * This file contains class that represents EventHasCategory in SQL database.
  *
  * @author Aleksandr Shevchenko (xshevc01)
  */
-package com.project.actionsandevents.Category;
+package com.project.actionsandevents.EventHasCategory;
 
-import jakarta.persistence.Column;
+import com.project.actionsandevents.Category.Category;
+import com.project.actionsandevents.Event.Event;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -22,16 +24,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="_category")
-public class Category {
+@Table(name = "_eventhascategory")
+public class EventHasCategory {
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "_category", referencedColumnName = "id")
+    private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "_category", referencedColumnName = "id", nullable = true)
-    private Category parentCategory;
+    @JoinColumn(name = "_event", referencedColumnName = "id")
+    private Event event;
 }

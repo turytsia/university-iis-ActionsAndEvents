@@ -10,16 +10,21 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
+import com.project.actionsandevents.Place.Place;
+import com.project.actionsandevents.User.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+
 
 @Getter
 @Setter
@@ -48,4 +53,12 @@ public class Event {
 
     @Column(nullable = true)
     private String image;
+
+    @ManyToOne
+    @JoinColumn(name = "_user", referencedColumnName = "id")
+    private User userManages;
+
+    @ManyToOne
+    @JoinColumn(name = "_place", referencedColumnName = "id")
+    private Place place;
 }
