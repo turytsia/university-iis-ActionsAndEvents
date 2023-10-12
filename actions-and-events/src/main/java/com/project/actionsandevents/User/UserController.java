@@ -6,58 +6,66 @@
 package com.project.actionsandevents.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.project.actionsandevents.User.exceptions.UserNotFoundException;
+import com.project.actionsandevents.User.requests.UserPatchRequest;
+import com.project.actionsandevents.User.responses.UserResponse;
+import com.project.actionsandevents.User.responses.UsersResponse;
+import com.project.actionsandevents.common.ResponseMessage;
+
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/auth")
+@RequestMapping
 public class UserController {
 
     @Autowired
-    private UserService service;
-    
-    @Autowired
-    private JwtService jwtService;
-    
-    @Autowired
-    private AuthenticationManager authenticationManager;
-  
-    @PostMapping("/register")
-    public String register(@RequestBody User userInfo) {
-        return service.addUser(userInfo);
+    private UserService userService;
+
+    @GetMapping("/user/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public ResponseEntity<Object> getUserById(@PathVariable Long id, Authentication authentication) throws UserNotFoundException {
+        User user = userService.getUserById(id);
+
+        return ResponseEntity.ok(new UserResponse(user));
     }
-    
-    @GetMapping("/user/profile")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
-    public String userProfile(Authentication authentication) {
-        
-        return "Welcome to User Profile";
-    }
-  
-    @GetMapping("/admin/profile")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public String adminProfile(Authentication authentication) {
-        return "Welcome to Admin Profile";
-    }
-  
-    @PostMapping("/login")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getLogin(), authRequest.getPassword()));
-            if (authentication.isAuthenticated()) {
-                return jwtService.generateToken(authRequest.getLogin());
-            } else {
-                throw new UsernameNotFoundException("Authentication failed for an unknown reason.");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new UsernameNotFoundException("Authentication failed: " + ex.getMessage(), ex);
+
+    @PatchMapping("/user/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public ResponseEntity<Object> patchUserById(
+            @PathVariable Long id,
+            @Valid @RequestBody UserPatchRequest patchRequest,
+            BindingResult bindingResult,
+            Authentication authentication) throws UserNotFoundException {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
+        userService.patchUserById(id, patchRequest);
+
+        return ResponseEntity.ok(new ResponseMessage("User was successfully updated", ResponseMessage.Status.SUCCESS));
     }
+    
+    @GetMapping("/users")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<Object> getUserIds(Authentication authentication) {
+        return ResponseEntity.ok(new UsersResponse(userService.getUserIds()));
+    }
+
+    @DeleteMapping("/user/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<Object> deleteUser(@PathVariable Long id, Authentication authentication) throws UserNotFoundException {
+        userService.deleteUserById(id);
+
+        // TODO add log to db
+
+        return ResponseEntity.ok(new ResponseMessage("User was successfully removed", ResponseMessage.Status.SUCCESS));
+    }
+
 }

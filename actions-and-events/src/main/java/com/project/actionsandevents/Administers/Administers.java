@@ -4,16 +4,13 @@
  * @author Vadim Goncearenco (xgonce00)
  */
 
-package com.project.actionsandevents.User;
+package com.project.actionsandevents.Administers;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
@@ -23,7 +20,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.Set;
+
+import com.project.actionsandevents.User.User;
 
 
 @Getter

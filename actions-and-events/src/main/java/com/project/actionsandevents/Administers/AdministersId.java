@@ -1,6 +1,8 @@
-package com.project.actionsandevents.User;
+package com.project.actionsandevents.Administers;
 
 import java.io.Serializable;
+
+import com.project.actionsandevents.User.User;
 
 public class AdministersId implements Serializable {
     private User admin;
