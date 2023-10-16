@@ -59,7 +59,7 @@ public class UserController {
     }
 
     @DeleteMapping("/user/{id}")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Object> deleteUser(@PathVariable Long id, Authentication authentication) throws UserNotFoundException {
         userService.deleteUserById(id);
 

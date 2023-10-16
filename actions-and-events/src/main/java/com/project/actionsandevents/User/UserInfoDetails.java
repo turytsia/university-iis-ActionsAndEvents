@@ -19,6 +19,7 @@ public class UserInfoDetails implements UserDetails {
     private String login;
     private String password;
     private List<GrantedAuthority> authorities;
+    private Long id;
   
     public UserInfoDetails(User userInfo) {
         login = userInfo.getLogin();
@@ -26,6 +27,7 @@ public class UserInfoDetails implements UserDetails {
         authorities = Arrays.stream(userInfo.getRoles().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+        id = userInfo.getId();
     }
   
     @Override
@@ -61,5 +63,9 @@ public class UserInfoDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
