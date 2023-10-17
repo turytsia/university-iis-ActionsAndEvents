@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,6 +83,15 @@ public class EventController {
     @DeleteMapping("/event/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> deleteEvent(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+        System.out.println(authentication.getAuthorities().size());
+
+        for (GrantedAuthority auth : authentication.getAuthorities()) {
+            if (auth.getAuthority().equals("ROLE_ADMIN")) {
+                eventService.deleteEventById(id);
+                return ResponseEntity.ok(new ResponseMessage("Event was successfully removed", ResponseMessage.Status.SUCCESS));
+            }
+        }
+        
         if (UserInfoDetails.class.cast(authentication.getDetails()).getId() != eventService.getEventById(id).getAuthor().getId()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "You are not allowed to delete this event", ResponseMessage.Status.ERROR));
@@ -132,4 +142,12 @@ public class EventController {
 
         return ResponseEntity.ok(new ResponseMessage(eventService.patchTicketTypeById(id, ticketType), ResponseMessage.Status.SUCCESS));
     }
+
+    // @DeleteMapping("/event/ticket/{id}")
+    // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    // public ResponseEntity<Object> deleteEventTicket(@PathVariable Long id, Authentication authentication) throws TicketNotFoundException {
+    //     eventService.deleteTicketTypeById(id);
+
+    //     return ResponseEntity.ok(new ResponseMessage("Ticket type was successfully removed", ResponseMessage.Status.SUCCESS));
+    // }
 }
