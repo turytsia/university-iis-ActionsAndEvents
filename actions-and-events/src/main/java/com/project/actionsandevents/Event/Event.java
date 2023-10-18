@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -67,7 +68,9 @@ public class Event {
     @Column(nullable = false)
     private EventStatus status;
 
-    @Column(nullable = true)
+    @ManyToOne
+    @JoinColumn(name = "author", referencedColumnName = "id", nullable = true)
+    // @Column(nullable = true)
     private User author;
 
     @ManyToOne
