@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
 import com.project.actionsandevents.Event.exceptions.UserNotRegisteredException;
@@ -43,6 +44,9 @@ public class EventService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EventLogRepository eventLogRepository;
 
     /**
      * TODO
@@ -316,6 +320,7 @@ public class EventService {
             " not registered for this event with id " + eventId);
     }
 
+    
     public String approveEvent(Long eventId) throws EventNotFoundException {
         Optional<Event> event = repository.findById(eventId);
 
@@ -326,6 +331,38 @@ public class EventService {
         event.get().setStatus(EventStatus.APPROVED);
 
         return "Event was successfully approved";
+    }
+
+    public List<Long> getEventLogs(Long eventId) throws EventNotFoundException {
+        Optional<Event> event = repository.findById(eventId);
+
+        if (!event.isPresent()) {
+            throw new EventNotFoundException("Event not found with id: " + eventId);
+        }
+
+        return eventLogRepository.findAllIdsByEvent(event.get());
+    }
+
+    public EventLog getEventLogById(Long id) 
+            throws EventLogNotFoundException {
+        Optional<EventLog> eventLog = eventLogRepository.findById(id);
+
+        if (!eventLog.isPresent()) {
+            throw new EventLogNotFoundException("Event log not found with id: " + id);
+        }
+
+        return eventLog.get();
+    }
+
+    public String deleteEventLogById(Long id) 
+            throws EventLogNotFoundException {
+        if (eventLogRepository.existsById(id)) {
+            eventLogRepository.deleteById(id);
+        } else {
+            throw new EventLogNotFoundException("Event log with ID " + id + " not found");
+        }
+
+        return "Event log was successfully deleted";
     }
 
 }

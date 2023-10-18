@@ -49,6 +49,6 @@ public class EventLog {
     private EventStatus status;
 
     @ManyToOne
-    @JoinColumn(referencedColumnName = "id")
+    @JoinColumn(name = "event_id", referencedColumnName = "id")
     private Event event;
 }

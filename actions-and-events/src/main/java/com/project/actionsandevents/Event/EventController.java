@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
 import com.project.actionsandevents.Event.exceptions.UserNotRegisteredException;
@@ -231,10 +232,6 @@ public class EventController {
         return ResponseEntity.ok(eventService.unregisterUserFromEvent(id, userId));
     }
 
-    // TODO: get event logs
-
-
-
     @PostMapping("/event/{id}/approve")
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> approveEvent(
@@ -244,5 +241,28 @@ public class EventController {
         return ResponseEntity.ok(new ResponseMessage(eventService.approveEvent(id), ResponseMessage.Status.SUCCESS));
     }
 
-    
+
+
+    @GetMapping("/event/{id}/logs")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    public ResponseEntity<Object> getEventLogs(@PathVariable Long id, Authentication authentication) 
+            throws EventNotFoundException {
+        return ResponseEntity.ok(eventService.getEventLogs(id));
+    }
+
+    @GetMapping("/event/log/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    public ResponseEntity<Object> getEventLogById(
+        @PathVariable Long id, Authentication authentication) 
+            throws EventLogNotFoundException {
+        return ResponseEntity.ok(eventService.getEventLogById(id));
+    }
+
+    @DeleteMapping("/event/log/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    public ResponseEntity<Object> deleteEventLogById(
+        @PathVariable Long id, Authentication authentication) 
+            throws EventLogNotFoundException {
+        return ResponseEntity.ok(new ResponseMessage(eventService.deleteEventLogById(id), ResponseMessage.Status.SUCCESS));
+    }
 }
