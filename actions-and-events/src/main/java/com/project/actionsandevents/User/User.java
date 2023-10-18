@@ -61,6 +61,6 @@ public class User {
 
     private String roles;
 
-    @ManyToMany(mappedBy = "registeredUsers")
-    private Set<TicketType> registeredTicketTypes;
+    // @ManyToMany(mappedBy = "registeredUsers")
+    // private Set<TicketType> registeredTicketTypes;
 }

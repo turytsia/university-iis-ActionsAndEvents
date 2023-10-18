@@ -49,10 +49,10 @@ public class TicketType {
     @ManyToOne
     private Event event;
 
-    @ManyToMany
-    @JoinTable(
-        name = "ticket_user",
-        joinColumns = @JoinColumn(name = "tickettype_id"), 
-        inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> registeredUsers;
+    // @ManyToMany
+    // @JoinTable(
+    //     name = "ticket_user",
+    //     joinColumns = @JoinColumn(name = "tickettype_id"), 
+    //     inverseJoinColumns = @JoinColumn(name = "user_id"))
+    // private Set<User> registeredUsers;
 }
