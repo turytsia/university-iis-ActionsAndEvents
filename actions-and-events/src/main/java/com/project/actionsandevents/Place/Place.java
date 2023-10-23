@@ -7,6 +7,8 @@ package com.project.actionsandevents.Place;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -37,4 +39,8 @@ public class Place {
 
     @Column(nullable = false)
     private String address;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PlaceStatus status;
 }
