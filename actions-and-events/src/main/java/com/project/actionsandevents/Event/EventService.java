@@ -15,15 +15,13 @@ import com.project.actionsandevents.Event.exceptions.UserNotRegisteredException;
 import com.project.actionsandevents.Event.requests.EventPatchRequest;
 import com.project.actionsandevents.Event.responses.EventUserRegisters;
 
+
 import com.project.actionsandevents.TicketType.TicketType;
 import com.project.actionsandevents.TicketType.TicketTypeRepository;
 
 import com.project.actionsandevents.User.User;
 import com.project.actionsandevents.User.UserRepository;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
-
-import com.project.actionsandevents.Category.Category;
-import com.project.actionsandevents.Category.CategoryRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,8 +46,7 @@ public class EventService {
     @Autowired
     private EventLogRepository eventLogRepository;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+
 
     /**
      * TODO
@@ -65,16 +62,6 @@ public class EventService {
         }
 
         return event.get();
-    }
-
-    public List<Category> getEventCategories(Long id) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(id);
-
-        if (!event.isPresent()) {
-            throw new EventNotFoundException("Event not found with id: " + id);
-        }
-
-        return repository.findAllCategoriesByEvent(event.get());
     }
 
     /**

@@ -13,14 +13,15 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.CascadeType;
 
 import com.project.actionsandevents.Category.Category;
 import com.project.actionsandevents.Place.Place;
+import com.project.actionsandevents.TicketType.TicketType;
 import com.project.actionsandevents.User.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,8 +29,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+
 
 
 @Getter
@@ -80,10 +81,17 @@ public class Event {
     @JoinColumn(referencedColumnName = "id")
     private Place place;
 
-    @ManyToMany
-    @JoinTable(
-        name = "event_category",
-        joinColumns = @JoinColumn(name = "event_id"), 
-        inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> categories = new HashSet<>();
+    // @ManyToMany
+    // @JoinTable(
+    //     name = "event_category",
+    //     joinColumns = @JoinColumn(name = "event_id"), 
+    //     inverseJoinColumns = @JoinColumn(name = "category_id"))
+    // private Set<Category> categories = new HashSet<>();
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TicketType> ticketTypes;
+
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id")
+    private Category category;
 }

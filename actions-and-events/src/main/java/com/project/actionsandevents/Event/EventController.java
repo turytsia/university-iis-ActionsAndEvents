@@ -49,9 +49,10 @@ public class EventController {
     @GetMapping("/event/{id}")
     public ResponseEntity<Object> getEventById(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
 
-        return ResponseEntity.ok(
-            new EventResponse(eventService.getEventById(id), 
-            eventService.getEventCategories(id)));
+        // return ResponseEntity.ok(
+        //     new EventResponse(eventService.getEventById(id), 
+        //     eventService.getEventCategories(id)));
+        return ResponseEntity.ok(new EventResponse(eventService.getEventById(id)));
     }
 
     @GetMapping("/events")
