@@ -22,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="_place")
+//@Table(name="_place")
 public class Place {
     @Id
     @GeneratedValue

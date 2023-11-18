@@ -7,7 +7,7 @@ spring:
     password: root # This property specifies the password associated with the provided username.
   jpa:
     hibernate:
-      ddl-auto: none # This property determines how Hibernate should handle the database schema.
+      ddl-auto: update # This property determines how Hibernate should handle the database schema.
       properties:
         hibernate:
           dialect: org.hibernate.dialect.PostgreSQLDialect # This property specifies the Hibernate dialect for the database being used.

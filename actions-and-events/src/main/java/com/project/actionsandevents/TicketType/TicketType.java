@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 //import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,7 +28,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="_tickettype")
+//@Table(name="_tickettype")
 public class TicketType {
     @Id
     @GeneratedValue
@@ -46,7 +47,7 @@ public class TicketType {
     private String description;
 
     //@PrimaryKeyJoinColumn(name = "_event", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Event event;
 
     // @ManyToMany

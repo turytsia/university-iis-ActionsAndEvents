@@ -15,9 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
@@ -31,6 +29,7 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.HashSet;
 
 
 @Getter
@@ -38,7 +37,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="event")
+//@Table(name="event")
 public class Event {
     @Id
     @GeneratedValue
@@ -86,5 +85,5 @@ public class Event {
         name = "event_category",
         joinColumns = @JoinColumn(name = "event_id"), 
         inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private Set<Category> categories;
+    private Set<Category> categories = new HashSet<>();
 }

@@ -24,6 +24,7 @@ import lombok.Setter;
 
 import com.project.actionsandevents.Event.Event;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -31,7 +32,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="_category")
+//@Table(name="_category")
 public class Category {
     @Id
     @GeneratedValue
@@ -41,11 +42,11 @@ public class Category {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "_category", referencedColumnName = "id", nullable = true)
+    @JoinColumn(referencedColumnName = "id", nullable = true) //name = "parent_category",
     private Category parentCategory;
 
     @ManyToMany(mappedBy = "categories")
-    private Set<Event> events;
+    private Set<Event> events = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

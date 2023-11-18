@@ -1,2 +1,1 @@
-DELETE FROM "_tickettype" CASCADE;
-DELETE FROM "event" CASCADE;
+drop DATABASE db;
