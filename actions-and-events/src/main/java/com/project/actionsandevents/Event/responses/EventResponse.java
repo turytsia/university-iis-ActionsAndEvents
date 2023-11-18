@@ -11,6 +11,9 @@ import com.project.actionsandevents.Event.Event;
 import com.project.actionsandevents.Event.EventStatus;
 import com.project.actionsandevents.User.User;
 
+import com.project.actionsandevents.Category.Category;
+
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,6 +30,7 @@ public class EventResponse {
     private EventStatus status;
     private Long placeId;
     private User author;
+    private Category category;
 
     public EventResponse(Event event) {
         this.id = event.getId();
@@ -39,5 +43,6 @@ public class EventResponse {
         this.status = event.getStatus();
         this.placeId = event.getPlace().getId();
         this.author = event.getAuthor();
+        this.category = event.getCategory();
     }
 }

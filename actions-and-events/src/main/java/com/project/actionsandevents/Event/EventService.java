@@ -6,10 +6,6 @@
 package com.project.actionsandevents.Event;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
@@ -17,6 +13,8 @@ import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
 import com.project.actionsandevents.Event.exceptions.UserNotRegisteredException;
 import com.project.actionsandevents.Event.requests.EventPatchRequest;
+import com.project.actionsandevents.Event.responses.EventUserRegisters;
+
 
 import com.project.actionsandevents.TicketType.TicketType;
 import com.project.actionsandevents.TicketType.TicketTypeRepository;
@@ -47,6 +45,8 @@ public class EventService {
 
     @Autowired
     private EventLogRepository eventLogRepository;
+
+
 
     /**
      * TODO
@@ -241,14 +241,14 @@ public class EventService {
         return "User was successfully registered";
     }
 
-    public List<Long> getRegisteredUsersByEventId(Long eventId) throws EventNotFoundException {
+    public List<EventUserRegisters> getRegisteredUsersByEventId(Long eventId) throws EventNotFoundException {
         Optional<Event> event = repository.findById(eventId);
 
         if (!event.isPresent()) {
             throw new EventNotFoundException("Event not found with id: " + eventId);
         }
 
-        List<Long> users = new ArrayList<Long>();
+        List<EventUserRegisters> usersRegisters = new ArrayList<EventUserRegisters>();
 
         List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
 
@@ -256,13 +256,13 @@ public class EventService {
             List<Registers> registers = registersRepository.findByTicketType(ticketType);
 
             for (Registers register : registers) {
-                if (register.getStatus() == RegistersStatus.ACCEPTED) {
-                    users.add(register.getUser().getId());
-                }
+                //if (register.getStatus() == RegistersStatus.ACCEPTED) {
+                usersRegisters.add(new EventUserRegisters(register.getUser().getId(), register.getStatus()));
+                //}
             }
         }
 
-        return users;
+        return usersRegisters;
     }
 
     public User getRegisteredUserById(Long eventId, Long userId) 

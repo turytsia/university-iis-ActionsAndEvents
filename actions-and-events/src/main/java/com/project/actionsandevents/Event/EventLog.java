@@ -31,7 +31,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="event")
+//@Table(name="event")
 public class EventLog {
     @Id
     @GeneratedValue
