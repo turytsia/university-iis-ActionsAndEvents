@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.project.actionsandevents.Place.exceptions.PlaceNotFoundException;
 import com.project.actionsandevents.Place.requests.PlacePatchRequest;
 
+@Service
 public class PlaceService {
     
     @Autowired

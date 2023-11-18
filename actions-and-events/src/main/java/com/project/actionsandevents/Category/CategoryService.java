@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.project.actionsandevents.Category.exceptions.CategoryNotFoundException;
 import com.project.actionsandevents.Category.requests.CategoryPatchRequest;
 
+@Service
 public class CategoryService {
     
     @Autowired

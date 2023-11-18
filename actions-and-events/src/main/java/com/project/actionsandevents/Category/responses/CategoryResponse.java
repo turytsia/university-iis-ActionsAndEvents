@@ -22,7 +22,7 @@ public class CategoryResponse {
     public CategoryResponse(Category category) {
         this.id = category.getId();
         this.name = category.getName();
-        this.parentId = category.getParentCategory().getId();
+        this.parentId = category.getParentCategory() != null ? category.getParentCategory().getId() : null;
         this.status = category.getStatus();
     }
 }

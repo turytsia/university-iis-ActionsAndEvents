@@ -10,13 +10,14 @@ import com.project.actionsandevents.Event.EventStatus;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
 public class EventPatchRequest {
-    @NotBlank(message = "Starting date is required")
+    @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateFrom;
 

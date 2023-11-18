@@ -42,10 +42,9 @@ public class UserService implements UserDetailsService {
      * @param user User
      * @return Message
      */
-    public String addUser(User user) {
+    public User addUser(User user) {
         user.setPassword(encoder.encode(user.getPassword()));
-        repository.save(user);
-        return "User Added Successfully";
+        return repository.save(user);
     }
 
     /**

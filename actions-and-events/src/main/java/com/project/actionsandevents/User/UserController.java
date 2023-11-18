@@ -17,6 +17,7 @@ import com.project.actionsandevents.User.requests.UserPatchRequest;
 import com.project.actionsandevents.User.responses.UserResponse;
 import com.project.actionsandevents.User.responses.UsersResponse;
 import com.project.actionsandevents.common.ResponseMessage;
+import com.project.actionsandevents.common.ResponseMessage.Status;
 
 import jakarta.validation.Valid;
 
@@ -26,6 +27,24 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @GetMapping("/user")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public ResponseEntity<Object> getUser(Authentication authentication) throws UserNotFoundException {
+        User user = null;
+
+        if (authentication != null) {
+            // Get the authenticated user's details from the Authentication object
+            UserInfoDetails userInfoDetails = (UserInfoDetails) authentication.getPrincipal();
+            user = userService.getUserById(userInfoDetails.getId());
+        }
+
+        if (user == null) {
+            return ResponseEntity.status(403).body(new ResponseMessage("Unauthorized", Status.ERROR));
+        }
+
+        return ResponseEntity.ok(new UserResponse(user));
+    }
 
     @GetMapping("/user/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")

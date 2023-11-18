@@ -1,1 +1,2 @@
-drop table ticket_user;
+DELETE FROM "_tickettype" CASCADE;
+DELETE FROM "event" CASCADE;

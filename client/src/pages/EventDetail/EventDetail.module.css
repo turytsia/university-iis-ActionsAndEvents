@@ -1,0 +1,62 @@
+.container{
+    background-color: #fff;
+    border-radius: 3px;
+}
+.preview{
+    height: 300px;
+    border-radius: 3px 3px 0 0;
+}
+.content {
+    padding: 16px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.date{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.actions{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.description {
+    color: gray;
+    margin: 8px 0;
+}
+
+.section{
+    margin-top: 16px;
+}
+
+.title {
+    margin-bottom: 8px;
+}
+
+.comment{
+    background-color: #fff;
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 3px;
+}
+
+.comment textarea {
+    width: 50%;
+}
+
+.profile{
+    color: black;
+}
+
+.tickets{
+    display: grid;
+    grid-template-columns: repeat(5, 200px);
+}

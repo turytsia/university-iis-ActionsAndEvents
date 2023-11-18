@@ -1,0 +1,5 @@
+.outlet {
+    background-color: hsl(0, 0%, 100%);
+    padding: 16px;
+    overflow-y: auto;
+}

@@ -9,6 +9,7 @@ import java.util.Date;
 
 import com.project.actionsandevents.Event.Event;
 import com.project.actionsandevents.Event.EventStatus;
+import com.project.actionsandevents.User.User;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public class EventResponse {
     private String image;
     private EventStatus status;
     private Long placeId;
+    private User author;
 
     public EventResponse(Event event) {
         this.id = event.getId();
@@ -36,5 +38,6 @@ public class EventResponse {
         this.image = event.getImage();
         this.status = event.getStatus();
         this.placeId = event.getPlace().getId();
+        this.author = event.getAuthor();
     }
 }

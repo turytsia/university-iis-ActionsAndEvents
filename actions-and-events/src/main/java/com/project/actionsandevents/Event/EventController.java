@@ -21,6 +21,7 @@ import com.project.actionsandevents.Event.requests.EventPatchRequest;
 
 import com.project.actionsandevents.Event.responses.EventResponse;
 import com.project.actionsandevents.Event.responses.EventsResponse;
+import com.project.actionsandevents.Event.responses.TicketsResponse;
 import com.project.actionsandevents.User.UserInfoDetails;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
 import com.project.actionsandevents.Event.responses.EventPostResponse;
@@ -38,7 +39,6 @@ public class EventController {
     private EventService eventService;
 
     @GetMapping("/event/{id}")
-    //@PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getEventById(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
         Event event = eventService.getEventById(id);
 
@@ -46,8 +46,7 @@ public class EventController {
     }
 
     @GetMapping("/events")
-    //@PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> getEventIds(Authentication authentication) {
+    public ResponseEntity<Object> getEventIds() {
         return ResponseEntity.ok(new EventsResponse(eventService.getEventIds()));
     }
 
@@ -113,7 +112,7 @@ public class EventController {
     @GetMapping("/event/{id}/tickets")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getEventTickets(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
-        return ResponseEntity.ok(eventService.getTicketTypeIds(id));
+        return ResponseEntity.ok(new TicketsResponse(eventService.getTicketTypeIds(id)));
     }
 
     @GetMapping("/event/ticket/{id}")
@@ -240,8 +239,6 @@ public class EventController {
             
         return ResponseEntity.ok(new ResponseMessage(eventService.approveEvent(id), ResponseMessage.Status.SUCCESS));
     }
-
-
 
     @GetMapping("/event/{id}/logs")
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")

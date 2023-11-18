@@ -7,6 +7,7 @@
 package com.project.actionsandevents.Event;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
@@ -33,6 +34,7 @@ public class Registers {
     // @Id
     // @GeneratedValue
     // private Long id;
+
     @Id
     @ManyToOne
     private User user;
