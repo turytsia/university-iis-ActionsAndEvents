@@ -1,0 +1,46 @@
+.ticket {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    position: relative;
+    border-radius: 6px;
+    /* background-color: #f3f3f3; */
+}
+
+.open{
+    /* cursor: pointer; */
+}
+.content{
+    flex: 1;
+}
+.name{
+    font-weight: 600;
+}
+.description{
+    margin-top: 16px;
+    color: #646464;
+}
+.footer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.actions{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    right: 16px;
+    top: 16px;
+}
+
+.capacity{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

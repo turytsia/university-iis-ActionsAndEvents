@@ -1,6 +1,7 @@
 package com.project.actionsandevents.Auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import com.project.actionsandevents.User.AuthRequest;
 import com.project.actionsandevents.User.JwtService;
 import com.project.actionsandevents.User.User;
 import com.project.actionsandevents.User.UserService;
+import com.project.actionsandevents.User.responses.UserResponse;
 
 @RestController
 @RequestMapping("/auth")
@@ -28,8 +30,10 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
   
     @PostMapping("/register")
-    public String register(@RequestBody User userInfo) {
-        return service.addUser(userInfo);
+    public ResponseEntity<UserResponse> register(@RequestBody User userInfo) {
+        User user = service.addUser(userInfo);
+
+        return ResponseEntity.ok().body(new UserResponse(user));
     }
 
     @PostMapping("/login")

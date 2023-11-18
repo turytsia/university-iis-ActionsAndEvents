@@ -8,11 +8,9 @@ package com.project.actionsandevents.Event;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
@@ -22,7 +20,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.Set;
 
 import com.project.actionsandevents.User.User;
 
@@ -33,15 +30,14 @@ import com.project.actionsandevents.User.User;
 @Entity
 @IdClass(ManagesId.class)
 public class Manages {
-    // @Id
-    // @GeneratedValue
-    // private Long id;
     @Id
     @ManyToOne
+    //@Column(nullable = true)
     private User manager;
     
     @Id
     @ManyToOne
+    //@Column(nullable = true)
     private Event event;
 
     @Temporal(TemporalType.TIMESTAMP)

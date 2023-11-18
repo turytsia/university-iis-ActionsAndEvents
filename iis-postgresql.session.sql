@@ -1,4 +1,2 @@
-INSERT INTO _place
-VALUES (1, 'ke', 'k', 'lol', 'ee');
-
-SELECT * FROM _place;
+DELETE FROM "_tickettype" CASCADE;
+DELETE FROM "event" CASCADE;

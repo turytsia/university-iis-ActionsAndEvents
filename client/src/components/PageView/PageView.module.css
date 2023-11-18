@@ -1,0 +1,18 @@
+.container {
+    padding: 16px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.title {
+
+}
+
+.scrollable {
+    padding-bottom: 80px;
+    overflow: auto;
+}
+
+.header {
+    margin-bottom: 48px;
+}

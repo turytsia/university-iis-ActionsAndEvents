@@ -1,0 +1,17 @@
+.empty {
+    cursor: pointer;
+    aspect-ratio: 1;
+    padding: 16px;
+}
+
+.border{
+    border: 2px dashed black;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.border span {
+    font-size: 32px;
+}

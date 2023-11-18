@@ -14,6 +14,7 @@ public class UserResponse {
     private String name;
     private String surname;
     private String phone;
+    private String role;
 
     public UserResponse(User user) {
         this.id = user.getId();
@@ -22,5 +23,6 @@ public class UserResponse {
         this.name = user.getFirstname();
         this.surname = user.getLastname();
         this.phone = user.getPhone();
+        this.role = user.getRoles();
     }
 }

@@ -8,14 +8,20 @@ package com.project.actionsandevents.Event;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
+import com.project.actionsandevents.Category.Category;
 import com.project.actionsandevents.Place.Place;
 import com.project.actionsandevents.User.User;
 import lombok.AllArgsConstructor;
@@ -24,6 +30,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 
 @Getter
@@ -37,6 +44,7 @@ public class Event {
     @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateFrom;
 
@@ -44,8 +52,10 @@ public class Event {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateTo;
 
+    @Column(nullable = true)
     private String description;
 
+    @Column(nullable = false)
     private String title;
 
     @Column(nullable = true)
@@ -54,11 +64,27 @@ public class Event {
     @Column(nullable = true)
     private String image;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventStatus status;
+
     @ManyToOne
-    @JoinColumn(name = "_user", referencedColumnName = "id")
+    @JoinColumn(name = "author", referencedColumnName = "id", nullable = true)
+    // @Column(nullable = true)
+    private User author;
+
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "id")
     private User userManages;
 
     @ManyToOne
-    @JoinColumn(name = "_place", referencedColumnName = "id")
+    @JoinColumn(referencedColumnName = "id")
     private Place place;
+
+    @ManyToMany
+    @JoinTable(
+        name = "event_category",
+        joinColumns = @JoinColumn(name = "event_id"), 
+        inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> categories;
 }
