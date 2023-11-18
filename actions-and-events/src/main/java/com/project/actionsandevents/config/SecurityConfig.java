@@ -54,7 +54,6 @@ public class SecurityConfig {
     // Configuring HttpSecurity
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        
         return http
         .cors(Customizer.withDefaults())
         .csrf(csrf -> csrf.disable())
@@ -64,6 +63,10 @@ public class SecurityConfig {
                                         "/auth/register",
                                         "/auth/login",
                                         "/events",
+                                        "/event/{id}",
+                                        "/event/{id}/tickets",
+                                        "/event/{id}/users",
+                                        "/event/ticket/{id}",
                                         "/user")
                                 .permitAll()
                                 .anyRequest()

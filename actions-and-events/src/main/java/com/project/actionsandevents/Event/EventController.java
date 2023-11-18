@@ -110,13 +110,11 @@ public class EventController {
     }
 
     @GetMapping("/event/{id}/tickets")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getEventTickets(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
         return ResponseEntity.ok(new TicketsResponse(eventService.getTicketTypeIds(id)));
     }
 
     @GetMapping("/event/ticket/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getTicketById(@PathVariable Long id, Authentication authentication) throws TicketNotFoundException {
         return ResponseEntity.ok(eventService.getTicketTypeById(id));
     }
@@ -203,7 +201,6 @@ public class EventController {
     }
 
     @GetMapping("/event/{id}/users")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getRegisteredUsersByEventId(@PathVariable Long id, Authentication authentication) 
             throws EventNotFoundException {
         return ResponseEntity.ok(eventService.getRegisteredUsersByEventId(id));

@@ -73,13 +73,16 @@ const Dropdown = ({
                     <Icon className={classes.icon} icon={isActive ? icons.arrowUp : icons.arrowDown} height={20} width={20} />
                 </div>}>
             {setIsActive =>
-                <div className={classes.container}>
-                    {items.map(({ id, value }) => (
-                        <button key={id} className={itemStyles} onClick={() => { setIsActive(false); onChange(id, name) }}>
-                            {value}
-                        </button>
-                    ))}
-                </div>}
+                <div className={classes.outerContainer}>
+                    <div className={classes.container}>
+                        {items.map(({ id, value }) => (
+                            <button key={id} className={itemStyles} onClick={() => { setIsActive(false); onChange(id, name) }}>
+                                {value}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            }
         </DismissWindow>
     )
 }

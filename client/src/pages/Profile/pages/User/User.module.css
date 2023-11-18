@@ -1,0 +1,33 @@
+.container{
+    display: flex;
+   align-items: stretch;
+    gap: 32px;
+}
+
+.avaContainer{
+
+}
+
+.ava {
+    aspect-ratio: 1;
+    height: 250px;
+    background-color: gray;
+    border-radius: 50%;
+}
+.detailsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 8px;
+    width: 50%;
+}
+.details {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+
+}
+
+.details span{
+    font-weight: 600;
+}

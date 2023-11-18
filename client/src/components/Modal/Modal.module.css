@@ -84,3 +84,9 @@
 .close.dark {
     color: var(--white);
 }
+
+.contentInputs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}

@@ -1,6 +1,7 @@
 import React from 'react'
 import classes from "./Input.module.css"
 import InputLabel from '../InputLabel/InputLabel'
+import classNames from 'classnames'
 
 type PropsType = {
     value: string,
@@ -9,6 +10,7 @@ type PropsType = {
     label?: string,
     name?: string,
     inactive?: boolean
+    className?: string
 }
 
 const Input = ({
@@ -17,7 +19,8 @@ const Input = ({
     onChange,
     label,
     name,
-    inactive
+    inactive,
+    className = ""
 }: PropsType) => {
     return (
         <InputLabel htmlFor={classes.input} value={label}>
@@ -27,7 +30,7 @@ const Input = ({
                 type={type}
                 value={value}
                 onChange={onChange}
-                className={classes.input}
+                className={classNames(classes.input, className)}
                 readOnly={inactive}
             />
         </InputLabel>

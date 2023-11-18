@@ -87,8 +87,8 @@ const EventDetail = () => {
 
     useEffect(() => {
         fetch()
-
     }, [])
+    
     return (
         <PageView scroll title={event.title}>
             <div className={classes.container}>

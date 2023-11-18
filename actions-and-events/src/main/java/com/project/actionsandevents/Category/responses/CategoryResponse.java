@@ -16,13 +16,13 @@ import lombok.Setter;
 public class CategoryResponse {
     private Long id;
     private String name;
-    private Long parentId;
+    private Long parentCategory;
     private CategoryStatus status;
 
     public CategoryResponse(Category category) {
         this.id = category.getId();
         this.name = category.getName();
-        this.parentId = category.getParentCategory() != null ? category.getParentCategory().getId() : null;
+        this.parentCategory = category.getParentCategory() != null ? category.getParentCategory().getId() : null;
         this.status = category.getStatus();
     }
 }

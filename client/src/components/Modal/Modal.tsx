@@ -26,6 +26,11 @@ type PropsType = {
     onSubmit: () => void
     error?: string
     icon: icons
+    type?: ModalStyles
+}
+
+export enum ModalStyles {
+    Inputs
 }
 
 /**
@@ -60,6 +65,7 @@ const Modal = ({
     icon,
     onClose,
     onSubmit,
+    type,
 }: PropsType) => {
 
     // const { isDark } = useContext(AppContext)
@@ -69,6 +75,10 @@ const Modal = ({
     const containerStyles = classNames(classes.container)
 
     const closeStyles = classNames(classes.close)
+
+    const contentStyles = classNames(classes.content, {
+        [classes.contentInputs]: type === ModalStyles.Inputs
+    })
 
     return (
         <FloatingPortal root={floatingRoot}>
@@ -83,7 +93,7 @@ const Modal = ({
                             <Icon icon={icons.close} height={25} width={25} />
                         </button>
                     </header>
-                    <div className={classes.content}>{children}</div>
+                    <div className={contentStyles}>{children}</div>
                     <footer className={classes.footer}>
                         <div className={classes.errorContainer}>
                             {error && (

@@ -8,24 +8,17 @@ import Input from '../../../../components/Input/Input'
 import InputLabel from '../../../../components/InputLabel/InputLabel'
 import Table, { TableHeaderType } from '../../../../components/Table/Table'
 import TableFormView from '../../../../components/TableFormView/TableFormView'
+import Button from '../../../../components/Button/Button'
+import CreateCategoryModal, { CategoryInput } from './modals/CreateCategoryModal/CreateCategoryModal'
+import ButtonIconOnly from '../../../../components/ButtonIconOnly/ButtonIconOnly'
+import icons from '../../../../utils/icons'
+import RowActions from './components/RowActions/RowActions'
 
 export type CategoryType = {
     id: number,
     name: string,
     status: string,
-    parentCategory: number
-}
-
-type CategoryInput = {
-    name: string,
-    status: string,
-    parentCategory: number
-}
-
-const initialInputs: CategoryInput = {
-    name: "",
-    status: "",
-    parentCategory: -1
+    parentCategory: number | null
 }
 
 const dataKeys: TableHeaderType = {
@@ -43,25 +36,18 @@ const Categories = () => {
 
     const context = useContext(AppContext)
 
-    const [inputs, setInputs] = useState<CategoryInput>(initialInputs)
+    const [isCreateActive, setIsCreateActive] = useState(false)
     const [categories, setCategories] = useState<CategoryType[]>([])
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }))
-    }
-
-    const onDropdownChange = (value: string | number, name: string) => {
-        setInputs(prev => ({ ...prev, parentCategory: +value }))
-    }
-
-    const onSubmit = async () => {
+    const onSubmit = async (inputs: CategoryInput) => {
         try {
             const response = await context.request!.post("/category", {
                 name: inputs.name,
-                parentCategory: null,
+                parentCategory: inputs.parentCategory,
                 status: "APPROVED"
             })
             setCategories(prev => [...prev, { id: response.data.categoryId, ...inputs } as CategoryType])
+            setIsCreateActive(false)
         } catch (error) {
             console.error(error)
         }
@@ -91,20 +77,30 @@ const Categories = () => {
     }, [])
 
     return (
-        <TableFormView>
-            <div className={classes.form}>
-                <Input label='Name' name='name' value={inputs.name} onChange={onChange} />
-                <InputLabel value='Parent category'>
-                    <Dropdown value={inputs.parentCategory.toString()} items={categoriesToDropdown(categories)} onChange={onDropdownChange} />
-                </InputLabel>
-                <div>
-                    <button onClick={onSubmit}>
-                        Create
-                    </button>
-                </div>
-            </div>
-            <Table dataKeys={dataKeys} data={categories} />
-        </TableFormView>
+        <Table
+            dataKeys={dataKeys}
+            data={categories}
+            rowActions={(category) => (
+                <RowActions
+                    categories={categories}
+                    setCategories={setCategories}
+                    category={category}
+                />
+            )}
+            actions={
+            <>
+                <Button style='invert' onClick={() => setIsCreateActive(true)}>Create category</Button>
+                {isCreateActive && (
+                        <CreateCategoryModal
+                            textProceed='Create'
+                            title='Create category'
+                            categories={categories}
+                            onClose={() => setIsCreateActive(false)}
+                            onSubmit={onSubmit}
+                        />
+                )}
+            </>
+        } />
     )
 }
 

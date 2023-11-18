@@ -1,6 +1,8 @@
 .outlet {
     background-color: #fff;
     padding: 16px;
+    flex: 1;
+    overflow: hidden;
 }
 
 .title{
