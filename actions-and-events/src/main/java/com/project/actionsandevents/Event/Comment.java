@@ -28,14 +28,16 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(CommentsId.class)
-public class Comments {
+//@IdClass(CommentId.class)
+public class Comment {
     @Id
+    @GeneratedValue
+    private Long id;
+
     @ManyToOne
     //@JoinColumn(name = "_user", referencedColumnName = "id")
     private User user;
 
-    @Id
     @ManyToOne
     //@JoinColumn(name = "_event", referencedColumnName = "id")
     private Event event;

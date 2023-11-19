@@ -46,6 +46,9 @@ public class EventService {
     @Autowired
     private EventLogRepository eventLogRepository;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
 
 
     /**
@@ -137,6 +140,68 @@ public class EventService {
             repository.deleteById(id);
         } else {
             throw new EventNotFoundException("Event with ID " + id + " not found");
+        }
+    }
+
+    // get all comments
+    public List<Long> getCommentsIds(Long id) throws EventNotFoundException {
+        Optional<Event> event = repository.findById(id);
+
+        if (!event.isPresent()) {
+            throw new EventNotFoundException("Event not found with id: " + id);
+        }
+
+        return commentRepository.findAllIdsByEvent(event.get());
+    }
+
+    // get comment by id
+    public Comment getCommentById(Long id) throws EventNotFoundException {
+        Optional<Comment> comment = commentRepository.findById(id);
+
+        if (!comment.isPresent()) {
+            throw new EventNotFoundException("Comment not found with id: " + id);
+        }
+        
+        return comment.get();
+    }
+
+    // add comment
+    public String addComment(Long id, Comment comment) throws EventNotFoundException {
+        Optional<Event> event = repository.findById(id);
+
+        if (!event.isPresent()) {
+            throw new EventNotFoundException("Event not found with id: " + id);
+        }
+
+        comment.setEvent(event.get());
+        commentRepository.save(comment);
+
+        return "Comment was successfully added";
+    }
+
+    public String patchCommentById(Long id, Comment comment) throws EventNotFoundException {
+        Optional<Comment> commentToPatch = commentRepository.findById(id);
+
+        if (!commentToPatch.isPresent()) {
+            throw new EventNotFoundException("Comment not found with id: " + id);
+        }
+
+        commentToPatch.get().setRating(comment.getRating());
+
+        if (comment.getText() != null) {
+            commentToPatch.get().setText(comment.getText());
+        }
+
+        commentRepository.save(commentToPatch.get());
+
+        return "Comment was successfully updated";
+    }
+
+    public void deleteCommentById(Long id) throws EventNotFoundException {
+        if (commentRepository.existsById(id)) {
+            commentRepository.deleteById(id);
+        } else {
+            throw new EventNotFoundException("Comment with ID " + id + " not found");
         }
     }
 
