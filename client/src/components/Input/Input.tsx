@@ -11,6 +11,7 @@ type PropsType = {
     name?: string,
     inactive?: boolean
     className?: string
+    placeholder?: string
 }
 
 const Input = ({
@@ -20,7 +21,8 @@ const Input = ({
     label,
     name,
     inactive,
-    className = ""
+    className = "",
+    placeholder = ""
 }: PropsType) => {
     return (
         <InputLabel htmlFor={classes.input} value={label}>
@@ -30,6 +32,7 @@ const Input = ({
                 type={type}
                 value={value}
                 onChange={onChange}
+                placeholder={placeholder}
                 className={classNames(classes.input, className)}
                 readOnly={inactive}
             />

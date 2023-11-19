@@ -19,7 +19,7 @@ type PropsType = {
     rowActions?: (value: any) => React.ReactNode
 }
 
-const fmt = (v: any): string => {
+export const fmt = (v: any): string => {
     return [null, undefined, ""].includes(v) ? "--" : String(v)
 }
 

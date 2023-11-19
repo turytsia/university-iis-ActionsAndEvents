@@ -13,7 +13,7 @@ public class TicketResponse {
     private String name;
     private Long capacity;
     private String description;
-    private Event event;
+    private Long event;
     private Float price;
     
     public TicketResponse(TicketType ticketType) {
@@ -22,6 +22,6 @@ public class TicketResponse {
         this.capacity = ticketType.getCapacity();
         this.description = ticketType.getDescription();
         this.price = ticketType.getPrice();
-        this.event = ticketType.getEvent();
+        this.event = ticketType.getEvent().getId();
     }
 }

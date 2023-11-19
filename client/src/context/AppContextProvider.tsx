@@ -13,7 +13,7 @@ export type UserType = {
   lastname: string | null,
   phone: string | null,
   email: string | null,
-  role: string | null
+  role: "ROLE_USER" | "ROLE_ADMIN" | "ROLE_MANAGER" | null
 }
 
 type AppContextType = {

@@ -16,25 +16,13 @@ import Ticket from '../CreateEvent/pages/components/TicketInputs/components/Tick
 import EventUpdateModal from './modals/EventUpdateModal/EventUpdateModal'
 import EventDeleteModal from './modals/EventDeleteModal/EventDeleteModal'
 
-const initialEvent: EventType = {
-    id: 0,
-    dateFrom: '',
-    dateTo: '',
-    description: '',
-    title: '',
-    icon: null,
-    image: null,
-    status: '',
-    placeId: 0
-}
-
 const EventDetail = () => {
     const { id } = useParams()
     const navigate = useNavigate()
 
     const context = useContext(AppContext)
 
-    const [event, setEvent] = useState<EventType>(initialEvent)
+    const [event, setEvent] = useState<EventType | null>(null)
     const [tickets, setTickets] = useState<TicketType[]>([])
     const [isUpdateActive, setIsUpdateActive] = useState(false)
     const [isDeleteActive, setIsDeleteActive] = useState(false)
@@ -88,6 +76,10 @@ const EventDetail = () => {
     useEffect(() => {
         fetch()
     }, [])
+
+    if (event === null) {
+        return null;
+    }
     
     return (
         <PageView scroll title={event.title}>
@@ -102,14 +94,18 @@ const EventDetail = () => {
                             <span>{event.dateTo}</span>
                         </div>
                         <div className={classes.actions}>
-                            <Button onClick={() => setIsUpdateActive(true)}>
-                                <Icon icon={icons.pen} width={20} height={20} />
-                                Update
-                            </Button>
-                            <Button style='invert' onClick={() => setIsDeleteActive(true)}>
-                                <Icon icon={icons.trash} width={20} height={20} />
-                                Remove
-                            </Button>
+                            {context.user.id === event.author.id && (
+                                <>
+                                    <Button onClick={() => setIsUpdateActive(true)}>
+                                        <Icon icon={icons.pen} width={20} height={20} />
+                                        Update
+                                    </Button>
+                                    <Button style='invert' onClick={() => setIsDeleteActive(true)}>
+                                        <Icon icon={icons.trash} width={20} height={20} />
+                                        Remove
+                                    </Button>
+                                </>
+                            )}
                         </div>
                     </div>
                     <div className={classes.section}>
@@ -124,15 +120,7 @@ const EventDetail = () => {
                     </div>
                     <div className={classes.section}>
                         <h4 className={classes.title}>Managed by</h4>
-                        <ProfileCard className={classes.profile} user={{
-                            id: null,
-                            login: null,
-                            firstname: null,
-                            lastname: null,
-                            phone: null,
-                            email: "Author",
-                            role: null
-                        }} />
+                        <ProfileCard className={classes.profile} user={event.author} />
                     </div>
                 </div>
             </div>

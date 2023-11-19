@@ -1,5 +1,17 @@
 .events{
     display: grid;
-    grid-template-columns: repeat(2, 50%);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
+}
+
+.filtersContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin: 16px 0;
+}
+
+.search{
+    width: 300px;
 }

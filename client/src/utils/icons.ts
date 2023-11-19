@@ -47,7 +47,9 @@ enum icons {
     calendar = 'material-symbols:calendar-clock',
     time = 'material-symbols:av-timer',
     location = 'material-symbols:location-on',
-    trash = 'material-symbols:delete'
+    trash = 'material-symbols:delete',
+    star = 'bi:star-fill',
+    manager = 'clarity:administrator-solid'
 }
 
 export default icons

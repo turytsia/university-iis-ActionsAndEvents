@@ -1,3 +1,6 @@
+import { UserType } from "../context/AppContextProvider"
+import { CategoryType } from "../pages/Admin/pages/Categories/Categories"
+
 export type EventType = {
     "id": number,
     "dateFrom": string,
@@ -7,5 +10,7 @@ export type EventType = {
     "icon": null,
     "image": null,
     "status": string,
-    "placeId": number
+    "placeId": number,
+    "author": UserType,
+    "category": CategoryType
 }

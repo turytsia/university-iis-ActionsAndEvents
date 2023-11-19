@@ -16,7 +16,7 @@ const ProfileCard = ({
 }: PropsType) => {
     const containerStyles = classNames(classes.profile, className)
     return (
-        <Link to="/profile" className={containerStyles}>
+        <Link to={`/profile/${user.id}`} className={containerStyles}>
           <div className={classes.ava}></div>
           <div className={classes.author}>
               <h3>{user.email}</h3>

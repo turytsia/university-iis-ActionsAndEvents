@@ -6,6 +6,7 @@
     padding: 8px;
     border-radius: 12px;
     width: fit-content;
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 
@@ -13,8 +14,7 @@
     width: 38px;
     height: 38px;
     background-color: gray;
-    border: 2px solid white;
-    border-radius: 50%;
+    border-radius: 9px;
 }
 
 /* .author{
@@ -27,5 +27,5 @@
 }
 
 .profile:hover {
-    background-color: rgb(240, 240, 240)
+    background-color: rgba(0, 0, 0, 0.1)
 }
