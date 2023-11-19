@@ -13,16 +13,18 @@ import lombok.Setter;
 @Getter
 public class CommentResponse {
     private Long id;
-    private User user;
-    private Event event;
+    // private User user;
+    private String user;
+    // private Event event;
     private Date date;
     private int rating;
     private String text;
 
     public CommentResponse(Comment comments) {
         this.id = comments.getId();
-        this.user = comments.getUser();
-        this.event = comments.getEvent();
+        // this.user = comments.getUser();
+        // this.event = comments.getEvent();
+        this.user = comments.getUser().getLogin();
         this.date = comments.getDate();
         this.rating = comments.getRating();
         this.text = comments.getText();

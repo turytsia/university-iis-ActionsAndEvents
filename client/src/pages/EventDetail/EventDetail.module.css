@@ -60,3 +60,11 @@
     display: grid;
     grid-template-columns: repeat(5, 200px);
 }
+
+.filled-star {
+    color: rgb(255, 217, 0);
+}
+  
+.empty-star {
+    color: rgb(148, 148, 148);
+}

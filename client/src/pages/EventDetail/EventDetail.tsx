@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import PageView from '../../components/PageView/PageView'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AppContext } from '../../context/AppContextProvider'
+import AppContextProvider, { AppContext, UserType } from '../../context/AppContextProvider'
 import { EventType } from '../../utils/types'
 
 import classes from "./EventDetail.module.css"
@@ -15,6 +15,19 @@ import { TicketType } from '../CreateEvent/pages/Tickets/modals/CreateTicketModa
 import Ticket from '../CreateEvent/pages/components/TicketInputs/components/Ticket/Ticket'
 import EventUpdateModal from './modals/EventUpdateModal/EventUpdateModal'
 import EventDeleteModal from './modals/EventDeleteModal/EventDeleteModal'
+import axios from 'axios'
+import styles from './EventDetail.module.css';
+
+
+type CommentType = {
+    "id": number,
+    // "user": UserType,
+    // "event": EventType,
+    "user": string,
+    "date": string,
+    "rating": number,
+    "text": string
+}
 
 const EventDetail = () => {
     const { id } = useParams()
@@ -26,6 +39,10 @@ const EventDetail = () => {
     const [tickets, setTickets] = useState<TicketType[]>([])
     const [isUpdateActive, setIsUpdateActive] = useState(false)
     const [isDeleteActive, setIsDeleteActive] = useState(false)
+    const [comment, setComment] = useState('')
+    const [comments, setComments] = useState<CommentType[]>([])
+    const [rating, setRating] = useState(0)
+
 
     const fetch = async () => {
         try {
@@ -36,6 +53,7 @@ const EventDetail = () => {
             const ticketResponses = await Promise.allSettled(
                 ticketsResponse.data.tickets.map(async (ticketId: number) => await context.request!.get(`/event/ticket/${ticketId}`))
             );
+            
 
             const fulfilledResponses = ticketResponses
                 .filter((r): r is PromiseFulfilledResult<SpringResponseType<TicketType>> => r.status === "fulfilled")
@@ -44,6 +62,20 @@ const EventDetail = () => {
             
             setTickets(fulfilledResponses.map(({ data }) => data))
             setEvent(response.data)
+
+            
+            const commentsResponse = await context.request!.get(`/event/${id}/comments`)
+
+            const commentsResponses = await Promise.allSettled(
+                commentsResponse.data.comments.map(async (commentId: number) => await context.request!.get(`/event/comment/${commentId}`))
+            );
+
+            const fulfilledCommentsResponses = commentsResponses
+                .map((r) => r.status === 'fulfilled' ? r.value : null)
+                .filter((v) => v !== null);
+
+
+            setComments(fulfilledCommentsResponses.map(({ data }) => data))
 
             const usersResponse = await context.request!.get(`/event/${response.data.id}/users`)
             console.log(usersResponse.data)
@@ -70,6 +102,26 @@ const EventDetail = () => {
             navigate("/")
         } catch (error) {
             console.error(error)
+        }
+    }
+
+    const handleRatingChange = (newRating: number) => {
+        setRating(newRating)
+    }
+
+    const handleCommentChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setComment(e.target.value)
+    }
+
+    const handleCommentSubmit = async () => {
+        try {
+            await context.request!.post(`/event/${id}/comment`, {
+                text: comment,
+                date: new Date(),
+                rating: rating
+            })
+        } catch (error) {
+            console.error('Failed to submit comment:', error)
         }
     }
 
@@ -115,7 +167,7 @@ const EventDetail = () => {
                     <div className={classes.section}>
                         <h4 className={classes.title}>Tickets</h4>
                         <div className={classes.tickets}>
-                            {tickets.map(ticket => <Ticket ticket={ticket} />)}
+                            {tickets.map(ticket => <Ticket key = {ticket.id} ticket={ticket} />)}
                         </div>
                     </div>
                     <div className={classes.section}>
@@ -127,8 +179,66 @@ const EventDetail = () => {
             <div className={classes.comment}>
                 <h4 className={classes.title}>Comment as {context.user.email}</h4>
                 <div>
-                    <Textarea value={''} />
+                    <Textarea value={comment} onChange={handleCommentChange} />
+                <div>
+                {
+                    [...Array(5)].map((star, i) => {
+                        const ratingValue = i + 1;
+                        return (
+                            <label key={i} style={{ cursor: 'pointer' }}>
+                                <input
+                                type="radio"
+                                value={ratingValue}
+                                onClick={() => handleRatingChange(ratingValue)}
+                                style={{ display: 'none' }}
+                                />
+                                <span className={ratingValue <= rating ? styles['filled-star'] : styles['empty-star']}
+                                style={{ fontSize: '2em' }}
+                                >
+                                &#9733;
+                                </span>
+                            </label>
+                        );
+                    }
+                )}
                 </div>
+                <Button onClick={handleCommentSubmit}>Submit</Button>
+            </div>
+            <div>
+                {comments.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((comment) => (
+                    <div className={classes.comment} key={comment.id}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
+                        <p>{new Date(comment.date).toLocaleDateString()}</p>
+                        <h4 className={classes.title}>{comment.user}:</h4>
+                        <div style={{ display: 'flex' }}>
+                        {[...Array(5)].map((star, i) => {
+                            const ratingValue = i + 1;
+                            return (
+                            <label key={i} style={{ cursor: 'pointer', margin: '0 0.5em' }}>
+                                <input
+                                type="radio"
+                                value={ratingValue}
+                                checked={ratingValue === comment.rating}
+                                readOnly
+                                style={{ display: 'none' }}
+                                />
+                                <span
+                                className={ratingValue <= comment.rating ? styles['filled-star'] : styles['empty-star']}
+                                style={{ fontSize: '1em' }}
+                                >
+                                &#9733;
+                                </span>
+                            </label>
+                            );
+                        })}
+                        </div>
+                    </div>
+                    <div>
+                        <textarea value={comment.text} readOnly style={{ fontSize: '1em', width: '100%' }} />
+                    </div>
+                    </div>
+                ))}
+            </div>
             </div>
             {isUpdateActive && (
                 <EventUpdateModal event={event} onClose={() => setIsUpdateActive(false)} onSubmit={updateEvent} />

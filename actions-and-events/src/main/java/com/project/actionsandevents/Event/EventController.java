@@ -179,6 +179,9 @@ public class EventController {
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
         
+        UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
+
+        comment.setUser(userService.getUserById(userDetails.getId()));
         return ResponseEntity.ok(new ResponseMessage(eventService.addComment(id, comment), ResponseMessage.Status.SUCCESS));
     }
 
