@@ -70,7 +70,6 @@ public class Event {
 
     @ManyToOne
     @JoinColumn(name = "author", referencedColumnName = "id", nullable = true)
-    // @Column(nullable = true)
     private User author;
 
     @ManyToOne
@@ -81,15 +80,10 @@ public class Event {
     @JoinColumn(referencedColumnName = "id")
     private Place place;
 
-    // @ManyToMany
-    // @JoinTable(
-    //     name = "event_category",
-    //     joinColumns = @JoinColumn(name = "event_id"), 
-    //     inverseJoinColumns = @JoinColumn(name = "category_id"))
-    // private Set<Category> categories = new HashSet<>();
 
-    // @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<TicketType> ticketTypes;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TicketType> ticketTypes;
 
     @ManyToOne
     @JoinColumn(referencedColumnName = "id")
