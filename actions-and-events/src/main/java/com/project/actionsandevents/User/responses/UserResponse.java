@@ -11,8 +11,8 @@ public class UserResponse {
     private Long id;
     private String email;
     private String login;
-    private String name;
-    private String surname;
+    private String firstname;
+    private String lastname;
     private String phone;
     private String role;
 
@@ -20,8 +20,8 @@ public class UserResponse {
         this.id = user.getId();
         this.email = user.getEmail();
         this.login = user.getLogin();
-        this.name = user.getFirstname();
-        this.surname = user.getLastname();
+        this.firstname = user.getFirstname();
+        this.lastname = user.getLastname();
         this.phone = user.getPhone();
         this.role = user.getRoles();
     }

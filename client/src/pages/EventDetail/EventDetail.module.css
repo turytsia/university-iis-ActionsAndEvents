@@ -61,6 +61,10 @@
     grid-template-columns: repeat(5, 200px);
 }
 
+.header{
+    margin-bottom: 12px;
+}
+
 .filled-star {
     color: rgb(255, 217, 0);
 }

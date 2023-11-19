@@ -322,7 +322,7 @@ public class EventService {
 
             for (Registers register : registers) {
                 //if (register.getStatus() == RegistersStatus.ACCEPTED) {
-                usersRegisters.add(new EventUserRegisters(register.getUser().getId(), register.getStatus()));
+                usersRegisters.add(new EventUserRegisters(register.getUser(), register.getStatus()));
                 //}
             }
         }

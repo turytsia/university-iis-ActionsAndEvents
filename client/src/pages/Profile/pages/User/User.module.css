@@ -46,3 +46,9 @@
     align-items: center;
     gap: 8px;
 }
+
+.settings{
+    position: absolute;
+    right: 16px;
+    top: 16px;
+}

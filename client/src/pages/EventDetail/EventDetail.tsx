@@ -134,17 +134,12 @@ const EventDetail = () => {
     }
     
     return (
-        <PageView scroll title={event.title}>
+        <>
             <div className={classes.container}>
                 <div className={classes.preview} style={{ backgroundColor: "purple" }} />
                 <div className={classes.content}>
                     <div className={classes.header}>
-                        <div className={classes.date}>
-                            <Icon icon={icons.calendar} width={20} height={20} />
-                            <span>{event.dateFrom}</span>
-                            <span>-</span>
-                            <span>{event.dateTo}</span>
-                        </div>
+                        <h2>{event.title}</h2>
                         <div className={classes.actions}>
                             {context.user.id === event.author.id && (
                                 <>
@@ -159,6 +154,12 @@ const EventDetail = () => {
                                 </>
                             )}
                         </div>
+                    </div>
+                    <div className={classes.date}>
+                        <Icon icon={icons.calendar} width={20} height={20} />
+                        <span>{event.dateFrom}</span>
+                        <span>-</span>
+                        <span>{event.dateTo}</span>
                     </div>
                     <div className={classes.section}>
                         <h4 className={classes.title}>Description</h4>
@@ -246,7 +247,7 @@ const EventDetail = () => {
             {isDeleteActive && (
                 <EventDeleteModal onClose={() => setIsDeleteActive(false)} onSubmit={deleteEvent} />
             )}
-        </PageView>
+        </>
     )
 }
 
