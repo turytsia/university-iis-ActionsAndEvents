@@ -34,7 +34,7 @@ enum icons {
     plus = 'ic:round-plus',
     pen = 'material-symbols:edit',
     open = 'fluent:open-20-filled',
-    settings = 'material-symbols:settings-outline',
+    settings = 'mdi:gear',
     nats = 'logos:nats-icon',
     message = 'mi:message',
     arrowBack = 'formkit:arrowleft',
@@ -49,7 +49,8 @@ enum icons {
     location = 'material-symbols:location-on',
     trash = 'material-symbols:delete',
     star = 'bi:star-fill',
-    manager = 'clarity:administrator-solid'
+    manager = 'clarity:administrator-solid',
+    check = 'uil:check'
 }
 
 export default icons

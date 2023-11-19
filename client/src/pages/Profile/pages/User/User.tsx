@@ -8,6 +8,7 @@ import Popover from '../../../../components/Popover/Popover'
 import { fmt } from '../../../../components/Table/Table'
 import ButtonIconOnly from '../../../../components/ButtonIconOnly/ButtonIconOnly'
 import { useParams } from 'react-router-dom'
+import UserSettingsModal from './modals/UserSettingsModal/UserSettingsModal'
 
 const getUserRoleIcon = (role: "ROLE_USER" | "ROLE_MANAGER" | "ROLE_ADMIN") => {
     const roles = {
@@ -32,15 +33,27 @@ const getUserRoleIcon = (role: "ROLE_USER" | "ROLE_MANAGER" | "ROLE_ADMIN") => {
 }
 
 const User = () => {
-
     const context = useContext(AppContext)
-    const [user, setUser] = useState<UserType | null>(null)
     const { id } = useParams()
+
+    const [isSettingsActive, setIsSettingsActive] = useState(false)
+    const [user, setUser] = useState<UserType | null>(null)
 
     const fetch = async () => {
         try {
             const response = await context.request!.get(`/user/${id}`)
             setUser(response.data)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const updateUser = async (inputs: UserType) => {
+        try {
+            const response = await context.request!.patch(`/user/${id}`, inputs)
+            console.log(response.data)
+            setUser(inputs)
+            setIsSettingsActive(false)
         } catch (error) {
             console.error(error)
         }
@@ -81,6 +94,18 @@ const User = () => {
                     {fmt(user.phone)}
                 </p>
             </div>
+            <ButtonIconOnly
+                className={classes.settings}
+                icon={icons.settings}
+                onClick={() => setIsSettingsActive(true)}
+            />
+            {isSettingsActive && (
+                <UserSettingsModal
+                    inputs={user}
+                    onSubmit={updateUser}
+                    onClose={() => setIsSettingsActive(false)}
+                />
+            )}
         </div>
     )
 }

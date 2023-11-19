@@ -4,15 +4,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import com.project.actionsandevents.Event.RegistersStatus;
+import com.project.actionsandevents.User.User;
 
 @Setter
 @Getter
 public class EventUserRegisters {
-    private Long users;
+    private User user;
     private RegistersStatus status;
 
-    public EventUserRegisters(Long ids, RegistersStatus status) {
-        this.users = ids;
+    public EventUserRegisters(User user, RegistersStatus status) {
+        this.user = user;
         this.status = status;
     }
 }

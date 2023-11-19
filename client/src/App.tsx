@@ -24,6 +24,8 @@ import Content from './components/Content/Content';
 
 import "react-datepicker/dist/react-datepicker.css";
 import EventDetail from './pages/EventDetail/EventDetail';
+import EventUsers from './pages/EventUsers/EventUsers';
+import EventView from './pages/EventView/EventView';
 
 function App() {
 
@@ -36,7 +38,10 @@ function App() {
         <Content>
           <Routes>
             <Route index element={<Events />} />
-            <Route path="/events/:id" element={<EventDetail />} />
+            <Route path="/events/:id" element={<EventView />}>
+              <Route index element={<EventDetail />} />
+              <Route path="users" element={<EventUsers />} />
+            </Route>
             {
               (context.isAuth && context.user && context.user.role === roles.ADMIN) && (
                 <>

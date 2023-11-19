@@ -15,6 +15,7 @@ import { TicketType } from '../CreateEvent/pages/Tickets/modals/CreateTicketModa
 import Ticket from '../CreateEvent/pages/components/TicketInputs/components/Ticket/Ticket'
 import EventUpdateModal from './modals/EventUpdateModal/EventUpdateModal'
 import EventDeleteModal from './modals/EventDeleteModal/EventDeleteModal'
+import Tabs, { TabsType } from '../../components/Tabs/Tabs'
 
 const EventDetail = () => {
     const { id } = useParams()
@@ -82,17 +83,12 @@ const EventDetail = () => {
     }
     
     return (
-        <PageView scroll title={event.title}>
+        <>
             <div className={classes.container}>
                 <div className={classes.preview} style={{ backgroundColor: "purple" }} />
                 <div className={classes.content}>
                     <div className={classes.header}>
-                        <div className={classes.date}>
-                            <Icon icon={icons.calendar} width={20} height={20} />
-                            <span>{event.dateFrom}</span>
-                            <span>-</span>
-                            <span>{event.dateTo}</span>
-                        </div>
+                        <h2>{event.title}</h2>
                         <div className={classes.actions}>
                             {context.user.id === event.author.id && (
                                 <>
@@ -108,6 +104,12 @@ const EventDetail = () => {
                             )}
                         </div>
                     </div>
+                    <div className={classes.date}>
+                        <Icon icon={icons.calendar} width={20} height={20} />
+                        <span>{event.dateFrom}</span>
+                        <span>-</span>
+                        <span>{event.dateTo}</span>
+                    </div>
                     <div className={classes.section}>
                         <h4 className={classes.title}>Description</h4>
                         <p className={classes.description}>{event.description}</p>
@@ -115,7 +117,7 @@ const EventDetail = () => {
                     <div className={classes.section}>
                         <h4 className={classes.title}>Tickets</h4>
                         <div className={classes.tickets}>
-                            {tickets.map(ticket => <Ticket ticket={ticket} />)}
+                            {tickets.map(ticket => <Ticket key = {ticket.id} ticket={ticket} />)}
                         </div>
                     </div>
                     <div className={classes.section}>
@@ -136,7 +138,7 @@ const EventDetail = () => {
             {isDeleteActive && (
                 <EventDeleteModal onClose={() => setIsDeleteActive(false)} onSubmit={deleteEvent} />
             )}
-        </PageView>
+        </>
     )
 }
 

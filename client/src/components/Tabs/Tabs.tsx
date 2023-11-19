@@ -25,7 +25,7 @@ const Tabs = ({
     }
   return (
       <div className={classes.tabs}>
-          {tabs.map(({ to, text }) => <Link to={to} className={classNames(classes.tab, { [classes.active]: isActive(to) })}>{text}</Link>)}
+          {tabs.map(({ to, text }) => <Link key={to} to={to} className={classNames(classes.tab, { [classes.active]: isActive(to) })}>{text}</Link>)}
       </div>
   )
 }
