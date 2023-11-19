@@ -5,6 +5,8 @@ import { AppContext } from '../../context/AppContextProvider'
 import PageView from '../../components/PageView/PageView'
 import { EventType } from '../../utils/types'
 import EventCard from './components/EventCard/EventCard'
+import Button from '../../components/Button/Button'
+import Input from '../../components/Input/Input'
 
 const Events = () => {
   const context = useContext(AppContext)
@@ -37,6 +39,14 @@ const Events = () => {
 
   return (
     <PageView scroll title='Events'>
+      <div className={classes.filtersContainer}>
+        <div className={classes.filters}>
+          <Input placeholder='Search...' className={classes.search} value='' />
+        </div>
+        <div className={classes.actions}>
+          <Button style='invert' to="/events/create">Create new event</Button>
+        </div>
+      </div>
       <div className={classes.events}>
         {events.map(event => <EventCard key={event.id} event={event} />)}
       </div>

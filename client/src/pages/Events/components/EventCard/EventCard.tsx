@@ -19,15 +19,7 @@ const EventCard = ({
     return (
         <div className={classes.container}>
             <div className={classes.preview} style={{ backgroundColor: "purple" }} >
-                <ProfileCard className={classes.profile} user={{
-                    id: null,
-                    login: null,
-                    firstname: null,
-                    lastname: null,
-                    phone: null,
-                    email: "Author",
-                    role: null
-                }} />
+                <ProfileCard className={classes.profile} user={event.author} />
             </div>
             <div className={classes.header}>
                 <h2>{event.title}</h2>

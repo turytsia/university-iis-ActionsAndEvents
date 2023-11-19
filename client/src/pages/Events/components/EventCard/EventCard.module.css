@@ -1,6 +1,7 @@
 .container {
     background-color: #fff;
     border-radius: 3px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.05);
 }
 
 .preview {
@@ -47,4 +48,8 @@
     left: 16px;
     position: absolute;
     color: white;
+}
+
+.profile:hover {
+    /* background-color: #414141 !important; */
 }

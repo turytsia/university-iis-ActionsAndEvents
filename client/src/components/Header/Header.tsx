@@ -62,7 +62,7 @@ const Header = () => {
                                 }>
                                 {(setIsActive) => (
                                     <div className={classes.profileMenu}>
-                                        <Button alignLeft to='/profile'>Profile</Button>
+                                        <Button alignLeft to={`/profile/${context.user.id}`}>Profile</Button>
                                         <Button alignLeft to='/settings'>Settings</Button>
                                         <Button alignLeft onClick={logout}>Sign out</Button>
                                     </div>

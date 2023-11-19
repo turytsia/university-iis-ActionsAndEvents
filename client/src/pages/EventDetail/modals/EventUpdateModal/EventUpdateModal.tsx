@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import classes from "./EventUpdateModal.module.css"
-import Modal from '../../../../components/Modal/Modal'
+import Modal, { ModalStyles } from '../../../../components/Modal/Modal'
 import icons from '../../../../utils/icons'
 import { EventType } from '../../../../utils/types'
 import DateInput, { DateChangeType } from '../../../../components/DateInput/DateInput'
@@ -40,7 +40,9 @@ const EventUpdateModal = ({
             textCancel="Cancel"
             onClose={onClose}
             onSubmit={__onSubmit}
-            icon={icons.pen}>
+            icon={icons.pen}
+            type={ModalStyles.Inputs}
+            >
             <Input label='Title' name='title' value={inputs.title} onChange={onChange} />
             <DateInput label='Start date' name='dateFrom' value={inputs.dateFrom} onChange={onDateChange} />
             <DateInput label='End date' name='dateTo' value={inputs.dateTo} onChange={onDateChange} />

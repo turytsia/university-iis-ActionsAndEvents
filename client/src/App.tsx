@@ -44,7 +44,6 @@ function App() {
                     <Route path="" element={<Categories />} />
                     <Route path="places" element={<Places />} />
                     <Route path="users" element={<Users />} />
-                    <Route path="managers" element={<Managers />} />
                   </Route>
                 </>
               )
@@ -52,7 +51,7 @@ function App() {
             {
               context.isAuth && context.user && (
                 <>
-                  <Route path="profile" element={<Profile />}>
+                  <Route path="profile/:id" element={<Profile />}>
                     <Route path="" element={<User />} />
                     <Route path="events" element={<UserEvents />} />
                   </Route>

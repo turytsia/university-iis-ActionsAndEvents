@@ -12,14 +12,13 @@
     aspect-ratio: 1;
     height: 250px;
     background-color: gray;
-    border-radius: 50%;
+    border-radius: 3px;
 }
 .detailsContainer {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    gap: 8px;
-    width: 50%;
+    justify-content: flex-start;
+    gap: 12px;
 }
 .details {
     display: flex;
@@ -30,4 +29,20 @@
 
 .details span{
     font-weight: 600;
+}
+
+.adminIcon { 
+    color: rgb(176, 44, 44);
+}
+
+.managerIcon { 
+    color: rgb(248, 192, 38);
+}
+
+.login{
+    font-size: 32px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }

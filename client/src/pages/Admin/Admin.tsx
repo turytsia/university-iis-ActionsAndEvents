@@ -16,17 +16,13 @@ const tabs: TabsType = [
     {
         to: "users",
         text: "Users"
-    },
-    {
-        to: "managers",
-        text: "Managers"
     }
 ]
 
 const Admin = () => {
     return (
         <PageView title="Admin">
-            <Tabs tabs={tabs} />
+            <Tabs prefix='/admin' tabs={tabs} />
             <Outlet />
         </PageView>
     )

@@ -1,7 +1,8 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import classes from "./Tabs.module.css"
+import classNames from 'classnames'
 
 export type TabsType = {
     to: string,
@@ -10,14 +11,21 @@ export type TabsType = {
 
 type PropsType = {
     tabs: TabsType
+    prefix: string
 }
 
 const Tabs = ({
-    tabs
+    tabs,
+    prefix
 }: PropsType) => {
+    const location = useLocation()
+
+    const isActive = (to: string) => {
+        return location.pathname === (to ? prefix + '/' + to : prefix)
+    }
   return (
       <div className={classes.tabs}>
-          {tabs.map(({ to, text }) => <Link to={to}>{text}</Link>)}
+          {tabs.map(({ to, text }) => <Link to={to} className={classNames(classes.tab, { [classes.active]: isActive(to) })}>{text}</Link>)}
       </div>
   )
 }

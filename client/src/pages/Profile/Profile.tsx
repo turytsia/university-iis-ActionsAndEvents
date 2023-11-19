@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { AppContext } from '../../context/AppContextProvider'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useParams } from 'react-router-dom'
 import Tabs, { TabsType } from '../../components/Tabs/Tabs'
 import PageView from '../../components/PageView/PageView'
 
@@ -18,10 +18,11 @@ const tabs: TabsType = [
 ]
 
 const Profile = () => {
-    const context = useContext(AppContext)
+    const {id} = useParams()
+
     return (
         <PageView title="Profile">
-            <Tabs tabs={tabs} />
+            <Tabs prefix={`/profile/${id}`} tabs={tabs} />
             <div className={classes.outlet}>
                 <Outlet />
             </div>
