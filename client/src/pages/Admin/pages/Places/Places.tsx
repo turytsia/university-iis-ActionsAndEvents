@@ -3,8 +3,11 @@ import classes from "./Places.module.css"
 import Input from '../../../../components/Input/Input'
 import { AppContext } from '../../../../context/AppContextProvider'
 import { SpringResponseType } from '../../../../utils/common'
-import TableFormView from '../../../../components/TableFormView/TableFormView'
+import TableView from '../../../../components/TableView/TableView'
 import Table, { TableHeaderType } from '../../../../components/Table/Table'
+import Button from '../../../../components/Button/Button'
+import CreatePlaceModal from './modals/CreatePlaceModal/CreatePlaceModal'
+import RowActions from './components/RowActions/RowActions'
 
 export type PlaceType = {
     id: number,
@@ -26,19 +29,12 @@ const dataKeys: TableHeaderType = {
     status: "Status"
 }
 
-const initialInputs = {
-    "name": "",
-    "description": "",
-    "address": "",
-    "status": "APPROVED"
-}
-
 const Places = () => {
 
     const context = useContext(AppContext)
-    
+
     const [places, setPlaces] = useState<PlaceType[]>([])
-    const [inputs, setInputs] = useState(initialInputs)
+    const [isCreateActive, setIsCreateActive] = useState(false)
 
     const fetchPlaces = async () => {
         try {
@@ -52,24 +48,20 @@ const Places = () => {
                 .filter((r): r is PromiseFulfilledResult<SpringResponseType<PlaceType>> => r.status === "fulfilled")
                 .map((r) => r.value)
                 .filter((v) => v);
-            
+
             setPlaces(fulfilledResponses.map(({ data }) => data))
         } catch (error) {
             console.log(error)
         }
     }
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }))
-    }
-
-    const onSubmit = async () => {
+    const onSubmit = async (inputs: PlaceType) => {
         try {
             const response = await context.request!.post("/place", {
                 ...inputs
             })
-
-            setPlaces(prev => [...prev, { id: response.data.placeId, ...inputs }])
+            setPlaces(prev => [...prev, { ...inputs, id: response.data.placeId }])
+            setIsCreateActive(false)
         } catch (error) {
             console.log(error)
         }
@@ -83,20 +75,33 @@ const Places = () => {
     )
 
     return (
-        <TableFormView>
-            <div className={classes.form}>
-                <Input label='Name' name='name' value={inputs.name} onChange={onChange} />
-                <Input label='Description' name='description' value={inputs.description} onChange={onChange} />
-                <Input label='Address' name='address' value={inputs.address} onChange={onChange} />
-
-                <div>
-                    <button onClick={onSubmit}>
-                        Create
-                    </button>
-                </div>
-            </div>
-            <Table data={places} dataKeys={dataKeys} />
-        </TableFormView>
+        <TableView>
+            <Table
+                data={places}
+                dataKeys={dataKeys}
+                rowActions={(place) => (
+                    <RowActions
+                        places={places}
+                        setPlaces={setPlaces}
+                        place={place}
+                    />
+                )}
+                actions={
+                    <>
+                        <Button style='invert' onClick={() => setIsCreateActive(true)}>Create place</Button>
+                        {isCreateActive && (
+                            <CreatePlaceModal
+                                textProceed='Create'
+                                title='Create place'
+                                places={places}
+                                onClose={() => setIsCreateActive(false)}
+                                onSubmit={onSubmit}
+                            />
+                        )}
+                    </>
+                }
+            />
+        </TableView>
     )
 }
 

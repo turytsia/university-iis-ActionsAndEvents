@@ -1,11 +1,11 @@
 import React from 'react'
-import classes from "./TableFormView.module.css"
+import classes from "./TableView.module.css"
 
 type PropsType = {
     children: React.ReactNode
 }
 
-const TableFormView = ({
+const TableView = ({
     children
 }: PropsType) => {
   return (
@@ -13,4 +13,4 @@ const TableFormView = ({
   )
 }
 
-export default TableFormView
+export default TableView

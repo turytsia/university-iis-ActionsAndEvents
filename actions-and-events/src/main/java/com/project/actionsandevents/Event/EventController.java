@@ -22,6 +22,7 @@ import com.project.actionsandevents.Event.requests.EventPatchRequest;
 
 import com.project.actionsandevents.Event.responses.EventResponse;
 import com.project.actionsandevents.Event.responses.EventsResponse;
+import com.project.actionsandevents.Event.responses.TicketResponse;
 import com.project.actionsandevents.Event.responses.TicketsResponse;
 import com.project.actionsandevents.Event.responses.UsersRegisteredToEventResponse;
 import com.project.actionsandevents.Event.responses.EventPostResponse;
@@ -160,7 +161,7 @@ public class EventController {
 
     @GetMapping("/event/ticket/{id}")
     public ResponseEntity<Object> getTicketById(@PathVariable Long id, Authentication authentication) throws TicketNotFoundException {
-        return ResponseEntity.ok(eventService.getTicketTypeById(id));
+        return ResponseEntity.ok(new TicketResponse(eventService.getTicketTypeById(id)));
     }
 
     @PostMapping("/event/{id}/ticket")

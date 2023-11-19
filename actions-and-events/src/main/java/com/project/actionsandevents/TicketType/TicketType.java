@@ -48,6 +48,7 @@ public class TicketType {
 
     //@PrimaryKeyJoinColumn(name = "_event", referencedColumnName = "id")
     @ManyToOne //cascade = CascadeType.ALL
+    @JoinColumn(referencedColumnName = "id")
     private Event event; 
 
     // @ManyToMany

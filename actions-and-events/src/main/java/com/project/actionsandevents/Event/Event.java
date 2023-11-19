@@ -88,8 +88,8 @@ public class Event {
     //     inverseJoinColumns = @JoinColumn(name = "category_id"))
     // private Set<Category> categories = new HashSet<>();
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TicketType> ticketTypes;
+    // @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    // private List<TicketType> ticketTypes;
 
     @ManyToOne
     @JoinColumn(referencedColumnName = "id")

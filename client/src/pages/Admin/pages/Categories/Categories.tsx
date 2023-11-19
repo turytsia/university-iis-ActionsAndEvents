@@ -7,7 +7,7 @@ import classes from "./Categories.module.css"
 import Input from '../../../../components/Input/Input'
 import InputLabel from '../../../../components/InputLabel/InputLabel'
 import Table, { TableHeaderType } from '../../../../components/Table/Table'
-import TableFormView from '../../../../components/TableFormView/TableFormView'
+import TableView from '../../../../components/TableView/TableView'
 import Button from '../../../../components/Button/Button'
 import CreateCategoryModal, { CategoryInput } from './modals/CreateCategoryModal/CreateCategoryModal'
 import ButtonIconOnly from '../../../../components/ButtonIconOnly/ButtonIconOnly'
@@ -65,8 +65,8 @@ const Categories = () => {
                 .filter((r): r is PromiseFulfilledResult<SpringResponseType<CategoryType>> => r.status === "fulfilled")
                 .map((r) => r.value)
                 .filter((v) => v);
-            
-            setCategories(fulfilledResponses.map(({data}) => data))
+
+            setCategories(fulfilledResponses.map(({ data }) => data))
         } catch (error) {
             console.error(error)
         }
@@ -77,7 +77,7 @@ const Categories = () => {
     }, [])
 
     return (
-        <TableFormView>
+        <TableView>
             <Table
                 dataKeys={dataKeys}
                 data={categories}
@@ -102,7 +102,7 @@ const Categories = () => {
                         )}
                     </>
                 } />
-        </TableFormView>
+        </TableView>
     )
 }
 
