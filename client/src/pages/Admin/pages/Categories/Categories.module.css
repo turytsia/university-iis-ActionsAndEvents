@@ -1,11 +1,10 @@
-.form {
-    width: 50%;
-    width: 350px;
-}
+
 
 .container {
+    background-color: #fff;
+    padding: 16px;
+    flex: 1;
+    overflow: hidden;
     display: flex;
-    align-items: flex-start;
-    flex-direction: row-reverse;
-    gap: 8px;
+    flex-direction: column;
 }

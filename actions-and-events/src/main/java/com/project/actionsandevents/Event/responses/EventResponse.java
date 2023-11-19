@@ -41,7 +41,7 @@ public class EventResponse {
         this.icon = event.getIcon();
         this.image = event.getImage();
         this.status = event.getStatus();
-        this.placeId = event.getPlace().getId();
+        this.placeId = event.getPlace() != null ? event.getPlace().getId() : null;
         this.author = event.getAuthor();
         this.category = event.getCategory();
     }

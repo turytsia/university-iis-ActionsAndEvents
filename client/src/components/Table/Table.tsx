@@ -68,7 +68,7 @@ const Table = ({
     })
 
     return (
-        <div className={classes.tableContainer}>
+        <>
             <div className={classes.filters}>
                 <div className={classes.innerFilters}>
                     {/* <Input className={classes.search} value={''} /> */}
@@ -84,7 +84,7 @@ const Table = ({
                 {rowActions && <div className={headStyles} />}
                 {body}
             </div>
-        </div>
+        </>
     )
 }
 

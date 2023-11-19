@@ -46,6 +46,12 @@ function App() {
                     <Route path="users" element={<Users />} />
                     <Route path="managers" element={<Managers />} />
                   </Route>
+                </>
+              )
+            }
+            {
+              context.isAuth && context.user && (
+                <>
                   <Route path="profile" element={<Profile />}>
                     <Route path="" element={<User />} />
                     <Route path="events" element={<UserEvents />} />

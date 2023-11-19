@@ -77,30 +77,32 @@ const Categories = () => {
     }, [])
 
     return (
-        <Table
-            dataKeys={dataKeys}
-            data={categories}
-            rowActions={(category) => (
-                <RowActions
-                    categories={categories}
-                    setCategories={setCategories}
-                    category={category}
-                />
-            )}
-            actions={
-            <>
-                <Button style='invert' onClick={() => setIsCreateActive(true)}>Create category</Button>
-                {isCreateActive && (
-                        <CreateCategoryModal
-                            textProceed='Create'
-                            title='Create category'
-                            categories={categories}
-                            onClose={() => setIsCreateActive(false)}
-                            onSubmit={onSubmit}
-                        />
+        <TableFormView>
+            <Table
+                dataKeys={dataKeys}
+                data={categories}
+                rowActions={(category) => (
+                    <RowActions
+                        categories={categories}
+                        setCategories={setCategories}
+                        category={category}
+                    />
                 )}
-            </>
-        } />
+                actions={
+                    <>
+                        <Button style='invert' onClick={() => setIsCreateActive(true)}>Create category</Button>
+                        {isCreateActive && (
+                            <CreateCategoryModal
+                                textProceed='Create'
+                                title='Create category'
+                                categories={categories}
+                                onClose={() => setIsCreateActive(false)}
+                                onSubmit={onSubmit}
+                            />
+                        )}
+                    </>
+                } />
+        </TableFormView>
     )
 }
 

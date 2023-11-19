@@ -27,9 +27,7 @@ const Admin = () => {
     return (
         <PageView title="Admin">
             <Tabs tabs={tabs} />
-            <div className={classes.outlet}>
-                <Outlet />
-            </div>
+            <Outlet />
         </PageView>
     )
 }
