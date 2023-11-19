@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
+import com.project.actionsandevents.Event.exceptions.RegistrationNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
-import com.project.actionsandevents.Event.exceptions.UserNotRegisteredException;
 
 import com.project.actionsandevents.Event.requests.EventPatchRequest;
 
@@ -46,6 +46,42 @@ public class EventController {
 
     @Autowired
     private UserService userService;
+
+    private boolean hasElevatedPrivileges(Authentication authentication) {
+
+        for (GrantedAuthority auth : authentication.getAuthorities()) {
+            if (auth.getAuthority().equals("ROLE_ADMIN") || 
+                    auth.getAuthority().equals("ROLE_MANAGER")) {
+                    
+                System.out.println("***************hasElevatedPrivileges: " + auth.getAuthority());
+                
+                return true;
+            }
+        }
+
+        System.out.println("***************DOESN't have elevated");
+
+        return false;
+    }
+
+    private boolean hasPrivilegesOnEvent(Authentication authentication, Event event) {
+        // Among users only author of the event can modify it or its tickets
+
+        // if (!(authentication.getDetails() instanceof UserInfoDetails)) {
+        //     System.out.println("***************Is not instance of UserInfoDetails");
+        //     return false;
+        // }
+
+        UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
+        System.out.println("***************Casted");
+
+        boolean isAuthor = userDetails.getId() == event.getAuthor().getId();
+        if (isAuthor) {
+            System.out.println("***************isAuthor: " + userDetails.getId() + " " + event.getAuthor().getId());
+        }
+        return isAuthor || hasElevatedPrivileges(authentication);
+    }
+
 
     @GetMapping("/event/{id}")
     public ResponseEntity<Object> getEventById(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
@@ -102,40 +138,6 @@ public class EventController {
             "Event was successfully added", ResponseMessage.Status.SUCCESS));
     }
 
-    private boolean hasElevatedPrivileges(Authentication authentication) {
-
-        for (GrantedAuthority auth : authentication.getAuthorities()) {
-            if (auth.getAuthority().equals("ROLE_ADMIN") || 
-                    auth.getAuthority().equals("ROLE_MANAGER")) {
-                    
-                System.out.println("***************hasElevatedPrivileges: " + auth.getAuthority());
-                
-                return true;
-            }
-        }
-
-        System.out.println("***************DOESN't have elevated");
-
-        return false;
-    }
-
-    private boolean hasPrivilegesOnEvent(Authentication authentication, Event event) {
-        // Among users only author of the event can modify it or its tickets
-
-        // if (!(authentication.getDetails() instanceof UserInfoDetails)) {
-        //     System.out.println("***************Is not instance of UserInfoDetails");
-        //     return false;
-        // }
-
-        UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
-        System.out.println("***************Casted");
-
-        boolean isAuthor = userDetails.getId() == event.getAuthor().getId();
-        if (isAuthor) {
-            System.out.println("***************isAuthor: " + userDetails.getId() + " " + event.getAuthor().getId());
-        }
-        return isAuthor || hasElevatedPrivileges(authentication);
-    }
 
 
 
@@ -186,7 +188,8 @@ public class EventController {
             @PathVariable Long id,
             @Valid @RequestBody TicketType ticketType,
             BindingResult bindingResult,
-            Authentication authentication) throws TicketNotFoundException {
+            Authentication authentication) throws TicketNotFoundException 
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
@@ -228,36 +231,112 @@ public class EventController {
         );
     }
 
-    @GetMapping("/event/{id}/users")
-    public ResponseEntity<Object> getRegisteredUsersByEventId(
-        @PathVariable Long id, Authentication authentication) throws EventNotFoundException {
 
-        return ResponseEntity.ok(
-            new UsersRegisteredToEventResponse(eventService.getRegisteredUsersByEventId(id))
-        );
+
+
+
+
+
+
+
+    @GetMapping("/event/ticket{id}/registrations")
+    public ResponseEntity<Object> getTicketRegistrationIds(@PathVariable Long id, Authentication authentication) 
+        throws TicketNotFoundException 
+    {
+        return ResponseEntity.ok(eventService.getTicketRegistrationIds(id));
     }
 
-    @GetMapping("/event/{id}/user/{userId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> getRegisteredUserById(
-        @PathVariable Long id, @PathVariable Long userId, Authentication authentication) 
-            throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
-        return ResponseEntity.ok(eventService.getRegisteredUserById(id, userId));
+    @GetMapping("/event/ticket/registration/{id}")
+    public ResponseEntity<Object> getTicketRegistrationById(@PathVariable RegistersId id, Authentication authentication) 
+        throws RegistrationNotFoundException 
+    {
+        return ResponseEntity.ok(eventService.getTicketRegistrationById(id));
     }
 
-    @DeleteMapping("/event/{id}/user/{userId}")
+    @PatchMapping("/event/ticket/registration/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> unregisterUserFromEvent(
-        @PathVariable Long id, @PathVariable Long userId, Authentication authentication) 
-            throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
-
-        if (!hasPrivilegesOnEvent(authentication, eventService.getEventById(id))) {
+    public ResponseEntity<Object> patchTicketRegistrationById(
+            @PathVariable RegistersId id,
+            @Valid @RequestBody RegistersStatus status,
+            BindingResult bindingResult,
+            Authentication authentication) throws RegistrationNotFoundException 
+    {
+        if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
-                "You are not allowed to unregister this user", ResponseMessage.Status.ERROR));
+                    "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
-        
-        return ResponseEntity.ok(eventService.unregisterUserFromEvent(id, userId));
+
+        if (!hasPrivilegesOnEvent(authentication, eventService.getTicketRegistrationById(id).getTicketType().getEvent())) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    "You are not allowed to patch this ticket registration", ResponseMessage.Status.ERROR));
+        }
+
+        return ResponseEntity.ok(new ResponseMessage(eventService.patchTicketRegistrationById(id, status), ResponseMessage.Status.SUCCESS));
     }
+
+
+    // @GetMapping("/event/{id}/users")
+    // public ResponseEntity<Object> getRegisteredUsersByEventId(
+    //     @PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+
+    //     return ResponseEntity.ok(
+    //         new UsersRegisteredToEventResponse(eventService.getRegisteredUsersByEventId(id))
+    //     );
+    // }
+
+    // @GetMapping("/event/{id}/user/{userId}")
+    // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    // public ResponseEntity<Object> getRegisteredUserById(
+    //     @PathVariable Long id, @PathVariable Long userId, Authentication authentication) 
+    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
+    //     return ResponseEntity.ok(eventService.getRegisteredUserById(id, userId));
+    // }
+
+    // @DeleteMapping("/event/{id}/user/{userId}")
+    // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    // public ResponseEntity<Object> unregisterUserFromEvent(
+    //     @PathVariable Long id, @PathVariable Long userId, Authentication authentication) 
+    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
+
+    //     if (!hasPrivilegesOnEvent(authentication, eventService.getEventById(id))) {
+    //         return ResponseEntity.badRequest().body(new ResponseMessage(
+    //             "You are not allowed to unregister this user", ResponseMessage.Status.ERROR));
+    //     }
+        
+    //     return ResponseEntity.ok(eventService.unregisterUserFromEvent(id, userId));
+    // }
+
+    // @PatchMapping("/event/{id}/user/{userId}")
+    // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    // public ResponseEntity<Object> patchRegisteredUser(
+    //     @PathVariable Long id, @PathVariable Long userId, Authentication authentication) 
+    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException 
+    // {
+    //     return ResponseEntity.ok(eventService.getRegisteredUserById(id, userId));
+    // }
+
+    // @PatchMapping("/event/ticket/{id}")
+    // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    // public ResponseEntity<Object> patchUserRegistration(
+    //         @PathVariable Long ticketId,
+    //         @Valid @RequestBody Long userId,
+    //         @Valid @RequestBody Status status,
+    //         BindingResult bindingResult,
+    //         Authentication authentication) throws TicketNotFoundException 
+    // {
+    //     if (bindingResult.hasErrors()) {
+    //         return ResponseEntity.badRequest().body(new ResponseMessage(
+    //                 "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
+    //     }
+
+    //     if (!hasPrivilegesOnEvent(authentication, eventService.getTicketTypeById(eventId).getEvent())) {
+    //         return ResponseEntity.badRequest().body(new ResponseMessage(
+    //                 "You are not allowed to patch this user's registration", ResponseMessage.Status.ERROR));
+    //     }
+
+    //     return ResponseEntity.ok(new ResponseMessage(eventService.patchUserRegistration(eventId, user), ResponseMessage.Status.SUCCESS));
+    // }
+
 
     @PostMapping("/event/{id}/approve")
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")

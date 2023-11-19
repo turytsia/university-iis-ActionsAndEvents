@@ -28,6 +28,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
     @GetMapping("/user")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getUser(Authentication authentication) throws UserNotFoundException {
@@ -85,6 +86,13 @@ public class UserController {
         // TODO add log to db
 
         return ResponseEntity.ok(new ResponseMessage("User was successfully removed", ResponseMessage.Status.SUCCESS));
+    }
+
+
+    @GetMapping("/user/{id}/events")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public ResponseEntity<Object> getUserEvents(@PathVariable Long id, Authentication authentication) throws UserNotFoundException {
+        return ResponseEntity.ok(userService.getUserEvents(id));
     }
 
 }

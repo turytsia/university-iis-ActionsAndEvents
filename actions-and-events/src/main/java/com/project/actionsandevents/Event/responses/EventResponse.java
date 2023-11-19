@@ -29,9 +29,12 @@ public class EventResponse {
     private String icon;
     private String image;
     private EventStatus status;
-    private Place place;
-    private User author;
-    private Category category;
+    //private Place place;
+    private Long placeId; // avoid recursion
+    //private User author;
+    private Long authorId; // avoid recursion
+    //private Category category;
+    private Long categoryId; // avoid recursion
 
     public EventResponse(Event event) {
         this.id = event.getId();
@@ -42,8 +45,8 @@ public class EventResponse {
         this.icon = event.getIcon();
         this.image = event.getImage();
         this.status = event.getStatus();
-        this.place = event.getPlace();
-        this.author = event.getAuthor();
-        this.category = event.getCategory();
+        this.placeId = event.getPlace().getId();
+        this.authorId = event.getAuthor().getId();
+        this.categoryId = event.getCategory().getId();
     }
 }

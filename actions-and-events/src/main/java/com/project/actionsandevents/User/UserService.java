@@ -12,8 +12,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.project.actionsandevents.Event.Event;
+import com.project.actionsandevents.Event.EventRepository;
+
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
 import com.project.actionsandevents.User.requests.UserPatchRequest;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +30,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
@@ -108,5 +115,16 @@ public class UserService implements UserDetailsService {
      */
     public List<Long> getUserIds() {
         return repository.findAllIds();
+    }
+
+
+    public List<Event> getUserEvents(Long id) throws UserNotFoundException {
+        Optional<User> user = repository.findById(id);
+
+        if (!user.isPresent()) {
+            throw new UserNotFoundException("User not found with ID: " + id);
+        }
+
+        return eventRepository.findAllByAuthor(user.get());
     }
 }
