@@ -80,7 +80,12 @@ public class Event {
     @JoinColumn(referencedColumnName = "id")
     private Place place;
 
-
+    // @ManyToMany
+    // @JoinTable(
+    //     name = "event_category",
+    //     joinColumns = @JoinColumn(name = "event_id"), 
+    //     inverseJoinColumns = @JoinColumn(name = "category_id"))
+    // private Set<Category> categories = new HashSet<>();
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TicketType> ticketTypes;
