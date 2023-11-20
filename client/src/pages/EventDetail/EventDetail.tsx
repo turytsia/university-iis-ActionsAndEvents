@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import PageView from '../../components/PageView/PageView'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AppContext } from '../../context/AppContextProvider'
+import { AppContext, UserType } from '../../context/AppContextProvider'
 import { EventType } from '../../utils/types'
 
 import classes from "./EventDetail.module.css"
@@ -25,6 +25,7 @@ const EventDetail = () => {
 
     const [event, setEvent] = useState<EventType | null>(null)
     const [tickets, setTickets] = useState<TicketType[]>([])
+    const [users, setUsers] = useState<{ user: UserType, status: "PENDING" | "APPROVED" }[]>([])
     const [isUpdateActive, setIsUpdateActive] = useState(false)
     const [isDeleteActive, setIsDeleteActive] = useState(false)
 
@@ -42,12 +43,12 @@ const EventDetail = () => {
                 .filter((r): r is PromiseFulfilledResult<SpringResponseType<TicketType>> => r.status === "fulfilled")
                 .map((r) => r.value)
                 .filter((v) => v);
-            
+
             setTickets(fulfilledResponses.map(({ data }) => data))
             setEvent(response.data)
 
             const usersResponse = await context.request!.get(`/event/${response.data.id}/users`)
-            console.log(usersResponse.data)
+            setUsers(usersResponse.data.userRegisters)
         } catch (error) {
             navigate("/")
         }
@@ -81,7 +82,9 @@ const EventDetail = () => {
     if (event === null) {
         return null;
     }
-    
+
+    const entry = users.find(({ user }) => user.id === context.user.id)
+
     return (
         <>
             <div className={classes.container}>
@@ -116,9 +119,16 @@ const EventDetail = () => {
                     </div>
                     <div className={classes.section}>
                         <h4 className={classes.title}>Tickets</h4>
-                        <div className={classes.tickets}>
-                            {tickets.map(ticket => <Ticket key = {ticket.id} ticket={ticket} />)}
-                        </div>
+                        {entry === null ? (
+                            <div className={classes.tickets}>
+                                {tickets.map(ticket => <Ticket key={ticket.id} ticket={ticket} />)}
+                            </div>
+                        ) : (
+                            <div>
+                                <p>{entry?.status}</p>
+                            </div>
+                        )}
+
                     </div>
                     <div className={classes.section}>
                         <h4 className={classes.title}>Managed by</h4>
