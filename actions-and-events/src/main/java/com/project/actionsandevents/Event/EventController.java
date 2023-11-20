@@ -25,6 +25,8 @@ import com.project.actionsandevents.Event.responses.EventsResponse;
 import com.project.actionsandevents.Event.responses.TicketResponse;
 import com.project.actionsandevents.Event.responses.TicketsResponse;
 import com.project.actionsandevents.Event.responses.UsersRegisteredToEventResponse;
+import com.project.actionsandevents.Event.responses.CommentResponse;
+import com.project.actionsandevents.Event.responses.CommentsResponse;
 import com.project.actionsandevents.Event.responses.EventPostResponse;
 
 import com.project.actionsandevents.User.UserInfoDetails;
@@ -158,6 +160,69 @@ public class EventController {
         eventService.deleteEventById(id);
 
         return ResponseEntity.ok(new ResponseMessage("Event was successfully removed", ResponseMessage.Status.SUCCESS));
+    }
+
+    @GetMapping("/event/{id}/comments")
+    public ResponseEntity<Object> getEventComments(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+        return ResponseEntity.ok(new CommentsResponse(eventService.getCommentsIds(id)));
+    }
+
+    @GetMapping("/event/comment/{id}")
+    public ResponseEntity<Object> getEventCommentById(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+        return ResponseEntity.ok(new CommentResponse(eventService.getCommentById(id)));
+    }
+
+    @PostMapping("/event/{id}/comment")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public ResponseEntity<Object> addEventComment(
+            @PathVariable Long id,
+            @Valid @RequestBody Comment comment,
+            BindingResult bindingResult,
+            Authentication authentication) throws EventNotFoundException, UserNotFoundException {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
+        }
+        
+        UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
+
+        comment.setUser(userService.getUserById(userDetails.getId()));
+        return ResponseEntity.ok(new ResponseMessage(eventService.addComment(id, comment), ResponseMessage.Status.SUCCESS));
+    }
+
+    @PatchMapping("/event/comment/{id}")
+    public ResponseEntity<Object> patchEventCommentById(
+            @PathVariable Long id,
+            @Valid @RequestBody Comment comment,
+            BindingResult bindingResult,
+            Authentication authentication) throws EventNotFoundException, UserNotFoundException {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
+        }
+
+        if (!hasPrivilegesOnEvent(authentication, eventService.getCommentById(id).getEvent())) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    "You are not allowed to patch this comment", ResponseMessage.Status.ERROR));
+        }
+
+        return ResponseEntity.ok(new ResponseMessage(eventService.patchCommentById(id, comment), ResponseMessage.Status.SUCCESS));
+    }
+
+    @DeleteMapping("/event/comment/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public ResponseEntity<Object> deleteEventComment(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+        
+        if (!hasPrivilegesOnEvent(authentication, eventService.getCommentById(id).getEvent())) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    "You are not allowed to delete this comment", ResponseMessage.Status.ERROR));
+        }
+
+        eventService.deleteCommentById(id);
+
+        return ResponseEntity.ok(new ResponseMessage("Comment was successfully removed", ResponseMessage.Status.SUCCESS));
     }
 
     @GetMapping("/event/{id}/tickets")
