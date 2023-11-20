@@ -316,7 +316,7 @@ public class EventService {
         if (!ticketType.isPresent()) {
             throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
         }
-
+        
         return registersRepository.findAllIdsByTicketType(ticketType.get());
     }
 

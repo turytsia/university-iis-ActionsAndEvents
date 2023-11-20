@@ -61,7 +61,7 @@ const EventDetail = () => {
             
 
             const registersResponses = await Promise.allSettled(
-                ticketsResponse.data.tickets.map(async (id: number) => await context.request!.get(`user/${context.user.id}/ticket/${id}`))
+                ticketsResponse.data.tickets.map(async (id: number) => await context.request!.get(`/event/ticket/${id}/registrations`))
             );
 
             const registersFulfilledResponses = registersResponses
@@ -98,9 +98,6 @@ const EventDetail = () => {
 
 
             setComments(fulfilledCommentsResponses.map(({ data }) => data))
-
-            const usersResponse = await context.request!.get(`/event/${response.data.id}/users`)
-            console.log(usersResponse.data)
         } catch (error) {
             console.error(error)
             navigate("/")

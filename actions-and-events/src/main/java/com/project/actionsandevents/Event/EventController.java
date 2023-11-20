@@ -56,11 +56,11 @@ public class EventController {
     private boolean hasElevatedPrivileges(Authentication authentication) {
 
         for (GrantedAuthority auth : authentication.getAuthorities()) {
-            if (auth.getAuthority().equals("ROLE_ADMIN") || 
+            if (auth.getAuthority().equals("ROLE_ADMIN") ||
                     auth.getAuthority().equals("ROLE_MANAGER")) {
-                    
+
                 System.out.println("***************hasElevatedPrivileges: " + auth.getAuthority());
-                
+
                 return true;
             }
         }
@@ -74,8 +74,8 @@ public class EventController {
         // Among users only author of the event can modify it or its tickets
 
         // if (!(authentication.getDetails() instanceof UserInfoDetails)) {
-        //     System.out.println("***************Is not instance of UserInfoDetails");
-        //     return false;
+        // System.out.println("***************Is not instance of UserInfoDetails");
+        // return false;
         // }
 
         UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
@@ -88,13 +88,13 @@ public class EventController {
         return isAuthor || hasElevatedPrivileges(authentication);
     }
 
-
     @GetMapping("/event/{id}")
-    public ResponseEntity<Object> getEventById(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+    public ResponseEntity<Object> getEventById(@PathVariable Long id, Authentication authentication)
+            throws EventNotFoundException {
 
         // return ResponseEntity.ok(
-        //     new EventResponse(eventService.getEventById(id), 
-        //     eventService.getEventCategories(id)));
+        // new EventResponse(eventService.getEventById(id),
+        // eventService.getEventCategories(id)));
         return ResponseEntity.ok(new EventResponse(eventService.getEventById(id)));
     }
 
@@ -126,8 +126,7 @@ public class EventController {
     public ResponseEntity<Object> addEvent(
             @Valid @RequestBody Event event,
             BindingResult bindingResult,
-            Authentication authentication) throws UserNotFoundException
-    {
+            Authentication authentication) throws UserNotFoundException {
 
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new EventPostResponse(null,
@@ -135,22 +134,20 @@ public class EventController {
         }
 
         UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
-        
+
         User author = userService.getUserById(userDetails.getId());
         event.setAuthor(author);
-        
+
         return ResponseEntity.ok(
-            new EventPostResponse(eventService.addEvent(event), 
-            "Event was successfully added", ResponseMessage.Status.SUCCESS));
+                new EventPostResponse(eventService.addEvent(event),
+                        "Event was successfully added", ResponseMessage.Status.SUCCESS));
     }
-
-
-
 
     @DeleteMapping("/event/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteEvent(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
-        
+    public ResponseEntity<Object> deleteEvent(@PathVariable Long id, Authentication authentication)
+            throws EventNotFoundException {
+
         System.out.println("***************DELETE EVENT");
         if (!hasPrivilegesOnEvent(authentication, eventService.getEventById(id))) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
@@ -163,12 +160,14 @@ public class EventController {
     }
 
     @GetMapping("/event/{id}/comments")
-    public ResponseEntity<Object> getEventComments(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+    public ResponseEntity<Object> getEventComments(@PathVariable Long id, Authentication authentication)
+            throws EventNotFoundException {
         return ResponseEntity.ok(new CommentsResponse(eventService.getCommentsIds(id)));
     }
 
     @GetMapping("/event/comment/{id}")
-    public ResponseEntity<Object> getEventCommentById(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+    public ResponseEntity<Object> getEventCommentById(@PathVariable Long id, Authentication authentication)
+            throws EventNotFoundException {
         return ResponseEntity.ok(new CommentResponse(eventService.getCommentById(id)));
     }
 
@@ -184,11 +183,12 @@ public class EventController {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
-        
+
         UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
 
         comment.setUser(userService.getUserById(userDetails.getId()));
-        return ResponseEntity.ok(new ResponseMessage(eventService.addComment(id, comment), ResponseMessage.Status.SUCCESS));
+        return ResponseEntity
+                .ok(new ResponseMessage(eventService.addComment(id, comment), ResponseMessage.Status.SUCCESS));
     }
 
     @PatchMapping("/event/comment/{id}")
@@ -208,13 +208,15 @@ public class EventController {
                     "You are not allowed to patch this comment", ResponseMessage.Status.ERROR));
         }
 
-        return ResponseEntity.ok(new ResponseMessage(eventService.patchCommentById(id, comment), ResponseMessage.Status.SUCCESS));
+        return ResponseEntity
+                .ok(new ResponseMessage(eventService.patchCommentById(id, comment), ResponseMessage.Status.SUCCESS));
     }
 
     @DeleteMapping("/event/comment/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteEventComment(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
-        
+    public ResponseEntity<Object> deleteEventComment(@PathVariable Long id, Authentication authentication)
+            throws EventNotFoundException {
+
         if (!hasPrivilegesOnEvent(authentication, eventService.getCommentById(id).getEvent())) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "You are not allowed to delete this comment", ResponseMessage.Status.ERROR));
@@ -222,16 +224,19 @@ public class EventController {
 
         eventService.deleteCommentById(id);
 
-        return ResponseEntity.ok(new ResponseMessage("Comment was successfully removed", ResponseMessage.Status.SUCCESS));
+        return ResponseEntity
+                .ok(new ResponseMessage("Comment was successfully removed", ResponseMessage.Status.SUCCESS));
     }
 
     @GetMapping("/event/{id}/tickets")
-    public ResponseEntity<Object> getEventTickets(@PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+    public ResponseEntity<Object> getEventTickets(@PathVariable Long id, Authentication authentication)
+            throws EventNotFoundException {
         return ResponseEntity.ok(new TicketsResponse(eventService.getTicketTypeIds(id)));
     }
 
     @GetMapping("/event/ticket/{id}")
-    public ResponseEntity<Object> getTicketById(@PathVariable Long id, Authentication authentication) throws TicketNotFoundException {
+    public ResponseEntity<Object> getTicketById(@PathVariable Long id, Authentication authentication)
+            throws TicketNotFoundException {
         return ResponseEntity.ok(new TicketResponse(eventService.getTicketTypeById(id)));
     }
 
@@ -247,18 +252,17 @@ public class EventController {
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
-        return ResponseEntity.ok(new ResponseMessage(eventService.addTicketType(id, ticketType), ResponseMessage.Status.SUCCESS));
+        return ResponseEntity
+                .ok(new ResponseMessage(eventService.addTicketType(id, ticketType), ResponseMessage.Status.SUCCESS));
     }
 
-   
     @PatchMapping("/event/ticket/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> patchTicketById(
             @PathVariable Long id,
             @Valid @RequestBody TicketType ticketType,
             BindingResult bindingResult,
-            Authentication authentication) throws TicketNotFoundException 
-    {
+            Authentication authentication) throws TicketNotFoundException {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
@@ -269,56 +273,47 @@ public class EventController {
                     "You are not allowed to patch this ticket", ResponseMessage.Status.ERROR));
         }
 
-        return ResponseEntity.ok(new ResponseMessage(eventService.patchTicketTypeById(id, ticketType), ResponseMessage.Status.SUCCESS));
+        return ResponseEntity.ok(
+                new ResponseMessage(eventService.patchTicketTypeById(id, ticketType), ResponseMessage.Status.SUCCESS));
     }
 
     @DeleteMapping("/event/ticket/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteTicket(@PathVariable Long id, Authentication authentication) throws TicketNotFoundException {
-        
+    public ResponseEntity<Object> deleteTicket(@PathVariable Long id, Authentication authentication)
+            throws TicketNotFoundException {
+
         if (!hasPrivilegesOnEvent(authentication, eventService.getTicketTypeById(id).getEvent())) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "You are not allowed to delete this ticket", ResponseMessage.Status.ERROR));
         }
-        
+
         eventService.deleteTicketTypeById(id);
 
-        return ResponseEntity.ok(new ResponseMessage("Ticket type was successfully removed", ResponseMessage.Status.SUCCESS));
+        return ResponseEntity
+                .ok(new ResponseMessage("Ticket type was successfully removed", ResponseMessage.Status.SUCCESS));
     }
 
     @GetMapping("/event/ticket/{id}/register/{userId}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> registerUserForTicketType(
-        @PathVariable Long id, 
-        @PathVariable Long userId, 
-        Authentication authentication) 
-        throws TicketNotFoundException, UserNotFoundException 
-    {
+            @PathVariable Long id,
+            @PathVariable Long userId,
+            Authentication authentication)
+            throws TicketNotFoundException, UserNotFoundException {
         return ResponseEntity.ok(
-            new ResponseMessage(eventService.registerUserForTicketType(id, userId), 
-            ResponseMessage.Status.SUCCESS)
-        );
+                new ResponseMessage(eventService.registerUserForTicketType(id, userId),
+                        ResponseMessage.Status.SUCCESS));
     }
 
-
-
-
-
-
-
-
-
     @GetMapping("/event/ticket/{id}/registrations")
-    public ResponseEntity<Object> getTicketRegistrationIds(@PathVariable Long id, Authentication authentication) 
-        throws TicketNotFoundException 
-    {
+    public ResponseEntity<Object> getTicketRegistrationIds(@PathVariable Long id, Authentication authentication)
+            throws TicketNotFoundException {
         return ResponseEntity.ok(eventService.getTicketRegistrationIds(id));
     }
 
     @GetMapping("/event/ticket/registration/{id}")
-    public ResponseEntity<Object> getTicketRegistrationById(@PathVariable RegistersId id, Authentication authentication) 
-        throws RegistrationNotFoundException 
-    {
+    public ResponseEntity<Object> getTicketRegistrationById(@PathVariable RegistersId id, Authentication authentication)
+            throws RegistrationNotFoundException {
         return ResponseEntity.ok(eventService.getTicketRegistrationById(id));
     }
 
@@ -329,8 +324,8 @@ public class EventController {
             @PathVariable Long ticketTypeId,
             @Valid @RequestBody Registers registers,
             BindingResult bindingResult,
-            Authentication authentication) throws RegistrationNotFoundException, UserNotFoundException, TicketNotFoundException 
-    {
+            Authentication authentication)
+            throws RegistrationNotFoundException, UserNotFoundException, TicketNotFoundException {
         RegistersId id = registersService.getId(userId, ticketTypeId);
 
         if (bindingResult.hasErrors()) {
@@ -338,90 +333,104 @@ public class EventController {
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
-        if (!hasPrivilegesOnEvent(authentication, eventService.getTicketRegistrationById(id).getTicketType().getEvent())) {
+        if (!hasPrivilegesOnEvent(authentication,
+                eventService.getTicketRegistrationById(id).getTicketType().getEvent())) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "You are not allowed to patch this ticket registration", ResponseMessage.Status.ERROR));
         }
 
-        return ResponseEntity.ok(new ResponseMessage(eventService.patchTicketRegistrationById(id, registers.getStatus()), ResponseMessage.Status.SUCCESS));
+        return ResponseEntity.ok(new ResponseMessage(
+                eventService.patchTicketRegistrationById(id, registers.getStatus()), ResponseMessage.Status.SUCCESS));
     }
-
 
     // @GetMapping("/event/{id}/users")
     // public ResponseEntity<Object> getRegisteredUsersByEventId(
-    //     @PathVariable Long id, Authentication authentication) throws EventNotFoundException {
+    // @PathVariable Long id, Authentication authentication) throws
+    // EventNotFoundException {
 
-    //     return ResponseEntity.ok(
-    //         new UsersRegisteredToEventResponse(eventService.getRegisteredUsersByEventId(id))
-    //     );
+    // return ResponseEntity.ok(
+    // new
+    // UsersRegisteredToEventResponse(eventService.getRegisteredUsersByEventId(id))
+    // );
     // }
 
     // @GetMapping("/event/{id}/user/{userId}")
     // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     // public ResponseEntity<Object> getRegisteredUserById(
-    //     @PathVariable Long id, @PathVariable Long userId, Authentication authentication) 
-    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
-    //     return ResponseEntity.ok(eventService.getRegisteredUserById(id, userId));
+    // @PathVariable Long id, @PathVariable Long userId, Authentication
+    // authentication)
+    // throws EventNotFoundException, UserNotFoundException,
+    // UserNotRegisteredException {
+    // return ResponseEntity.ok(eventService.getRegisteredUserById(id, userId));
     // }
 
     // @DeleteMapping("/event/{id}/user/{userId}")
     // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     // public ResponseEntity<Object> unregisterUserFromEvent(
-    //     @PathVariable Long id, @PathVariable Long userId, Authentication authentication) 
-    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
+    // @PathVariable Long id, @PathVariable Long userId, Authentication
+    // authentication)
+    // throws EventNotFoundException, UserNotFoundException,
+    // UserNotRegisteredException {
 
-    //     if (!hasPrivilegesOnEvent(authentication, eventService.getEventById(id))) {
-    //         return ResponseEntity.badRequest().body(new ResponseMessage(
-    //             "You are not allowed to unregister this user", ResponseMessage.Status.ERROR));
-    //     }
-        
-    //     return ResponseEntity.ok(eventService.unregisterUserFromEvent(id, userId));
+    // if (!hasPrivilegesOnEvent(authentication, eventService.getEventById(id))) {
+    // return ResponseEntity.badRequest().body(new ResponseMessage(
+    // "You are not allowed to unregister this user",
+    // ResponseMessage.Status.ERROR));
+    // }
+
+    // return ResponseEntity.ok(eventService.unregisterUserFromEvent(id, userId));
     // }
 
     // @PatchMapping("/event/{id}/user/{userId}")
     // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     // public ResponseEntity<Object> patchRegisteredUser(
-    //     @PathVariable Long id, @PathVariable Long userId, Authentication authentication) 
-    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException 
+    // @PathVariable Long id, @PathVariable Long userId, Authentication
+    // authentication)
+    // throws EventNotFoundException, UserNotFoundException,
+    // UserNotRegisteredException
     // {
-    //     return ResponseEntity.ok(eventService.getRegisteredUserById(id, userId));
+    // return ResponseEntity.ok(eventService.getRegisteredUserById(id, userId));
     // }
 
     // @PatchMapping("/event/ticket/{id}")
     // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     // public ResponseEntity<Object> patchUserRegistration(
-    //         @PathVariable Long ticketId,
-    //         @Valid @RequestBody Long userId,
-    //         @Valid @RequestBody Status status,
-    //         BindingResult bindingResult,
-    //         Authentication authentication) throws TicketNotFoundException 
+    // @PathVariable Long ticketId,
+    // @Valid @RequestBody Long userId,
+    // @Valid @RequestBody Status status,
+    // BindingResult bindingResult,
+    // Authentication authentication) throws TicketNotFoundException
     // {
-    //     if (bindingResult.hasErrors()) {
-    //         return ResponseEntity.badRequest().body(new ResponseMessage(
-    //                 "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
-    //     }
-
-    //     if (!hasPrivilegesOnEvent(authentication, eventService.getTicketTypeById(eventId).getEvent())) {
-    //         return ResponseEntity.badRequest().body(new ResponseMessage(
-    //                 "You are not allowed to patch this user's registration", ResponseMessage.Status.ERROR));
-    //     }
-
-    //     return ResponseEntity.ok(new ResponseMessage(eventService.patchUserRegistration(eventId, user), ResponseMessage.Status.SUCCESS));
+    // if (bindingResult.hasErrors()) {
+    // return ResponseEntity.badRequest().body(new ResponseMessage(
+    // "Validation failed: " + bindingResult.getAllErrors(),
+    // ResponseMessage.Status.ERROR));
     // }
 
+    // if (!hasPrivilegesOnEvent(authentication,
+    // eventService.getTicketTypeById(eventId).getEvent())) {
+    // return ResponseEntity.badRequest().body(new ResponseMessage(
+    // "You are not allowed to patch this user's registration",
+    // ResponseMessage.Status.ERROR));
+    // }
+
+    // return ResponseEntity.ok(new
+    // ResponseMessage(eventService.patchUserRegistration(eventId, user),
+    // ResponseMessage.Status.SUCCESS));
+    // }
 
     @PostMapping("/event/{id}/approve")
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> approveEvent(
             @PathVariable Long id,
             Authentication authentication) throws EventNotFoundException {
-            
+
         return ResponseEntity.ok(new ResponseMessage(eventService.approveEvent(id), ResponseMessage.Status.SUCCESS));
     }
 
     @GetMapping("/event/{id}/logs")
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> getEventLogs(@PathVariable Long id, Authentication authentication) 
+    public ResponseEntity<Object> getEventLogs(@PathVariable Long id, Authentication authentication)
             throws EventNotFoundException {
         return ResponseEntity.ok(eventService.getEventLogs(id));
     }
@@ -429,7 +438,7 @@ public class EventController {
     @GetMapping("/event/log/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getEventLogById(
-        @PathVariable Long id, Authentication authentication) 
+            @PathVariable Long id, Authentication authentication)
             throws EventLogNotFoundException {
         return ResponseEntity.ok(eventService.getEventLogById(id));
     }
@@ -437,8 +446,9 @@ public class EventController {
     @DeleteMapping("/event/log/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<Object> deleteEventLogById(
-        @PathVariable Long id, Authentication authentication) 
+            @PathVariable Long id, Authentication authentication)
             throws EventLogNotFoundException {
-        return ResponseEntity.ok(new ResponseMessage(eventService.deleteEventLogById(id), ResponseMessage.Status.SUCCESS));
+        return ResponseEntity
+                .ok(new ResponseMessage(eventService.deleteEventLogById(id), ResponseMessage.Status.SUCCESS));
     }
 }
