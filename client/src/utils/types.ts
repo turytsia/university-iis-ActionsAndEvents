@@ -11,6 +11,6 @@ export type EventType = {
     "image": null,
     "status": string,
     "placeId": number,
-    "author": UserType,
-    "category": CategoryType
+    "authorId": number,
+    "categoryId": number
 }

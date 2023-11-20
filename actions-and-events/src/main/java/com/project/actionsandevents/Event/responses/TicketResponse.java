@@ -1,6 +1,5 @@
 package com.project.actionsandevents.Event.responses;
 
-import com.project.actionsandevents.Event.Event;
 import com.project.actionsandevents.TicketType.TicketType;
 
 import lombok.Getter;
@@ -13,7 +12,8 @@ public class TicketResponse {
     private String name;
     private Long capacity;
     private String description;
-    private Long event;
+    // Pass event by id to avoid infinite recursion when sending response
+    private Long eventId;
     private Float price;
     
     public TicketResponse(TicketType ticketType) {
@@ -22,6 +22,6 @@ public class TicketResponse {
         this.capacity = ticketType.getCapacity();
         this.description = ticketType.getDescription();
         this.price = ticketType.getPrice();
-        this.event = ticketType.getEvent().getId();
+        this.eventId = ticketType.getEvent().getId();
     }
 }

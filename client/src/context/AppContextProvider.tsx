@@ -55,8 +55,10 @@ export const floatingRoot = document.getElementById("portal")
  */
 const AppContextProvider = ({ children }: PropsType) => {
 
+  const localUser = localStorage.getItem("user")
+
   const [token, setToken] = useState(localStorage.getItem("token"))
-  const [user, setUser] = useState<UserType>(initialUser)
+  const [user, setUser] = useState<UserType>(localUser ? JSON.parse(localUser) : initialUser)
 
   const request = useMemo(
     () => axios.create({
@@ -68,10 +70,17 @@ const AppContextProvider = ({ children }: PropsType) => {
     [token]
   )
 
+
   const getUser = async () => {
+    // if (localUser) {
+    //   setUser(JSON.parse(localUser))
+    //   return
+    // }
+    
     try {
       const response = await request.get<typeof initialUser>("/user")
       setUser(response.data)
+      localStorage.setItem("user", JSON.stringify(response.data))
     } catch (error) {
       logout()
     }
@@ -86,7 +95,8 @@ const AppContextProvider = ({ children }: PropsType) => {
         email,
         roles: role
       })
-      setUser(response.data)
+      // setUser(response.data)
+      // localStorage.setItem("user", JSON.stringify(response.data))
     } catch (error) {
       setUser(initialUser)
     }
@@ -100,6 +110,7 @@ const AppContextProvider = ({ children }: PropsType) => {
       })
       setToken(response.data)
       localStorage.setItem("token", response.data)
+      localStorage.setItem("user", JSON.stringify(response.data))
     } catch (error) {
       logout()
     }
@@ -108,6 +119,7 @@ const AppContextProvider = ({ children }: PropsType) => {
   const logout = () => {
     setToken(null)
     setUser(initialUser)
+    localStorage.setItem("user", "")
     localStorage.removeItem("token")
   }
 

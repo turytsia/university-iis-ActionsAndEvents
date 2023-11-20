@@ -11,18 +11,23 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import com.project.actionsandevents.Event.Event;
+
+import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-//@Table(name="_place")
 public class Place {
     @Id
     @GeneratedValue
@@ -43,4 +48,8 @@ public class Place {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PlaceStatus status;
+
+    // Delete all events when place is deleted
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Event> events;
 }

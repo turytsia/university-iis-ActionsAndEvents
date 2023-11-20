@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import classes from "./NewTicket.module.css"
 import CreateTicketModal, { TicketType } from '../../../../Tickets/modals/CreateTicketModal/CreateTicketModal'
+import { TicketTypeWithRegister } from '../../../../Tickets/Tickets'
 
 type PropsType = {
-    createTicket: (inputs: TicketType) => void
+    createTicket: (inputs: TicketTypeWithRegister) => void
 }
 
 const NewTicket = ({
@@ -11,7 +12,7 @@ const NewTicket = ({
 }: PropsType) => {
     const [isActive, setIsActive] = useState(false)
 
-    const onSubmit = (inputs: TicketType) => {
+    const onSubmit = (inputs: TicketTypeWithRegister) => {
         createTicket(inputs)
         onClose()
     }

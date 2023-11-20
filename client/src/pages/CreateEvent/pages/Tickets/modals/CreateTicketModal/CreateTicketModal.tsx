@@ -3,27 +3,32 @@ import Modal from '../../../../../../components/Modal/Modal'
 import icons from '../../../../../../utils/icons'
 import Input from '../../../../../../components/Input/Input'
 import Textarea from '../../../../../../components/Textarea/Textarea'
+import { TicketTypeWithRegister } from '../../Tickets'
 
 type PropsType = {
-    defaultInputs?: TicketType
+    defaultInputs?: TicketTypeWithRegister
     onClose: () => void,
-    onSubmit: (inputs: TicketType) => void,
+    onSubmit: (inputs: TicketTypeWithRegister) => void,
 }
 
 export type TicketType = {
-    id: string | null
+    id: number | null
     name: string,
     price: string,
     capacity: string,
     description: string
+    eventId: number | null
 }
 
-const initialInputs: TicketType = {
+const initialInputs: TicketTypeWithRegister = {
     id: null,
     name: "",
     price: "",
     capacity: "",
-    description: ""
+    description: "",
+    date: "",
+    status: "",
+    eventId: null
 }
 
 const CreateTicketModal = ({

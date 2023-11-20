@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { EventType } from '../../../../utils/types'
 
 import classes from "./EventCard.module.css"
@@ -7,7 +7,7 @@ import icons from '../../../../utils/icons'
 import Button from '../../../../components/Button/Button'
 import { Link } from 'react-router-dom'
 import ProfileCard from '../../../../components/ProfileCard/ProfileCard'
-import { AppContext } from '../../../../context/AppContextProvider'
+import { AppContext, UserType } from '../../../../context/AppContextProvider'
 
 type PropsType = {
     event: EventType
@@ -16,10 +16,28 @@ type PropsType = {
 const EventCard = ({
     event
 }: PropsType) => {
+
+    const context = useContext(AppContext)
+
+    const [author, setAuthor] = useState<UserType | null>(null)
+
+    const fetchAuthor = async () => {
+        try {
+            const response = await context.request!.get(`/user/${event.authorId}`)
+            setAuthor(response.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchAuthor()
+    }, [])
+
     return (
         <div className={classes.container}>
             <div className={classes.preview} style={{ backgroundColor: "purple" }} >
-                <ProfileCard className={classes.profile} user={event.author} />
+                {author && <ProfileCard className={classes.profile} user={author} />}
             </div>
             <div className={classes.header}>
                 <h2>{event.title}</h2>
@@ -41,8 +59,7 @@ const EventCard = ({
                 </span>
             </div>
             <div className={classes.actions}>
-                <Button to={`/events/${event.id}`}>Details</Button>
-                <Button style='invert'>Buy tickets</Button>
+                <Button style='invert' to={`/events/${event.id}`}>Details</Button>
             </div>
         </div>
     )

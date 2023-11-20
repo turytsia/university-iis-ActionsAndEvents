@@ -10,11 +10,15 @@ import java.util.List;
 import java.util.Optional;
 
 import com.project.actionsandevents.Event.Event;
+import com.project.actionsandevents.User.User;
 
 @Repository
 public interface TicketTypeRepository extends JpaRepository<TicketType, Long> {
     @Query("SELECT tt.id FROM TicketType tt WHERE tt.event = :event")
     List<Long> findAllIdsByEvent(@Param("event") Event event);
+
+    @Query("SELECT tt.id FROM TicketType tt WHERE tt.id IN ( SELECT r.ticketType FROM Registers r WHERE r.user = :user )")
+    List<Long> findAllIdsByUser(@Param("user") User user);
 
     List<TicketType> findAllByEvent(Event event);
 

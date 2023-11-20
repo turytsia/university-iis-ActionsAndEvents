@@ -17,41 +17,53 @@ const RowActions = ({
     users,
     setUsers
 }: PropsType) => {
-    const {id} = useParams()
+    const { id } = useParams()
     const context = useContext(AppContext)
 
     const [isDeleteActive, setIsDeleteActive] = useState(false)
 
     const checkUser = async () => {
         try {
-            // const response = await context.request!.get(`/event/{id}/user/{userId}`)
+            ///event/ticket/registration/{id}
+            const response = await context.request!.patch(`/event/ticket/registration/${user.id}/${user.ticketId}`, {
+                userId: user.id,
+                ticketId: user.ticketId,
+                status: "Accepted",
+                date: new Date()
+            })
+            setUsers(prev => prev.reduce((a, u) => [...a, u.id === user.id ? { ...user, status: "Accepted" } : u ], [] as UserWithStatus[]))
         } catch (error) {
-
+            console.error(error)
         }
     }
 
     const deleteUser = async () => {
         try {
-            const response = await context.request!.delete(`/event/${id}/user/${user.id}`)
-            console.log(response.data)
-            setUsers(prev => prev.filter(({ id }) => id !== user.id))
+            const response = await context.request!.patch(`/event/ticket/registration/${user.id}/${user.ticketId}`, {
+                userId: user.id,
+                ticketId: user.ticketId,
+                status: "Rejected",
+                date: new Date()
+            })
+            setUsers(prev => prev.reduce((a, u) => [...a, u.id === user.id ? { ...user, status: "Rejected" } : u], [] as UserWithStatus[]))
+            setIsDeleteActive(false)
         } catch (error) {
             console.error(error)
         }
     }
-  return (
-      <>
-          <ButtonIconOnly icon={icons.check}></ButtonIconOnly>
-          <ButtonIconOnly onClick={() => setIsDeleteActive(true)} icon={icons.close}></ButtonIconOnly>
-          {isDeleteActive && (
-              <DeleteModal
-                  title={`Dismiss user "${user.login}"?`}
-                  onSubmit={deleteUser}
-                  onClose={() => setIsDeleteActive(false)}
-              />
-          )}
-      </>
-  )
+    return (
+        <>
+            <ButtonIconOnly onClick={checkUser} icon={icons.check}></ButtonIconOnly>
+            <ButtonIconOnly onClick={() => setIsDeleteActive(true)} icon={icons.close}></ButtonIconOnly>
+            {isDeleteActive && (
+                <DeleteModal
+                    title={`Dismiss user "${user.login}"?`}
+                    onSubmit={deleteUser}
+                    onClose={() => setIsDeleteActive(false)}
+                />
+            )}
+        </>
+    )
 }
 
 export default RowActions

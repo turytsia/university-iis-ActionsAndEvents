@@ -67,7 +67,9 @@ public class SecurityConfig {
                                         "/event/{id}/tickets",
                                         "/event/{id}/users",
                                         "/event/ticket/{id}",
-                                        "/user")
+                                        "/user",
+                                        "/user/{id}",
+                                        "/user/{id}/events")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

@@ -94,11 +94,13 @@ const User = () => {
                     {fmt(user.phone)}
                 </p>
             </div>
-            <ButtonIconOnly
-                className={classes.settings}
-                icon={icons.settings}
-                onClick={() => setIsSettingsActive(true)}
-            />
+            {context.user.id === +id! && (
+                <ButtonIconOnly
+                    className={classes.settings}
+                    icon={icons.settings}
+                    onClick={() => setIsSettingsActive(true)}
+                />
+            )}
             {isSettingsActive && (
                 <UserSettingsModal
                     inputs={user}

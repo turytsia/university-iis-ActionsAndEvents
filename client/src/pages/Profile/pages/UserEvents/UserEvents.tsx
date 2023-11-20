@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { AppContext } from '../../../../context/AppContextProvider'
 
 import classes from "./UserEvents.module.css"
@@ -8,12 +8,14 @@ import { EventType } from '../../../../utils/types'
 
 const UserEvents = () => {
 
+  const {id} = useParams()
+
   const context = useContext(AppContext)
 
   const [events,setEvents] = useState<EventType[]>([])
   const fetchEvents = async () => {
     try {
-      const response = await context.request!.get("/events")
+      const response = await context.request!.get(`/user/${id}/events`)
 
       const responses = await Promise.allSettled(
         response.data.events.map(async (id: number) => await context.request!.get(`/event/${id}`))

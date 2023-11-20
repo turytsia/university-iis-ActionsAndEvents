@@ -12,11 +12,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.project.actionsandevents.Event.Event;
+import com.project.actionsandevents.Event.EventRepository;
+import com.project.actionsandevents.Event.Registers;
+import com.project.actionsandevents.Event.RegistersRepository;
+import com.project.actionsandevents.TicketType.TicketType;
+import com.project.actionsandevents.TicketType.TicketTypeRepository;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
 import com.project.actionsandevents.User.requests.UserPatchRequest;
 
+
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -26,6 +35,15 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private EventRepository eventRepository;
+
+    @Autowired
+    private TicketTypeRepository ticketTypeRepository;
+
+    @Autowired
+    private RegistersRepository registersRepository;
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
@@ -108,5 +126,49 @@ public class UserService implements UserDetailsService {
      */
     public List<Long> getUserIds() {
         return repository.findAllIds();
+    }
+
+
+    public List<Long> getUserEvents(Long id) throws UserNotFoundException {
+        Optional<User> user = repository.findById(id);
+
+        if (!user.isPresent()) {
+            throw new UserNotFoundException("User not found with ID: " + id);
+        }
+
+        return eventRepository.findAllByAuthor(user.get()).stream().map(Event::getId).collect(Collectors.toList());
+    }
+
+    public List<Long> getUserTickets(Long id) throws UserNotFoundException {
+        Optional<User> user = repository.findById(id);
+
+        if (!user.isPresent()) {
+            throw new UserNotFoundException("User not found with ID: " + id);
+        }
+
+        return ticketTypeRepository
+                .findAllIdsByUser(user.get()).stream()
+                .map(_id -> ticketTypeRepository.findById(_id).orElse(null)) // Assuming findById returns an
+                // Optional<TicketType>
+                .filter(Objects::nonNull)
+                .map(TicketType::getId).collect(Collectors.toList());
+    }
+
+    public Registers getUserTicketRegistration(Long id, Long ticketId) throws UserNotFoundException {
+        Optional<User> user = repository.findById(id);
+
+        if (!user.isPresent()) {
+            throw new UserNotFoundException("User not found with ID: " + id);
+        }
+
+        Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
+
+        if (!ticketType.isPresent()) {
+            throw new UserNotFoundException("Ticket not found with ID: " + ticketType);
+        }
+
+        Optional<Registers> registers = registersRepository.findByUserAndTicketType(user.get(), ticketType.get());
+
+        return registers.get();
     }
 }

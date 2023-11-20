@@ -16,6 +16,7 @@ import Ticket from '../CreateEvent/pages/components/TicketInputs/components/Tick
 import EventUpdateModal from './modals/EventUpdateModal/EventUpdateModal'
 import EventDeleteModal from './modals/EventDeleteModal/EventDeleteModal'
 import Tabs, { TabsType } from '../../components/Tabs/Tabs'
+import { TicketTypeWithRegister } from '../CreateEvent/pages/Tickets/Tickets'
 
 const EventDetail = () => {
     const { id } = useParams()
@@ -24,8 +25,8 @@ const EventDetail = () => {
     const context = useContext(AppContext)
 
     const [event, setEvent] = useState<EventType | null>(null)
-    const [tickets, setTickets] = useState<TicketType[]>([])
-    const [users, setUsers] = useState<{ user: UserType, status: "PENDING" | "APPROVED" }[]>([])
+    const [tickets, setTickets] = useState<TicketTypeWithRegister[]>([])
+    const [author, setAuthor] = useState<UserType | null>(null)
     const [isUpdateActive, setIsUpdateActive] = useState(false)
     const [isDeleteActive, setIsDeleteActive] = useState(false)
 
@@ -35,21 +36,39 @@ const EventDetail = () => {
 
             const ticketsResponse = await context.request!.get(`/event/${id}/tickets`)
 
+            const authorResponse = await context.request!.get(`/user/${response.data.authorId}`)
+
             const ticketResponses = await Promise.allSettled(
                 ticketsResponse.data.tickets.map(async (ticketId: number) => await context.request!.get(`/event/ticket/${ticketId}`))
             );
 
-            const fulfilledResponses = ticketResponses
-                .filter((r): r is PromiseFulfilledResult<SpringResponseType<TicketType>> => r.status === "fulfilled")
+            const registersResponses = await Promise.allSettled(
+                ticketsResponse.data.tickets.map(async (id: number) => await context.request!.get(`user/${context.user.id}/ticket/${id}`))
+            );
+
+            const registersFulfilledResponses = registersResponses
+                .filter((r): r is PromiseFulfilledResult<SpringResponseType<{ ticketId: number, date: string, status: string, userId: number }>> => r.status === "fulfilled")
                 .map((r) => r.value)
                 .filter((v) => v);
 
-            setTickets(fulfilledResponses.map(({ data }) => data))
-            setEvent(response.data)
+            const ticketFulfilledResponses = ticketResponses
+                .filter((r): r is PromiseFulfilledResult<SpringResponseType<TicketType>> => r.status === "fulfilled")
+                .map((r) => r.value)
+                .filter((v) => v);           
 
-            const usersResponse = await context.request!.get(`/event/${response.data.id}/users`)
-            setUsers(usersResponse.data.userRegisters)
+            setTickets(ticketFulfilledResponses.map(({ data: ticket }) => {
+                const entry = registersFulfilledResponses.map(({ data }) => data).find(({ ticketId }) => ticket.id! === ticketId!)
+
+                if (entry) {
+                    return { ...ticket, date: entry?.date, status: entry?.status }
+                } else {
+                    return { ...ticket, date: "", status: "" }
+                }
+            }))
+            setAuthor(authorResponse.data)
+            setEvent(response.data)
         } catch (error) {
+            console.error(error)
             navigate("/")
         }
     }
@@ -83,7 +102,7 @@ const EventDetail = () => {
         return null;
     }
 
-    const entry = users.find(({ user }) => user.id === context.user.id)
+    // const entry = users.find(({ user }) => user.id === context.user.id)
 
     return (
         <>
@@ -93,7 +112,7 @@ const EventDetail = () => {
                     <div className={classes.header}>
                         <h2>{event.title}</h2>
                         <div className={classes.actions}>
-                            {context.user.id === event.author.id && (
+                            {context.user.id === event.authorId && (
                                 <>
                                     <Button onClick={() => setIsUpdateActive(true)}>
                                         <Icon icon={icons.pen} width={20} height={20} />
@@ -119,20 +138,13 @@ const EventDetail = () => {
                     </div>
                     <div className={classes.section}>
                         <h4 className={classes.title}>Tickets</h4>
-                        {entry === null ? (
-                            <div className={classes.tickets}>
-                                {tickets.map(ticket => <Ticket key={ticket.id} ticket={ticket} />)}
-                            </div>
-                        ) : (
-                            <div>
-                                <p>{entry?.status}</p>
-                            </div>
-                        )}
-
+                        <div className={classes.tickets}>
+                            {tickets.map(ticket => <Ticket key={ticket.id} ticket={ticket} />)}
+                        </div>
                     </div>
                     <div className={classes.section}>
                         <h4 className={classes.title}>Managed by</h4>
-                        <ProfileCard className={classes.profile} user={event.author} />
+                        {author && <ProfileCard className={classes.profile} user={author} />}
                     </div>
                 </div>
             </div>

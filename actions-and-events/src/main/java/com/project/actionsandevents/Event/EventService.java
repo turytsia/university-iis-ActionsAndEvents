@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
+import com.project.actionsandevents.Event.exceptions.RegistrationNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
-import com.project.actionsandevents.Event.exceptions.UserNotRegisteredException;
 import com.project.actionsandevents.Event.requests.EventPatchRequest;
 import com.project.actionsandevents.Event.responses.EventUserRegisters;
 
@@ -241,84 +241,136 @@ public class EventService {
         return "User was successfully registered";
     }
 
-    public List<EventUserRegisters> getRegisteredUsersByEventId(Long eventId) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(eventId);
+    
 
-        if (!event.isPresent()) {
-            throw new EventNotFoundException("Event not found with id: " + eventId);
+
+
+    public List<RegistersId> getTicketRegistrationIds(Long ticketId) throws TicketNotFoundException {
+        Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
+
+        if (!ticketType.isPresent()) {
+            throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
         }
 
-        List<EventUserRegisters> usersRegisters = new ArrayList<EventUserRegisters>();
-
-        List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
-
-        for (TicketType ticketType : ticketTypes) {
-            List<Registers> registers = registersRepository.findByTicketType(ticketType);
-
-            for (Registers register : registers) {
-                //if (register.getStatus() == RegistersStatus.ACCEPTED) {
-                usersRegisters.add(new EventUserRegisters(register.getUser(), register.getStatus()));
-                //}
-            }
-        }
-
-        return usersRegisters;
+        return registersRepository.findAllIdsByTicketType(ticketType.get());
     }
 
-    public User getRegisteredUserById(Long eventId, Long userId) 
-            throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
-        Optional<Event> event = repository.findById(eventId);
-        Optional<User> user = userRepository.findById(userId);
+    public Registers getTicketRegistrationById(RegistersId id) throws RegistrationNotFoundException {
+        Optional<Registers> registers = registersRepository.findByUserAndTicketType(id.getUser(), id.getTicketType());
 
-        if (!event.isPresent()) {
-            throw new EventNotFoundException("Event not found with id: " + eventId);
+        if (!registers.isPresent()) {
+            throw new RegistrationNotFoundException("User not registered for this ticket with id: " + id);
         }
 
-        if (!user.isPresent()) {
-            throw new UserNotFoundException("User not found with id: " + userId);
-        }
-
-        List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
-
-        for (TicketType ticketType : ticketTypes) {
-            Optional<Registers> registers = registersRepository.findByUserAndTicketType(user.get(), ticketType);
-
-            if (registers.isPresent()) {
-                return user.get();
-            }
-        }
-
-        throw new UserNotRegisteredException("User not found with id: " + userId);
+        return registers.get();
     }
 
-    public String unregisterUserFromEvent(Long eventId, Long userId) 
-            throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
-        Optional<Event> event = repository.findById(eventId);
-        Optional<User> user = userRepository.findById(userId);
 
-        if (!event.isPresent()) {
-            throw new EventNotFoundException("Event not found with id: " + eventId);
+    public String patchTicketRegistrationById(RegistersId id, RegistersStatus status) throws RegistrationNotFoundException {
+        Optional<Registers> registers = registersRepository.findByUserAndTicketType(id.getUser(), id.getTicketType());
+
+        if (!registers.isPresent()) {
+            throw new RegistrationNotFoundException("Registration not found with id: " + id);
         }
 
-        if (!user.isPresent()) {
-            throw new UserNotFoundException("User not found with id: " + userId);
-        }
+        registers.get().setStatus(status);
 
-        List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
+        registersRepository.save(registers.get());
 
-        // TODO: check if user is registered to multiple tickets? Is that allowed??
-        for (TicketType ticketType : ticketTypes) {
-            Optional<Registers> registers = registersRepository.findByUserAndTicketType(user.get(), ticketType);
-
-            if (registers.isPresent()) {
-                registersRepository.delete(registers.get());
-                return "User was successfully unregistered";
-            }
-        }
-
-        throw new UserNotRegisteredException("User with id " + userId + 
-            " not registered for this event with id " + eventId);
+        return "Ticket registration was successfully updated";
     }
+
+
+
+
+
+
+    // public List<EventUserRegisters> getRegisteredUsersByEventId(Long eventId) throws EventNotFoundException {
+    //     Optional<Event> event = repository.findById(eventId);
+
+    //     if (!event.isPresent()) {
+    //         throw new EventNotFoundException("Event not found with id: " + eventId);
+    //     }
+
+    //     List<EventUserRegisters> usersRegisters = new ArrayList<EventUserRegisters>();
+
+    //     List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
+
+    //     for (TicketType ticketType : ticketTypes) {
+    //         List<Registers> registers = registersRepository.findByTicketType(ticketType);
+
+    //         for (Registers register : registers) {
+    //             //if (register.getStatus() == RegistersStatus.ACCEPTED) {
+    //             usersRegisters.add(new EventUserRegisters(register.getUser().getId(), register.getStatus()));
+    //             //}
+    //         }
+    //     }
+
+    //     return usersRegisters;
+    // }
+
+    // public User getRegisteredUserById(Long eventId, Long userId) 
+    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException 
+    // {
+    //     Optional<Event> event = repository.findById(eventId);
+    //     Optional<User>  user  = userRepository.findById(userId);
+
+    //     if (!event.isPresent()) {
+    //         throw new EventNotFoundException("Event not found with id: " + eventId);
+    //     }
+
+    //     if (!user.isPresent()) {
+    //         throw new UserNotFoundException("User not found with id: " + userId);
+    //     }
+
+    //     List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
+
+    //     for (TicketType ticketType : ticketTypes) {
+    //         Optional<Registers> registers = registersRepository.findByUserAndTicketType(user.get(), ticketType);
+
+    //         if (registers.isPresent()) {
+    //             return user.get();
+    //         }
+    //     }
+
+    //     throw new UserNotRegisteredException("User not found with id: " + userId);
+    // }
+
+    // public String unregisterUserFromEvent(Long eventId, Long userId) 
+    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
+    //     Optional<Event> event = repository.findById(eventId);
+    //     Optional<User> user = userRepository.findById(userId);
+
+    //     if (!event.isPresent()) {
+    //         throw new EventNotFoundException("Event not found with id: " + eventId);
+    //     }
+
+    //     if (!user.isPresent()) {
+    //         throw new UserNotFoundException("User not found with id: " + userId);
+    //     }
+
+    //     List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
+
+    //     // TODO: check if user is registered to multiple tickets? Is that allowed??
+    //     for (TicketType ticketType : ticketTypes) {
+    //         Optional<Registers> registers = registersRepository.findByUserAndTicketType(user.get(), ticketType);
+
+    //         if (registers.isPresent()) {
+    //             registersRepository.delete(registers.get());
+    //             return "User was successfully unregistered";
+    //         }
+    //     }
+
+    //     throw new UserNotRegisteredException("User with id " + userId + 
+    //         " not registered for this event with id " + eventId);
+    // }
+
+    
+
+
+
+
+
 
     
     public String approveEvent(Long eventId) throws EventNotFoundException {

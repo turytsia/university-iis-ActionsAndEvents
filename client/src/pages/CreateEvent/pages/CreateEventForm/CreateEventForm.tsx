@@ -15,6 +15,7 @@ import { CategoryType, categoriesToDropdown } from '../../../Admin/pages/Categor
 import InputLabel from '../../../../components/InputLabel/InputLabel'
 import Dropdown from '../../../../components/Dropdown/Dropdown'
 import Button from '../../../../components/Button/Button'
+import { TicketTypeWithRegister } from '../Tickets/Tickets'
 
 const initialInputs = {
     title: "",
@@ -34,7 +35,7 @@ const CreateEventForm = () => {
     const context = useContext(AppContext)
 
     const [inputs, setInputs] = useState(initialInputs)
-    const [tickets, setTickets] = useState<TicketType[]>([])
+    const [tickets, setTickets] = useState<TicketTypeWithRegister[]>([])
     const [places, setPlaces] = useState<PlaceType[]>([])
     const [categories, setCategories] = useState<CategoryType[]>([])
  

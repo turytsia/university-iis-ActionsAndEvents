@@ -83,6 +83,7 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<logLevel>ERROR</logLevel>
 				</configuration>
 			</plugin>
 		</plugins>

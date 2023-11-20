@@ -12,8 +12,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.project.actionsandevents.Event.responses.EventsResponse;
+import com.project.actionsandevents.Event.responses.TicketsResponse;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
 import com.project.actionsandevents.User.requests.UserPatchRequest;
+import com.project.actionsandevents.User.responses.RegistersResponse;
 import com.project.actionsandevents.User.responses.UserResponse;
 import com.project.actionsandevents.User.responses.UsersResponse;
 import com.project.actionsandevents.common.ResponseMessage;
@@ -27,6 +30,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
 
     @GetMapping("/user")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
@@ -47,7 +51,7 @@ public class UserController {
     }
 
     @GetMapping("/user/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getUserById(@PathVariable Long id, Authentication authentication) throws UserNotFoundException {
         User user = userService.getUserById(id);
 
@@ -85,6 +89,28 @@ public class UserController {
         // TODO add log to db
 
         return ResponseEntity.ok(new ResponseMessage("User was successfully removed", ResponseMessage.Status.SUCCESS));
+    }
+
+
+    @GetMapping("/user/{id}/events")
+    public ResponseEntity<Object> getUserEvents(@PathVariable Long id, Authentication authentication)
+            throws UserNotFoundException {
+        return ResponseEntity.ok(new EventsResponse(userService.getUserEvents(id)));
+    }
+    
+    @GetMapping("/user/{id}/tickets")
+    public ResponseEntity<Object> getUserTickets(@PathVariable Long id, Authentication authentication)
+            throws UserNotFoundException {
+        return ResponseEntity.ok(new TicketsResponse(userService.getUserTickets(id)));
+    }
+
+    @GetMapping("/user/{id}/ticket/{ticketId}")
+    public ResponseEntity<Object> getUserTicket(
+            @PathVariable Long id,
+            @PathVariable Long ticketId,
+        Authentication authentication)
+            throws UserNotFoundException {
+        return ResponseEntity.ok(new RegistersResponse(userService.getUserTicketRegistration(id, ticketId)));
     }
 
 }

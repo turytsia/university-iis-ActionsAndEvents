@@ -19,7 +19,9 @@ const Menu = ({
   return (
       <aside ref={ref} className={classes.container}>
           <Button alignLeft to="/">Home</Button>
-          <Button alignLeft to="/tickets">My tickets</Button>
+          {context.isAuth && (
+              <Button alignLeft to="/tickets">My tickets</Button>
+          )}
           {(context.isAuth && context.user && context.user.role === roles.ADMIN) && (
               <>
                   <Button alignLeft to="/admin">Admin</Button>

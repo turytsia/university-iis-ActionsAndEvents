@@ -9,13 +9,12 @@ import java.util.Set;
 
 import com.project.actionsandevents.Administers.Administers;
 import com.project.actionsandevents.Event.Event;
-import com.project.actionsandevents.TicketType.TicketType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -34,11 +33,8 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    //@ManyToMany(mappedBy = "users")
     @OneToMany(mappedBy = "user")
     private Set<Administers> administrators;
-
-    //TODO: @OneToMany(mappedBy = "admin") ?
 
     @Column(unique = true)
     private String login;
@@ -61,6 +57,8 @@ public class User {
 
     private String roles;
 
-    // @ManyToMany(mappedBy = "registeredUsers")
-    // private Set<TicketType> registeredTicketTypes;
+
+    // Delete all events when user is deleted
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Event> createdEvents;
 }
