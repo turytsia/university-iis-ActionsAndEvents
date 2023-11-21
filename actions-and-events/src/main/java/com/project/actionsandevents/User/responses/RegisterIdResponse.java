@@ -11,8 +11,8 @@ public class RegisterIdResponse {
     private Long userId;
     private Long ticketId;
 
-    public RegisterIdResponse(RegistersId registersId) {
-        this.userId = registersId.getUser().getId();
-        this.ticketId = registersId.getTicketType().getId();
-    }
+    // public RegisterIdResponse(RegistersId registersId) {
+    //     this.userId = registersId.getUser().getId();
+    //     this.ticketId = registersId.getTicketType().getId();
+    // }
 }

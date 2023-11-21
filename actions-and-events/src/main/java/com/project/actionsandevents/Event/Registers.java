@@ -29,17 +29,17 @@ import com.project.actionsandevents.TicketType.TicketType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(RegistersId.class)
+//@IdClass(RegistersId.class)
 public class Registers {
-    // @Id
-    // @GeneratedValue
-    // private Long id;
-
     @Id
+    @GeneratedValue
+    private Long id;
+
+    //@Id
     @ManyToOne
     private User user;
 
-    @Id
+    //@Id
     @ManyToOne
     private TicketType ticketType;
     //private Event event;

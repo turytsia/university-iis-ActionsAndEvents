@@ -28,6 +28,7 @@ import com.project.actionsandevents.Event.responses.UsersRegisteredToEventRespon
 import com.project.actionsandevents.Event.responses.CommentResponse;
 import com.project.actionsandevents.Event.responses.CommentsResponse;
 import com.project.actionsandevents.Event.responses.EventPostResponse;
+import com.project.actionsandevents.Event.responses.RegistersIdsResponse;
 
 import com.project.actionsandevents.User.UserInfoDetails;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
@@ -293,48 +294,56 @@ public class EventController {
                 .ok(new ResponseMessage("Ticket type was successfully removed", ResponseMessage.Status.SUCCESS));
     }
 
+
+
+
     @GetMapping("/event/ticket/{id}/register/{userId}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> registerUserForTicketType(
             @PathVariable Long id,
             @PathVariable Long userId,
             Authentication authentication)
-            throws TicketNotFoundException, UserNotFoundException {
+            throws TicketNotFoundException, UserNotFoundException 
+    {
         return ResponseEntity.ok(
                 new ResponseMessage(eventService.registerUserForTicketType(id, userId),
                         ResponseMessage.Status.SUCCESS));
     }
 
     @GetMapping("/event/ticket/{id}/registrations")
-    public ResponseEntity<Object> getTicketRegistrationIds(@PathVariable Long id, Authentication authentication)
-            throws TicketNotFoundException {
-        return ResponseEntity.ok(eventService.getTicketRegistrationIds(id));
+    public ResponseEntity<Object> getTicketRegistrations(@PathVariable Long id, Authentication authentication)
+            throws TicketNotFoundException 
+    {
+        return ResponseEntity.ok(eventService.getTicketRegistrations(id));
     }
 
     @GetMapping("/event/ticket/registration/{id}")
-    public ResponseEntity<Object> getTicketRegistrationById(@PathVariable RegistersId id, Authentication authentication)
-            throws RegistrationNotFoundException {
+    public ResponseEntity<Object> getTicketRegistrationById(
+            @PathVariable Long id, Authentication authentication)
+            throws RegistrationNotFoundException 
+    {
         return ResponseEntity.ok(eventService.getTicketRegistrationById(id));
     }
 
-    @PatchMapping("/event/ticket/registration/{userId}/{ticketTypeId}")
+    @PatchMapping("/event/ticket/registration/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> patchTicketRegistrationById(
-            @PathVariable Long userId,
-            @PathVariable Long ticketTypeId,
+            @PathVariable Long id,
             @Valid @RequestBody Registers registers,
             BindingResult bindingResult,
             Authentication authentication)
-            throws RegistrationNotFoundException, UserNotFoundException, TicketNotFoundException {
-        RegistersId id = registersService.getId(userId, ticketTypeId);
-
+            throws RegistrationNotFoundException, UserNotFoundException, TicketNotFoundException 
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
+
+        Registers reg = eventService.getTicketRegistrationById(id);
+
         if (!hasPrivilegesOnEvent(authentication,
-                eventService.getTicketRegistrationById(id).getTicketType().getEvent())) {
+                reg.getTicketType().getEvent())) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "You are not allowed to patch this ticket registration", ResponseMessage.Status.ERROR));
         }

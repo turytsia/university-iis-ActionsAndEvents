@@ -227,11 +227,11 @@ public class EventService {
         return ticketType.get();
     }
 
-    public String addTicketType(Long id, TicketType ticketType) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(id);
+    public String addTicketType(Long eventId, TicketType ticketType) throws EventNotFoundException {
+        Optional<Event> event = repository.findById(eventId);
 
         if (!event.isPresent()) {
-            throw new EventNotFoundException("Event not found with id: " + id);
+            throw new EventNotFoundException("Event not found with id: " + eventId);
         }
 
         ticketType.setEvent(event.get());
@@ -276,7 +276,9 @@ public class EventService {
         }
     }
 
-    public String registerUserForTicketType(Long ticketId, Long userId ) throws TicketNotFoundException, UserNotFoundException {
+    public String registerUserForTicketType(Long ticketId, Long userId) 
+        throws TicketNotFoundException, UserNotFoundException 
+    {
         Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
         Optional<User> user = userRepository.findById(userId);
 
@@ -288,9 +290,9 @@ public class EventService {
             throw new UserNotFoundException("User not found with id: " + userId);
         }
 
-        Optional<Registers> registers = registersRepository.findByUserAndTicketType(user.get(), ticketType.get());
+        Optional<Registers> reg = registersRepository.findByUserAndTicketType(user.get(), ticketType.get());
 
-        if (registers.isPresent()) {
+        if (reg.isPresent()) {
             return "User already registered for this ticket";
         }
 
@@ -307,21 +309,52 @@ public class EventService {
     }
 
     
+    // public List<Registers> getTicketRegistrations(Long ticketId) throws TicketNotFoundException {
+    //     Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
 
+    //     if (!ticketType.isPresent()) {
+    //         throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
+    //     }
 
+    //     List<Registers> registers = registersRepository.findByTicketType(ticketType.get());
+    //     System.out.println("************** ids **************");
+    //     System.out.println(registers);
 
-    public List<RegistersId> getTicketRegistrationIds(Long ticketId) throws TicketNotFoundException {
+    //     return registers;
+    // }
+
+    public List<Long> getTicketRegistrations(Long ticketId) throws TicketNotFoundException {
         Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
 
         if (!ticketType.isPresent()) {
             throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
         }
-        
-        return registersRepository.findAllIdsByTicketType(ticketType.get());
+
+        // List<Object[]> rows = registersRepository.findAllIdsByTicketType(ticketType.get());
+
+        // List<RegistersId> result = new ArrayList<>();
+        // for (Object[] row : rows) {
+        //     Long userId = ((Number) row[0]).longValue();
+        //     Long ticketTypeId = ((Number) row[1]).longValue();
+        //     result.add(new RegistersId(userId, ticketTypeId));
+        // }
+
+        List<Long> ids = registersRepository.findAllIdsByTicketType(ticketType.get());
+
+        // List<RegistersId> ids = new ArrayList<RegistersId>();
+        // for (Registers register : registers) {
+        //     ids.add(new RegistersId(register.getUser().getId(), register.getTicketType().getId()));
+        // }
+
+
+        System.out.println("************** ids **************");
+        System.out.println(ids);
+
+        return ids;
     }
 
-    public Registers getTicketRegistrationById(RegistersId id) throws RegistrationNotFoundException {
-        Optional<Registers> registers = registersRepository.findByUserAndTicketType(id.getUser(), id.getTicketType());
+    public Registers getTicketRegistrationById(Long id) throws RegistrationNotFoundException {
+        Optional<Registers> registers = registersRepository.findById(id);
 
         if (!registers.isPresent()) {
             throw new RegistrationNotFoundException("User not registered for this ticket with id: " + id);
@@ -331,8 +364,8 @@ public class EventService {
     }
 
 
-    public String patchTicketRegistrationById(RegistersId id, RegistersStatus status) throws RegistrationNotFoundException {
-        Optional<Registers> registers = registersRepository.findByUserAndTicketType(id.getUser(), id.getTicketType());
+    public String patchTicketRegistrationById(Long id, RegistersStatus status) throws RegistrationNotFoundException {
+        Optional<Registers> registers = registersRepository.findById(id);
 
         if (!registers.isPresent()) {
             throw new RegistrationNotFoundException("Registration not found with id: " + id);

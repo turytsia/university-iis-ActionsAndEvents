@@ -18,8 +18,11 @@ import com.project.actionsandevents.TicketType.TicketType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegistersId implements Serializable {
-    private User user;
-    private TicketType ticketType;
+    // private User user;
+    // private TicketType ticketType;
+
+    private Long userId;
+    private Long ticketTypeId;
 
     @Override
     public boolean equals(Object o) {
@@ -28,12 +31,12 @@ public class RegistersId implements Serializable {
         if (o == null || getClass() != o.getClass())
             return false;
         RegistersId that = (RegistersId) o;
-        return Objects.equals(user, that.user) &&
-                Objects.equals(ticketType, that.ticketType);
+        return Objects.equals(userId, that.userId) &&
+                Objects.equals(ticketTypeId, that.ticketTypeId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(user, ticketType);
+        return Objects.hash(userId, ticketTypeId);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
+import com.project.actionsandevents.Event.exceptions.RegistrationNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
 import com.project.actionsandevents.TicketType.TicketType;
 import com.project.actionsandevents.TicketType.TicketTypeRepository;
@@ -28,17 +29,24 @@ public class RegistersService {
     @Autowired
     private TicketTypeRepository ticketTypeRepository;
 
-    public RegistersId getId(Long userId, Long ticketId) throws UserNotFoundException, TicketNotFoundException {
-        Optional<User> user = userRepository.findById(userId);
-        if (!user.isPresent()) {
-            throw new UserNotFoundException("User not found with id: " + userId);
-        }
+    // public RegistersId getRegistrationId(Long ticketTypeId, Long userId) throws RegistrationNotFoundException {
+    //     // Optional<User> user = userRepository.findById(userId);
+    //     // if (!user.isPresent()) {
+    //     //     throw new UserNotFoundException("User not found with id: " + userId);
+    //     // }
 
-        Optional<TicketType> ticket = ticketTypeRepository.findById(ticketId);
-        if (!user.isPresent()) {
-            throw new TicketNotFoundException("Ticket not found with id: " + ticketId);
-        }
+    //     // Optional<TicketType> ticket = ticketTypeRepository.findById(ticketTypeId);
+    //     // if (!user.isPresent()) {
+    //     //     throw new TicketNotFoundException("Ticket type not found with id: " + ticketTypeId);
+    //     // }
  
-        return new RegistersId(user.get(), ticket.get());
-    }
+    //     //return new RegistersId(user.get(), ticket.get());
+    //     Registers registers = registersRepository.findByUserIdAndTicketTypeId(userId, ticketTypeId).orElse(null);
+
+    //     if (registers == null) {
+    //         throw new RegistrationNotFoundException("Registration not found with ticket type id: " + ticketTypeId + " and user id: " + userId);
+    //     }
+
+    //     return new RegistersId(registers.getUser(, registers.getTicketType());
+    // }
 }
