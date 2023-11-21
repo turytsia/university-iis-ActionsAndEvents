@@ -17,7 +17,7 @@ public class AdministersService {
         return administersRepository.findAllIds();
     }
 
-    public Administers getAdministerById(AdministersId id) throws AdministerLogNotFoundException {
+    public Administers getAdministerById(Long id) throws AdministerLogNotFoundException {
         Optional<Administers> administers = administersRepository.findById(id);
 
         if (!administers.isPresent()) {

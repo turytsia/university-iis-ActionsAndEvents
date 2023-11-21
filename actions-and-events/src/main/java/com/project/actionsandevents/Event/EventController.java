@@ -28,7 +28,6 @@ import com.project.actionsandevents.Event.responses.UsersRegisteredToEventRespon
 import com.project.actionsandevents.Event.responses.CommentResponse;
 import com.project.actionsandevents.Event.responses.CommentsResponse;
 import com.project.actionsandevents.Event.responses.EventPostResponse;
-import com.project.actionsandevents.Event.responses.RegistersIdsResponse;
 
 import com.project.actionsandevents.User.UserInfoDetails;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
@@ -50,9 +49,6 @@ public class EventController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private RegistersService registersService;
 
     private boolean hasElevatedPrivileges(Authentication authentication) {
 

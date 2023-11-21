@@ -8,6 +8,7 @@ package com.project.actionsandevents.Event;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
@@ -28,16 +29,15 @@ import com.project.actionsandevents.User.User;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(ManagesId.class)
 public class Manages {
     @Id
+    @GeneratedValue
+    private Long id;
+
     @ManyToOne
-    //@Column(nullable = true)
     private User manager;
     
-    @Id
     @ManyToOne
-    //@Column(nullable = true)
     private Event event;
 
     @Temporal(TemporalType.TIMESTAMP)

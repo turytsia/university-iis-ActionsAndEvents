@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
   
 @Repository
-public interface AdministersRepository extends JpaRepository<Administers, AdministersId> {
+public interface AdministersRepository extends JpaRepository<Administers, Long> {
     @Query("SELECT a.id FROM Administers a")
     List<Long> findAllIds();
 }
