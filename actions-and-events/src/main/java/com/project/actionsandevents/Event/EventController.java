@@ -22,6 +22,7 @@ import com.project.actionsandevents.Event.requests.EventPatchRequest;
 
 import com.project.actionsandevents.Event.responses.EventResponse;
 import com.project.actionsandevents.Event.responses.EventsResponse;
+import com.project.actionsandevents.Event.responses.RegisterListResponse;
 import com.project.actionsandevents.Event.responses.TicketResponse;
 import com.project.actionsandevents.Event.responses.TicketsResponse;
 import com.project.actionsandevents.Event.responses.UsersRegisteredToEventResponse;
@@ -310,7 +311,7 @@ public class EventController {
     public ResponseEntity<Object> getTicketRegistrations(@PathVariable Long id, Authentication authentication)
             throws TicketNotFoundException 
     {
-        return ResponseEntity.ok(eventService.getTicketRegistrations(id));
+        return ResponseEntity.ok(new RegisterListResponse(eventService.getTicketRegistrations(id)));
     }
 
     @GetMapping("/event/ticket/registration/{id}")
@@ -318,7 +319,7 @@ public class EventController {
             @PathVariable Long id, Authentication authentication)
             throws RegistrationNotFoundException 
     {
-        return ResponseEntity.ok(eventService.getTicketRegistrationById(id));
+        return ResponseEntity.ok(new RegistersResponse(eventService.getTicketRegistrationById(id)));
     }
 
     @PatchMapping("/event/ticket/registration/{id}")

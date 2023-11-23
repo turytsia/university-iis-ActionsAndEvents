@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from 'axios'
 import React, { createContext, useEffect, useMemo, useState } from 'react'
 import { roles } from '../utils/common'
+import Loading from '../components/Loading/Loading'
+import { useNavigate } from 'react-router-dom'
 
 type PropsType = {
   children: React.ReactNode
@@ -23,6 +25,7 @@ type AppContextType = {
   login: (login: string, password: string) => void,
   logout: () => void,
   user: UserType
+  setLoading: React.Dispatch<React.SetStateAction<LoadingType>>
 }
 
 const initialUser: UserType = {
@@ -41,7 +44,14 @@ const context: AppContextType = {
   register: () => { },
   login: () => { },
   logout: () => { },
-  user: initialUser
+  user: initialUser,
+  setLoading: () => {}
+}
+
+export enum LoadingType {
+  FETCHING,
+  LOADING,
+  NONE
 }
 
 export const AppContext = createContext(context)
@@ -57,6 +67,9 @@ const AppContextProvider = ({ children }: PropsType) => {
 
   const localUser = localStorage.getItem("user")
 
+  const navigate = useNavigate()
+
+  const [loading, setLoading] = useState<LoadingType>(LoadingType.NONE)
   const [token, setToken] = useState(localStorage.getItem("token"))
   const [user, setUser] = useState<UserType>(localUser ? JSON.parse(localUser) : initialUser)
 
@@ -97,6 +110,7 @@ const AppContextProvider = ({ children }: PropsType) => {
       })
       // setUser(response.data)
       // localStorage.setItem("user", JSON.stringify(response.data))
+      navigate("/login")
     } catch (error) {
       setUser(initialUser)
     }
@@ -130,6 +144,7 @@ const AppContextProvider = ({ children }: PropsType) => {
     login,
     logout,
     user,
+    setLoading
   }
 
   useEffect(() => {
@@ -138,7 +153,10 @@ const AppContextProvider = ({ children }: PropsType) => {
 
 
   return (
-    <AppContext.Provider value={value}>{children}</AppContext.Provider>
+    <AppContext.Provider value={value}>
+      {[LoadingType.LOADING, LoadingType.FETCHING].includes(loading) && <Loading />}
+      {children}
+    </AppContext.Provider>
   )
 }
 

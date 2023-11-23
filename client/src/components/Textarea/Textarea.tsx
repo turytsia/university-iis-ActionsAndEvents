@@ -7,13 +7,15 @@ type PropsType = {
     onChange?: React.ChangeEventHandler<HTMLTextAreaElement>,
     label?: string,
     name?: string
+    readOnly?: boolean
 }
 
 const Textarea = ({
     value,
     onChange,
     label,
-    name
+    name,
+    readOnly
 }: PropsType) => {
   return (
       <InputLabel htmlFor={classes.input} value={label}>
@@ -23,6 +25,7 @@ const Textarea = ({
               value={value}
               onChange={onChange}
               className={classes.input}
+              readOnly={readOnly}
           ></textarea>
       </InputLabel>
   )

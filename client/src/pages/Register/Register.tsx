@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 
 import classes from "./Register.module.css"
 import { roles } from '../../utils/common'
+import Input from '../../components/Input/Input'
+import Button from '../../components/Button/Button'
 
 type PropsType = {
     role: roles
@@ -40,12 +42,12 @@ const Register = ({
             <div className={classes.title}>
                 <h4>Register</h4>
             </div>
-            <input value={inputs.login} name="login" onChange={onChange} placeholder='Login' type='text' />
-            <input value={inputs.email} name="email" onChange={onChange} placeholder='Email' type='email' />
-            <input value={inputs.password} name="password" onChange={onChange} placeholder='Password' type='password' />
+            <Input value={inputs.login} name="login" onChange={onChange} placeholder='Login' type='text' />
+            <Input value={inputs.email} name="email" onChange={onChange} placeholder='Email' type='email' />
+            <Input value={inputs.password} name="password" onChange={onChange} placeholder='Password' type='password' />
             <div className={classes.actions}>
-                <button onClick={onSubmit}>Register</button>
-                <Link to="/login">Sign in</Link>
+                <Button style='invert' onClick={onSubmit}>Register</Button>
+                <Link to="/login">Already have an account?</Link>
             </div>
         </div>
     )

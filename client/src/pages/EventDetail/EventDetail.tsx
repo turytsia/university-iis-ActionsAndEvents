@@ -10,7 +10,7 @@ import { Icon } from '@iconify/react'
 import icons from '../../utils/icons'
 import Textarea from '../../components/Textarea/Textarea'
 import ProfileCard from '../../components/ProfileCard/ProfileCard'
-import { SpringResponseType } from '../../utils/common'
+import { SpringResponseType, formatDate } from '../../utils/common'
 import { TicketType } from '../CreateEvent/pages/Tickets/modals/CreateTicketModal/CreateTicketModal'
 import Ticket from '../CreateEvent/pages/components/TicketInputs/components/Ticket/Ticket'
 import EventUpdateModal from './modals/EventUpdateModal/EventUpdateModal'
@@ -58,24 +58,36 @@ const EventDetail = () => {
             const ticketResponses = await Promise.allSettled(
                 ticketsResponse.data.tickets.map(async (ticketId: number) => await context.request!.get(`/event/ticket/${ticketId}`))
             );
-            
+
 
             const registersResponses = await Promise.allSettled(
                 ticketsResponse.data.tickets.map(async (id: number) => await context.request!.get(`/event/ticket/${id}/registrations`))
             );
-
+            ///event/ticket/registration/{id}
             const registersFulfilledResponses = registersResponses
-                .filter((r): r is PromiseFulfilledResult<SpringResponseType<{ ticketId: number, date: string, status: string, userId: number }>> => r.status === "fulfilled")
+                .filter((r): r is PromiseFulfilledResult<{ data: { registers: number[] } }> => r.status === "fulfilled")
                 .map((r) => r.value)
                 .filter((v) => v);
+
+
+            const registersDataResponses = await Promise.allSettled(
+                registersFulfilledResponses.flatMap(({ data }) => data.registers).map(async (id: number) => await context.request!.get(`/event/ticket/registration/${id}`))
+            )
+
+            const registersDataFulfilledResponses = registersDataResponses
+                .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
+                .map((r) => r.value)
+                .filter((v) => v);
+
+            console.log(registersDataFulfilledResponses)
 
             const ticketFulfilledResponses = ticketResponses
                 .filter((r): r is PromiseFulfilledResult<SpringResponseType<TicketType>> => r.status === "fulfilled")
                 .map((r) => r.value)
-                .filter((v) => v);           
+                .filter((v) => v);
 
             setTickets(ticketFulfilledResponses.map(({ data: ticket }) => {
-                const entry = registersFulfilledResponses.map(({ data }) => data).find(({ ticketId }) => ticket.id! === ticketId!)
+                const entry = registersDataFulfilledResponses.map(({ data }) => data).find(({ ticketId }) => ticket.id! === ticketId!)
 
                 if (entry) {
                     return { ...ticket, date: entry?.date, status: entry?.status }
@@ -85,7 +97,7 @@ const EventDetail = () => {
             }))
             setAuthor(authorResponse.data)
             setEvent(response.data)
-            
+
             const commentsResponse = await context.request!.get(`/event/${id}/comments`)
 
             const commentsResponses = await Promise.allSettled(
@@ -179,9 +191,13 @@ const EventDetail = () => {
                     </div>
                     <div className={classes.date}>
                         <Icon icon={icons.calendar} width={20} height={20} />
-                        <span>{event.dateFrom}</span>
-                        <span>-</span>
-                        <span>{event.dateTo}</span>
+                        <span>{formatDate(event.dateFrom)}</span>
+                        {event.dateTo && (
+                            <>
+                                <span>-</span>
+                                <span>{formatDate(event.dateTo)}</span>
+                            </>
+                        )}
                     </div>
                     <div className={classes.section}>
                         <h4 className={classes.title}>Description</h4>
@@ -200,68 +216,72 @@ const EventDetail = () => {
                 </div>
             </div>
             <div className={classes.comment}>
-                <h4 className={classes.title}>Comment as {context.user.email}</h4>
-                <div>
-                    <Textarea value={comment} onChange={handleCommentChange} />
-                <div>
-                {
-                    [...Array(5)].map((star, i) => {
-                        const ratingValue = i + 1;
-                        return (
-                            <label key={i} style={{ cursor: 'pointer' }}>
-                                <input
-                                type="radio"
-                                value={ratingValue}
-                                onClick={() => handleRatingChange(ratingValue)}
-                                style={{ display: 'none' }}
-                                />
-                                <span className={ratingValue <= rating ? styles['filled-star'] : styles['empty-star']}
-                                style={{ fontSize: '2em' }}
-                                >
-                                &#9733;
-                                </span>
-                            </label>
-                        );
-                    }
-                )}
-                </div>
-                <Button onClick={handleCommentSubmit}>Submit</Button>
-            </div>
-            <div>
-                {comments.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((comment) => (
-                    <div className={classes.comment} key={comment.id}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
-                        <p>{new Date(comment.date).toLocaleDateString()}</p>
-                        <h4 className={classes.title}>{comment.user}:</h4>
-                        <div style={{ display: 'flex' }}>
-                        {[...Array(5)].map((star, i) => {
-                            const ratingValue = i + 1;
-                            return (
-                            <label key={i} style={{ cursor: 'pointer', margin: '0 0.5em' }}>
-                                <input
-                                type="radio"
-                                value={ratingValue}
-                                checked={ratingValue === comment.rating}
-                                readOnly
-                                style={{ display: 'none' }}
-                                />
-                                <span
-                                className={ratingValue <= comment.rating ? styles['filled-star'] : styles['empty-star']}
-                                style={{ fontSize: '1em' }}
-                                >
-                                &#9733;
-                                </span>
-                            </label>
-                            );
-                        })}
+                {context.isAuth && (
+                    <>
+                        <h4 className={classes.title}>Comment as {context.user.email}</h4>
+                        <div>
+                            <Textarea value={comment} onChange={handleCommentChange} />
+                            <div>
+                                {
+                                    [...Array(5)].map((star, i) => {
+                                        const ratingValue = i + 1;
+                                        return (
+                                            <label key={i} style={{ cursor: 'pointer' }}>
+                                                <input
+                                                    type="radio"
+                                                    value={ratingValue}
+                                                    onClick={() => handleRatingChange(ratingValue)}
+                                                    style={{ display: 'none' }}
+                                                />
+                                                <span className={ratingValue <= rating ? styles['filled-star'] : styles['empty-star']}
+                                                    style={{ fontSize: '2em' }}
+                                                >
+                                                    &#9733;
+                                                </span>
+                                            </label>
+                                        );
+                                    }
+                                    )}
+                            </div>
+                            <Button onClick={handleCommentSubmit}>Submit</Button>
                         </div>
-                    </div>
-                    <div>
-                        <textarea value={comment.text} readOnly style={{ fontSize: '1em', width: '100%' }} />
-                    </div>
-                    </div>
-                ))}
-            </div>
+                    </>
+                )}
+                <div>
+                    {comments.map((comment) => (
+                        <div className={classes.comment} key={comment.id}>
+                            <div className={classes.commentHeader}>
+                                <p>{formatDate(comment.date)}</p>
+                                <h4>{comment.user}</h4>
+                                <div className={classes.stars}>
+                                    {[...Array(5)].map((star, i) => {
+                                        const ratingValue = i + 1;
+                                        return (
+                                            <label key={i} style={{ cursor: 'pointer' }}>
+                                                <input
+                                                    type="radio"
+                                                    value={ratingValue}
+                                                    checked={ratingValue === comment.rating}
+                                                    readOnly
+                                                    style={{ display: 'none' }}
+                                                />
+                                                <span
+                                                    className={ratingValue <= comment.rating ? styles['filled-star'] : styles['empty-star']}
+                                                    style={{ fontSize: '2em' }}
+                                                >
+                                                    &#9733;
+                                                </span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div>
+                                <Textarea value={comment.text} readOnly />
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
             {isUpdateActive && (
                 <EventUpdateModal event={event} onClose={() => setIsUpdateActive(false)} onSubmit={updateEvent} />

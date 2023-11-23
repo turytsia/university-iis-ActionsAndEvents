@@ -3,6 +3,8 @@ import { AppContext } from '../../context/AppContextProvider'
 import { Link } from 'react-router-dom'
 
 import classes from "./Login.module.css"
+import Button from '../../components/Button/Button'
+import Input from '../../components/Input/Input'
 
 const initialInputs = {
     "login": "",
@@ -27,11 +29,11 @@ const Login = () => {
             <div className={classes.title}>
                 <h4>Login</h4>
             </div>
-            <input value={inputs.login} name="login" onChange={onChange} placeholder='Login' type='text' />
-            <input value={inputs.password} name="password" onChange={onChange} placeholder='Password' type='password' />
+            <Input value={inputs.login} name="login" onChange={onChange} placeholder='Login' type='text' />
+            <Input value={inputs.password} name="password" onChange={onChange} placeholder='Password' type='password' />
             <div className={classes.actions}>
-                <button onClick={onSubmit}>Login</button>
-                <Link to="/user/register">Sign up</Link>
+                <Button style='invert' onClick={onSubmit}>Login</Button>
+                <Link to="/user/register">I don't have an account</Link>
             </div>
         </div>
     )

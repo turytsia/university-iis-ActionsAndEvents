@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.actionsandevents.Category.exceptions.CategoryNotFoundException;
 import com.project.actionsandevents.Category.requests.CategoryPatchRequest;
+import com.project.actionsandevents.Category.requests.CategoryPostRequest;
 
 @Service
 public class CategoryService {
@@ -85,9 +86,22 @@ public class CategoryService {
      * TODO
      * @param category
      * @return
+     * @throws CategoryNotFoundException
      */
-    public Long addCategory(Category category) {
-        return repository.save(category).getId();
+    public Long addCategory(CategoryPostRequest category) throws CategoryNotFoundException {
+        Optional<Category> parentCateogry = repository.findById(category.getParentCategory());
+
+        if (!parentCateogry.isPresent()) {
+            throw new CategoryNotFoundException("Category not found with ID: " + category.getParentCategory());
+        }
+
+        Category newCategory = new Category();
+
+        newCategory.setName(category.getName());
+        newCategory.setParentCategory(parentCateogry.get());
+        newCategory.setStatus(category.getStatus());
+
+        return repository.save(newCategory).getId();
     }
 
     /**

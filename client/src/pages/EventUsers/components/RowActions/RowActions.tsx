@@ -25,7 +25,7 @@ const RowActions = ({
     const checkUser = async () => {
         try {
             ///event/ticket/registration/{id}
-            const response = await context.request!.patch(`/event/ticket/registration/${user.id}/${user.ticketId}`, {
+            const response = await context.request!.patch(`/event/ticket/registration/${user.id}`, {
                 userId: user.id,
                 ticketId: user.ticketId,
                 status: "Accepted",
@@ -39,7 +39,7 @@ const RowActions = ({
 
     const deleteUser = async () => {
         try {
-            const response = await context.request!.patch(`/event/ticket/registration/${user.id}/${user.ticketId}`, {
+            const response = await context.request!.patch(`/event/ticket/registration/${user.id}`, {
                 userId: user.id,
                 ticketId: user.ticketId,
                 status: "Rejected",

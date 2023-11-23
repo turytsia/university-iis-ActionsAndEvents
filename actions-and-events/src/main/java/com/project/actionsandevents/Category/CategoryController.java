@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.actionsandevents.Category.exceptions.CategoryNotFoundException;
 import com.project.actionsandevents.Category.requests.CategoryPatchRequest;
+import com.project.actionsandevents.Category.requests.CategoryPostRequest;
 import com.project.actionsandevents.Category.responses.CategoriesResponse;
 import com.project.actionsandevents.Category.responses.CategoryPostResponse;
 import com.project.actionsandevents.Category.responses.CategoryResponse;
@@ -67,9 +68,9 @@ public class CategoryController {
     @PostMapping("/category")
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> addCategory(
-                @Valid @RequestBody Category category,
+                @Valid @RequestBody CategoryPostRequest category,
                 BindingResult bindingResult,
-                Authentication authentication) {
+                Authentication authentication) throws CategoryNotFoundException {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new CategoryPostResponse(null, 
                             "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));

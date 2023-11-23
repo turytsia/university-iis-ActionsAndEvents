@@ -8,6 +8,7 @@ import Button from '../../../../components/Button/Button'
 import { Link } from 'react-router-dom'
 import ProfileCard from '../../../../components/ProfileCard/ProfileCard'
 import { AppContext, UserType } from '../../../../context/AppContextProvider'
+import { formatDate } from '../../../../utils/common'
 
 type PropsType = {
     event: EventType
@@ -45,11 +46,7 @@ const EventCard = ({
             <div className={classes.date}>
                 <span className={classes.info}>
                     <Icon icon={icons.calendar} width = {20} height={20} />
-                    {event.dateFrom} - {event.dateTo}
-                </span>
-                <span className={classes.info}>
-                    <Icon icon={icons.time} width={20} height={20} />
-                    15:00 PM
+                    {formatDate(event.dateFrom)} - {formatDate(event.dateTo)}
                 </span>
             </div>
             <div className={classes.location}>

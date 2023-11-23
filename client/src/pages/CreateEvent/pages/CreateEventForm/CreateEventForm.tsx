@@ -27,7 +27,20 @@ const initialInputs = {
 }
 
 const isEmpty = (inputs: typeof initialInputs) => {
-    return Object.keys(initialInputs).some(k => ["", null, undefined].includes(inputs[k as keyof typeof initialInputs]))
+
+    return Object
+        .keys(initialInputs)
+        .some(k => ["", null, undefined]
+            .includes(inputs[k as keyof typeof initialInputs]))
+}
+
+const isTicketsEmpty = (tickets: TicketTypeWithRegister[]) => {
+    if (tickets.length === 0) return true
+
+    return tickets.some(ticket => Object
+        .keys(ticket)
+        .some(k => ["", null, undefined]
+            .includes(String(ticket[k as keyof TicketTypeWithRegister]))))
 }
 
 const CreateEventForm = () => {
@@ -38,13 +51,13 @@ const CreateEventForm = () => {
     const [tickets, setTickets] = useState<TicketTypeWithRegister[]>([])
     const [places, setPlaces] = useState<PlaceType[]>([])
     const [categories, setCategories] = useState<CategoryType[]>([])
- 
+
     const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }))
     }
 
     const onDateChange: DateChangeType = (name, value) => {
-       
+
         setInputs(prev => ({ ...prev, [name]: value?.toISOString() }))
     }
 
@@ -140,9 +153,9 @@ const CreateEventForm = () => {
                 <Dropdown name='place' value={inputs.place} items={placesToDropdown(places)} onChange={onDropdownChange} />
             </InputLabel>
             <Textarea label='Description' name='description' value={inputs.description} onChange={onChange} />
-            <TicketInputs tickets={tickets} setTickets={setTickets}/>
+            <TicketInputs tickets={tickets} setTickets={setTickets} />
             <div>
-                <Button disabled={tickets.length === 0 || isEmpty(inputs)} onClick={onSubmit}>
+                <Button disabled={isTicketsEmpty(tickets) || isEmpty(inputs)} onClick={onSubmit}>
                     Submit
                 </Button>
             </div>

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 
 import classes from "./Events.module.css"
-import { AppContext } from '../../context/AppContextProvider'
+import { AppContext, LoadingType } from '../../context/AppContextProvider'
 import PageView from '../../components/PageView/PageView'
 import { EventType } from '../../utils/types'
 import EventCard from './components/EventCard/EventCard'
@@ -14,6 +14,7 @@ const Events = () => {
   const [events, setEvents] = useState<EventType[]>([])
 
   const fetchEvents = async () => {
+    context.setLoading(LoadingType.FETCHING)
     try {
       const response = await context.request!.get("/events")
 
@@ -30,6 +31,8 @@ const Events = () => {
 
     } catch (error) {
       console.error(error)
+    } finally {
+      context.setLoading(LoadingType.NONE)
     }
   }
 
@@ -44,7 +47,7 @@ const Events = () => {
           <Input placeholder='Search...' className={classes.search} value='' />
         </div>
         <div className={classes.actions}>
-          <Button style='invert' to="/events/create">Create new event</Button>
+          {context.isAuth && <Button style='invert' to="/events/create">Create new event</Button>}
         </div>
       </div>
       <div className={classes.events}>

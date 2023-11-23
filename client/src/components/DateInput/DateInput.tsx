@@ -3,6 +3,7 @@ import ReactDatePicker from 'react-datepicker'
 
 import classes from "./DateInput.module.css"
 import InputLabel from '../InputLabel/InputLabel'
+import { formatDate } from '../../utils/common'
 
 export type DateChangeType = (name: string, date: Date | null) => void
 
@@ -30,10 +31,12 @@ const DateInput = ({
               <ReactDatePicker
                   id={classes.input}
                   name={name}
-                  value={value}
+                  value={formatDate(value)}
                   onChange={onChange}
                   className={classes.input}
                   dateFormat="DD.MM.YYYY"
+                //   readOnly
+                  onKeyDown={(e) => e.preventDefault()}
               />
           </div>
       </InputLabel>

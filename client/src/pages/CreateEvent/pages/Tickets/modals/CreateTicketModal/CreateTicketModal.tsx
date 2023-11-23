@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Modal from '../../../../../../components/Modal/Modal'
+import Modal, { ModalStyles } from '../../../../../../components/Modal/Modal'
 import icons from '../../../../../../utils/icons'
 import Input from '../../../../../../components/Input/Input'
 import Textarea from '../../../../../../components/Textarea/Textarea'
@@ -52,7 +52,8 @@ const CreateTicketModal = ({
             textCancel="Cancel"
             onClose={onClose}
             onSubmit={__onSubmit}
-            icon={icons.sun}>
+            icon={icons.pen}
+        type={ModalStyles.Inputs}>
             <Input label='Name' name='name' value={inputs.name} onChange={onChange} />
             <Input label='Price' name='price' value={inputs.price} onChange={onChange} />
             <Input label='Capacity' name='capacity' value={inputs.capacity} onChange={onChange} />

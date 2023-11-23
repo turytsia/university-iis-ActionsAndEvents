@@ -26,7 +26,7 @@ const ConfirmTicketModal = ({
           textCancel="Cancel"
           onClose={onClose}
           onSubmit={onSubmit}
-          icon={icons.sun}>
+          icon={icons.danger}>
           Do you want to get a ticket "{ticketName}" for an event "{eventName}"?
       </Modal>
   )

@@ -41,6 +41,13 @@
     margin-bottom: 8px;
 }
 
+.commentHeader{
+    display: flex;
+    align-items: center;
+    gap: 1em;
+
+}
+
 .comment{
     background-color: #fff;
     margin-top: 16px;

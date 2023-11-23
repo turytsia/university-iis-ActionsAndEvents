@@ -46,9 +46,6 @@ function App() {
               <Route path="" element={<User />} />
               <Route path="events" element={<UserEvents />} />
             </Route>
-            <Route path="/events/create" element={<CreateEvent />}>
-              <Route path="" element={<CreateEventForm />} />
-            </Route>
             {
               (context.isAuth && context.user && context.user.role === roles.ADMIN) && (
                 <>
@@ -64,6 +61,9 @@ function App() {
               (context.isAuth && context.user) && (
                 <>
                   <Route path="tickets" element={<Tickets />} />
+                  <Route path="/events/create" element={<CreateEvent />}>
+                    <Route path="" element={<CreateEventForm />} />
+                  </Route>
                 </>
               )
             }

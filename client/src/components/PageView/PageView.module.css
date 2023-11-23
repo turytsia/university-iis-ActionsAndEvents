@@ -11,7 +11,7 @@
 
 .scrollable {
     padding-bottom: 80px;
-    overflow: auto;
+    /* overflow: auto; */
 }
 
 .header {

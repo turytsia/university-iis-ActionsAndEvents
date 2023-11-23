@@ -16,7 +16,7 @@ const dataKeys: TableHeaderType = {
     firstname: "Firstname",
     lastname: "Lastname",
     phone: "Phone",
-    roles: "Role",
+    role: "Role",
     status: "Status",
 }
 
@@ -36,24 +36,34 @@ const EventUsers = () => {
             );
 
             const registersFulfilledResponses = registersResponses
-                .filter((r): r is PromiseFulfilledResult<SpringResponseType<{ ticketId: number, date: string, status: string, userId: number }>> => r.status === "fulfilled")
+                .filter((r): r is PromiseFulfilledResult<SpringResponseType<any>> => r.status === "fulfilled")
                 .map((r) => r.value)
                 .filter((v) => v);
+            
+            const registersDataResponses = await Promise.allSettled(
+                registersFulfilledResponses.flatMap(({ data }) => data.registers).map(async (id: number) => await context.request!.get(`/event/ticket/registration/${id}`))
+            )
+
+            const registersDataFulfilledResponses = registersDataResponses
+                .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
+                .map((r) => r.value)
+                .filter((v) => v); 
 
             const usersResponses = await Promise.allSettled(
-                registersFulfilledResponses.map(async ({ data }) => await context.request!.get(`/user/${data.userId}`))
+                registersDataFulfilledResponses.map(async ({ data }) => await context.request!.get(`/user/${data.userId}`))
             );
 
             const usersFulfilledResponses = usersResponses
                 .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
                 .map((r) => r.value)
                 .filter((v) => v);
+            
+            console.log(usersFulfilledResponses)
 
-            setUsers(registersFulfilledResponses.map(({ data }) => {
+            setUsers(registersDataFulfilledResponses.map(({ data }) => {
                 const { userId, status, ticketId } = data
 
                 const user = usersFulfilledResponses.map(({ data }) => data).find(({ id }) => id === userId)
-
                 return { ...user, status, ticketId }
             }))
         } catch (error) {
