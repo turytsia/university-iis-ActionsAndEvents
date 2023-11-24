@@ -17,6 +17,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +38,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Administers> administrators;
 
+    @NotBlank(message = "Login is mandatory")
     @Column(unique = true)
     private String login;
 
@@ -45,13 +48,15 @@ public class User {
     @Column(nullable = true)
     private String lastname;
 
+    @NotBlank(message = "Email is mandatory")
+    @Email(message = "Email format is not valid")
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = true)
     private String phone;
 
-    // @JsonIgnore // This property is ignored when parsing to JSON format
+    @NotBlank(message = "Password is mandatory")
     @Column(nullable = false)
     private String password;
 

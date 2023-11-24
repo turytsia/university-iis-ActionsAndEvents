@@ -6,6 +6,7 @@
 package com.project.actionsandevents.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,6 +20,7 @@ import com.project.actionsandevents.Event.RegistersRepository;
 import com.project.actionsandevents.TicketType.TicketType;
 import com.project.actionsandevents.TicketType.TicketTypeRepository;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
+import com.project.actionsandevents.User.exceptions.DuplicateUserException;
 import com.project.actionsandevents.User.requests.UserPatchRequest;
 
 
@@ -60,10 +62,15 @@ public class UserService implements UserDetailsService {
      * @param user User
      * @return Message
      */
-    public User addUser(User user) {
+    public Long addUser(User user) throws DuplicateUserException {
+    try {
         user.setPassword(encoder.encode(user.getPassword()));
-        return repository.save(user);
+        return repository.save(user).getId();
+    } catch (DataIntegrityViolationException e) {
+        // Handle the exception here. For example, you might want to log the error and throw a custom exception.
+        throw new DuplicateUserException("A user with this email or username already exists.");
     }
+}
 
     /**
      * TODO
