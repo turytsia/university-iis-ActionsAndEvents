@@ -7,6 +7,10 @@ import PageView from '../../components/PageView/PageView'
 const tabs: TabsType = [
     {
         to: "",
+        text: "Events"
+    },
+    {
+        to: "categories",
         text: "Categories"
     },
     {
@@ -21,7 +25,7 @@ const tabs: TabsType = [
 
 const Admin = () => {
     return (
-        <PageView title="Admin">
+        <PageView title="Admin panel">
             <Tabs prefix='/admin' tabs={tabs} />
             <Outlet />
         </PageView>

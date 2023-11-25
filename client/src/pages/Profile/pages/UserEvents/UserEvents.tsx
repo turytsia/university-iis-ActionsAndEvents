@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { AppContext } from '../../../../context/AppContextProvider'
+import { AppContext, LoadingType } from '../../../../context/AppContextProvider'
 
 import classes from "./UserEvents.module.css"
 import EventCard from '../../../Events/components/EventCard/EventCard'
@@ -14,6 +14,7 @@ const UserEvents = () => {
 
   const [events,setEvents] = useState<EventType[]>([])
   const fetchEvents = async () => {
+    context.setLoading(LoadingType.FETCHING)
     try {
       const response = await context.request!.get(`/user/${id}/events`)
 
@@ -30,6 +31,8 @@ const UserEvents = () => {
 
     } catch (error) {
       console.error(error)
+    } finally {
+      context.setLoading(LoadingType.NONE)
     }
   }
 

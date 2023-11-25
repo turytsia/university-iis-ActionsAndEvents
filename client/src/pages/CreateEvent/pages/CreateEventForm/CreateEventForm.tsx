@@ -18,6 +18,10 @@ import Button from '../../../../components/Button/Button'
 import { TicketTypeWithRegister } from '../Tickets/Tickets'
 import StarRequire from '../../../../components/StarRequire/StarRequire'
 import { useNavigate } from 'react-router'
+import ButtonIconOnly from '../../../../components/ButtonIconOnly/ButtonIconOnly'
+import icons from '../../../../utils/icons'
+import CreateCategoryModal, { CategoryInput } from '../../../Admin/pages/Categories/modals/CreateCategoryModal/CreateCategoryModal'
+import CreatePlaceModal from '../../../Admin/pages/Places/modals/CreatePlaceModal/CreatePlaceModal'
 
 const initialInputs = {
     title: "",
@@ -58,6 +62,12 @@ const CreateEventForm = () => {
     const [tickets, setTickets] = useState<TicketTypeWithRegister[]>([])
     const [places, setPlaces] = useState<PlaceType[]>([])
     const [categories, setCategories] = useState<CategoryType[]>([])
+
+    const [newCategory, setNewCategory] = useState<CategoryType | null>(null)
+    const [newPlace, setNewPlace] = useState<PlaceType | null>(null)
+
+    const [isNewCategoryActive, setIsNewCategoryActive] = useState<boolean>(false)
+    const [isNewPlaceActive, setIsNewPlaceActive] = useState<boolean>(false)
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -125,8 +135,6 @@ const CreateEventForm = () => {
                 "dateTo": inputs.dateTo,
                 "category": categories.find(({ id }) => id === Number(inputs.category)),
                 "place": places.find(({ id }) => id === Number(inputs.place)),
-                "status": "APPROVED",
-                // "author": context.user.id
             })
 
             const eventId = response.data.eventId
@@ -136,6 +144,36 @@ const CreateEventForm = () => {
             );
             
             navigate("/")
+        } catch (error) {
+            console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
+        }
+    }
+
+    const createCategory = async (inputs: CategoryInput) => {
+        context.setLoading(LoadingType.LOADING)
+        try {
+            const response = await context.request!.post("/category", {
+                ...inputs
+            })
+            setCategories(prev => [...prev, { id: response.data.categoryId, ...inputs } as CategoryType])
+            setIsNewCategoryActive(false)
+        } catch (error) {
+            console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
+        }
+    }
+
+    const createPlace = async (inputs: PlaceType) => {
+        context.setLoading(LoadingType.LOADING)
+        try {
+            const response = await context.request!.post("/place", {
+                ...inputs
+            })
+            setPlaces(prev => [...prev, { ...inputs, id: response.data.placeId }])
+            setIsNewPlaceActive(false)
         } catch (error) {
             console.error(error)
         } finally {
@@ -164,12 +202,28 @@ const CreateEventForm = () => {
             <h3 className={classes.sectionTitle}>General</h3>
             <Input required label='Title' name='title' value={inputs.title} onChange={onChange} />
             <InputLabel required value='Category'>
-                <Dropdown name='category' value={inputs.category} items={categoriesToDropdown(categories)} onChange={onDropdownChange} />
+                <Dropdown
+                    name='category'
+                    value={inputs.category}
+                    items={categoriesToDropdown(categories)}
+                    onChange={onDropdownChange}
+                    actions={
+                        <ButtonIconOnly icon={icons.plus} onClick={() => setIsNewCategoryActive(true)} />
+                    }
+                />
             </InputLabel>
             <DateInput required label='Start date' name='dateFrom' value={inputs.dateFrom} onChange={onDateChange} />
             <DateInput label='End date' name='dateTo' value={inputs.dateTo} onChange={onDateChange} />
             <InputLabel required value='Place'>
-                <Dropdown name='place' value={inputs.place} items={placesToDropdown(places)} onChange={onDropdownChange} />
+                <Dropdown
+                    name='place'
+                    value={inputs.place}
+                    items={placesToDropdown(places)}
+                    onChange={onDropdownChange}
+                    actions={
+                        <ButtonIconOnly icon={icons.plus} onClick={() => setIsNewPlaceActive(true)} />
+                    }
+                />
             </InputLabel>
             <div className={classes.description}>
 
@@ -196,6 +250,26 @@ const CreateEventForm = () => {
                     Submit
                 </Button>
             </div>
+            {isNewCategoryActive && (
+                <CreateCategoryModal
+                    title='Create new category'
+                    icon={icons.plus}
+                    textProceed='Save'
+                    categories={categories}
+                    onSubmit={createCategory}
+                    onClose={() => setIsNewCategoryActive(false)}
+                />
+            )}
+            {isNewPlaceActive && (
+                <CreatePlaceModal
+                    icon={icons.plus}
+                    places={places}
+                    title="Create place"
+                    onClose={() => setIsNewPlaceActive(false)}
+                    onSubmit={createPlace}
+                    textProceed='Save'
+                />
+            )}
         </div>
     )
 }

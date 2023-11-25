@@ -21,12 +21,14 @@ import CreateEventForm from './pages/CreateEvent/pages/CreateEventForm/CreateEve
 import Tickets from './pages/CreateEvent/pages/Tickets/Tickets';
 import Menu from './components/Menu/Menu';
 import Content from './components/Content/Content';
+import AdminEvents from './pages/Admin/pages/Events/Events';
 
 import "react-datepicker/dist/react-datepicker.css";
 import 'react-toastify/dist/ReactToastify.css';
 import EventDetail from './pages/EventDetail/EventDetail';
 import EventUsers from './pages/EventUsers/EventUsers';
 import EventView from './pages/EventView/EventView';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
 
@@ -51,7 +53,8 @@ function App() {
               (context.isAuth && context.user && context.user.role === roles.ADMIN) && (
                 <>
                   <Route path="admin" element={<Admin />} >
-                    <Route path="" element={<Categories />} />
+                    <Route path="" element={<AdminEvents />} />
+                    <Route path="categories" element={<Categories />} />
                     <Route path="places" element={<Places />} />
                     <Route path="users" element={<Users />} />
                   </Route>

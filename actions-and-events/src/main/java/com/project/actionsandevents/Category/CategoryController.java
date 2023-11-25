@@ -27,6 +27,11 @@ import com.project.actionsandevents.Category.requests.CategoryPostRequest;
 import com.project.actionsandevents.Category.responses.CategoriesResponse;
 import com.project.actionsandevents.Category.responses.CategoryPostResponse;
 import com.project.actionsandevents.Category.responses.CategoryResponse;
+import com.project.actionsandevents.Event.EventStatus;
+import com.project.actionsandevents.User.User;
+import com.project.actionsandevents.User.UserInfoDetails;
+import com.project.actionsandevents.User.UserService;
+import com.project.actionsandevents.User.exceptions.UserNotFoundException;
 import com.project.actionsandevents.common.ResponseMessage;
 
 import jakarta.validation.Valid;
@@ -36,6 +41,9 @@ import jakarta.validation.Valid;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/category/{id}")
     public ResponseEntity<Object> getCategoryById(@PathVariable Long id, Authentication authentication) {
@@ -78,7 +86,7 @@ public class CategoryController {
     }
 
     @PostMapping("/category")
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> addCategory(
             @Valid @RequestBody CategoryPostRequest category,
             BindingResult bindingResult,
@@ -88,11 +96,21 @@ public class CategoryController {
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
+        UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
+
         try {
+            User user = userService.getUserById(userDetails.getId());
+
+            if (user.getRoles().equals("ROLE_USER")) {
+                category.setStatus(CategoryStatus.PENDING);
+            } else {
+                category.setStatus(CategoryStatus.ACCEPTED);
+            }
+
             Long categoryId = categoryService.addCategory(category);
             return ResponseEntity.ok(new CategoryPostResponse(categoryId,
                     "Category was successfully added", ResponseMessage.Status.SUCCESS));
-        } catch (CategoryNotFoundException | DuplicateCategoryException | CategoryParentException ex) {
+        } catch (CategoryNotFoundException | DuplicateCategoryException | CategoryParentException | UserNotFoundException ex) {
             return ResponseEntity.badRequest().body(new CategoryPostResponse(null,
                     ex.getMessage(), ResponseMessage.Status.ERROR));
         }

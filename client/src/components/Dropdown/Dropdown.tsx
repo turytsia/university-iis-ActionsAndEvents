@@ -29,6 +29,7 @@ type PropsType = {
     name?: string
     label?: string
     onChange: (value: string, name: string) => void
+    actions?: React.ReactNode
 }
 
 const defaultItem = { id: null, value: "--" }
@@ -49,7 +50,8 @@ const Dropdown = ({
     value,
     items: defaultItems,
     name = "",
-    onChange
+    onChange,
+    actions
 }: PropsType) => {
 
     // const { isDark } = useContext(AppContext)
@@ -68,29 +70,35 @@ const Dropdown = ({
                     {label}
                 </span>
             )}
-            <DismissWindow
-                align
-                offset={0}
-                placement={placements.BOTTOM}
-                element={(isActive) =>
+            <div className={classes.dropdownInputContainer}>
 
-                    <div className={classes.dropdownInputContainer}>
-                        <div className={classes.dropdownInput} >{currentValue}</div>
-                        <Icon className={classes.icon} icon={isActive ? icons.arrowUp : icons.arrowDown} height={20} width={20} />
-                    </div>
-                }>
-                {setIsActive =>
-                    <div className={classes.outerContainer}>
-                        <div className={classes.container}>
-                            {items.map(({ id, value }) => (
-                                <button key={id} className={itemStyles} onClick={() => { setIsActive(false); onChange(id!, name) }}>
-                                    {value}
-                                </button>
-                            ))}
+                <DismissWindow
+                    align
+                    offset={0}
+                    placement={placements.BOTTOM}
+                    element={(isActive) =>
+
+
+                        <div className={classes.innerInputContainer}>
+                            <div className={classes.dropdownInput} >{currentValue}</div>
+                            <Icon className={classes.icon} icon={isActive ? icons.arrowUp : icons.arrowDown} height={20} width={20} />
                         </div>
-                    </div>
-                }
-            </DismissWindow>
+
+                    }>
+                    {setIsActive =>
+                        <div className={classes.outerContainer}>
+                            <div className={classes.container}>
+                                {items.map(({ id, value }) => (
+                                    <button key={id} className={itemStyles} onClick={() => { setIsActive(false); onChange(id!, name) }}>
+                                        {value}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    }
+                </DismissWindow>
+                {actions}
+            </div>
         </div>
 
     )

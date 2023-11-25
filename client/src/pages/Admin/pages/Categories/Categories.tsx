@@ -25,8 +25,8 @@ export type CategoryType = {
 const dataKeys: TableHeaderType = {
     id: "Id",
     name: "Name",
+    parentCategory: "Parent Id",
     status: "Status",
-    parentCategory: "Parent Id"
 }
 
 export const categoriesToDropdown = (categories: CategoryType[]) => {

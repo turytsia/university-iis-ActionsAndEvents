@@ -73,8 +73,15 @@
     width: 100%;
     height: 33.6px;
 }
-
-.dropdownInputContainer{
-    cursor: pointer;
+.innerInputContainer{
     position: relative;
+    display: flex;
+    cursor: pointer;
+    width: 100%;
+}
+.dropdownInputContainer{
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }

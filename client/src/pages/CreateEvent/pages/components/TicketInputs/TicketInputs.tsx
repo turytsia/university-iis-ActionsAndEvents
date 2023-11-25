@@ -4,6 +4,7 @@ import { TicketType } from '../../Tickets/modals/CreateTicketModal/CreateTicketM
 import Ticket from './components/Ticket/Ticket'
 import NewTicket from './components/NewTicket/NewTicket'
 import { TicketTypeWithRegister } from '../../Tickets/Tickets'
+import uuid from 'react-uuid'
 
 type PropsType = {
     tickets: TicketTypeWithRegister[],
@@ -23,7 +24,7 @@ const TicketInputs = ({
     
     return (
         <div className={classes.container}>
-            {tickets.map((ticket, i) => <Ticket ticket={ticket} deleteTicket={deleteTicket(ticket.id!)} updateTicket={updateTicket(ticket.id!)} />)}
+            {tickets.map((ticket, i) => <Ticket key={uuid()} ticket={ticket} deleteTicket={deleteTicket(ticket.id!)} updateTicket={updateTicket(ticket.id!)} />)}
             {enableNewTicket && <NewTicket createTicket={createTicket} />}
         </div>
     )

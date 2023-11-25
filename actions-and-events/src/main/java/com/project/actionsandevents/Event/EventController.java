@@ -135,6 +135,12 @@ public class EventController {
             User author = userService.getUserById(userDetails.getId());
             event.setAuthor(author);
 
+            if (author.getRoles().equals("ROLE_USER")) {
+                event.setStatus(EventStatus.PENDING);
+            } else {
+                event.setStatus(EventStatus.ACCEPTED);
+            }
+
             return ResponseEntity.ok(
                 new EventPostResponse(eventService.addEvent(event),
                                 "Event was successfully added", ResponseMessage.Status.SUCCESS));

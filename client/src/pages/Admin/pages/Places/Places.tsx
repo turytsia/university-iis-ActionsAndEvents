@@ -102,6 +102,7 @@ const Places = () => {
                         </Button>
                         {isCreateActive && (
                             <CreatePlaceModal
+                                icon={icons.plus}
                                 textProceed='Create'
                                 title='Create place'
                                 places={places}

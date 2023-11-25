@@ -6,6 +6,7 @@ import CreateCategoryModal, { CategoryInput } from '../../modals/CreateCategoryM
 import { AppContext, LoadingType } from '../../../../../../context/AppContextProvider'
 import DeleteModal from '../../../../../../modals/DeleteModal/DeleteModal'
 import Popover from '../../../../../../components/Popover/Popover'
+import { status } from '../../../../../../utils/common'
 
 type PropsType = {
     category: CategoryType
@@ -55,9 +56,30 @@ const RowActions = ({
             context.setLoading(LoadingType.NONE)
         }
     }
+
+    const acceptCategory = async () => {
+        context.setLoading(LoadingType.LOADING)
+        try {
+            const response = await context.request!.patch(`/category/${category.id}`, {
+                ...category,
+                status: status.ACCEPTED
+            })
+
+            setCategories(prev => prev.reduce((a, c) => [...a, c.id === category.id ? { ...category, status: status.ACCEPTED } : c], [] as CategoryType[]))
+        } catch (error) {
+            console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
+        }
+    }
     
   return (
       <>
+          {category.status === status.PENDING && (
+              <Popover element={<ButtonIconOnly icon={icons.check} onClick={acceptCategory}></ButtonIconOnly>}>
+                  Accept
+              </Popover>
+          )}
           <Popover element={<ButtonIconOnly icon={icons.pen} onClick={() => setIsUpdateActive(true)}></ButtonIconOnly>}>
               Update
           </Popover>

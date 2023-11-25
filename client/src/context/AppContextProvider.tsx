@@ -79,7 +79,7 @@ const AppContextProvider = ({ children }: PropsType) => {
 
   const request = useMemo(
     () => axios.create({
-      baseURL: 'http://localhost:8080',
+      baseURL: 'https://actions-and-events.azurewebsites.net',
       headers: token ? {
         "Authorization": `Bearer ${token}`
       } : {}
@@ -166,6 +166,9 @@ const AppContextProvider = ({ children }: PropsType) => {
         draggable: true,
         progress: undefined,
         theme: "light",
+        style: {
+          top: 58
+        }
       });
     }
     request.interceptors.response.use(response => {

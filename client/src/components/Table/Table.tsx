@@ -77,7 +77,7 @@ const Table = ({
             [
                 ...keys.map(k => (
                     <div key={uuid()} className={cellStyles}>
-                        {_fmt ? _fmt(k, item[k]) : specFmt(fmt(item[k]))}
+                        {_fmt ? specFmt(_fmt(k, item[k]) as string) : specFmt(fmt(item[k]))}
                     </div>
                 )),
                 ...(rowActions ? [<div key={uuid()} className={classNames(cellStyles, classes.actions)}>{rowActions(item)}</div>] : [])

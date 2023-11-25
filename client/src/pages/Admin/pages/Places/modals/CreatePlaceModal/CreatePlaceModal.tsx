@@ -23,6 +23,7 @@ type PropsType = {
     onClose: () => void
     title: string,
     textProceed: string
+    icon: icons
 }
 
 const CreatePlaceModal = ({
@@ -31,7 +32,8 @@ const CreatePlaceModal = ({
     onSubmit,
     onClose,
     title,
-    textProceed
+    textProceed,
+    icon
 }: PropsType) => {
     const [inputs, setInputs] = useState(defaultInputs ?? initialInputs)
 
@@ -50,7 +52,7 @@ const CreatePlaceModal = ({
           textCancel={'Cancel'}
           onClose={onClose}
           onSubmit={__onSubmit}
-          icon={icons.pen}
+          icon={icon}
           type={ModalStyles.Inputs}
           disabled={inputs.name.length === 0 || inputs.address.length === 0}>
           <Input required label='Name' name='name' value={inputs.name} onChange={onChange} />

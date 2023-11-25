@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.actionsandevents.Place.exceptions.PlaceNotFoundException;
+import com.project.actionsandevents.Category.CategoryStatus;
 import com.project.actionsandevents.Place.exceptions.DuplicatePlaceException;
 
 import com.project.actionsandevents.Place.requests.PlacePatchRequest;
@@ -28,7 +29,10 @@ import com.project.actionsandevents.Place.requests.PlacePatchRequest;
 import com.project.actionsandevents.Place.responses.PlacePostResponse;
 import com.project.actionsandevents.Place.responses.PlaceResponse;
 import com.project.actionsandevents.Place.responses.PlacesResponse;
-
+import com.project.actionsandevents.User.User;
+import com.project.actionsandevents.User.UserInfoDetails;
+import com.project.actionsandevents.User.UserService;
+import com.project.actionsandevents.User.exceptions.UserNotFoundException;
 import com.project.actionsandevents.common.ResponseMessage;
 
 import jakarta.validation.Valid;
@@ -38,6 +42,9 @@ import jakarta.validation.Valid;
 public class PlaceController {
     @Autowired
     private PlaceService placeService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/place/{id}")
     public ResponseEntity<Object> getPlaceById(@PathVariable Long id, Authentication authentication) throws PlaceNotFoundException {
@@ -76,22 +83,32 @@ public class PlaceController {
     }
 
     @PostMapping("/place")
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> addPlace(
                 @Valid @RequestBody Place place,
                 BindingResult bindingResult,
                 Authentication authentication) 
     {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new PlacePostResponse(null, 
-                            "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
+            return ResponseEntity.badRequest().body(new PlacePostResponse(null,
+                    "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
+        
+        UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
 
         try {
+            User user = userService.getUserById(userDetails.getId());
+
+            if (user.getRoles().equals("ROLE_USER")) {
+                place.setStatus(PlaceStatus.PENDING);
+            } else {
+                place.setStatus(PlaceStatus.ACCEPTED);
+            }
+
             Long placeId = placeService.addPlace(place);
             return ResponseEntity.ok(new PlacePostResponse(placeId, 
                     "Place was successfully added", ResponseMessage.Status.SUCCESS));
-        } catch (DuplicatePlaceException ex) {
+        } catch (DuplicatePlaceException | UserNotFoundException ex) {
             return ResponseEntity.badRequest().body(new PlacePostResponse(null, 
                             ex.getMessage(), ResponseMessage.Status.ERROR));
         }

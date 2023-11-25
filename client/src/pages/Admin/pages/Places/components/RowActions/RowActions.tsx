@@ -7,6 +7,7 @@ import DeleteModal from '../../../../../../modals/DeleteModal/DeleteModal'
 import CreateCategoryModal from '../../../Categories/modals/CreateCategoryModal/CreateCategoryModal'
 import CreatePlaceModal from '../../modals/CreatePlaceModal/CreatePlaceModal'
 import Popover from '../../../../../../components/Popover/Popover'
+import { status } from '../../../../../../utils/common'
 
 type PropsType = {
     place: PlaceType
@@ -56,8 +57,29 @@ const RowActions = ({
         }
     }
 
+    const acceptPlace = async () => {
+        context.setLoading(LoadingType.LOADING)
+        try {
+            const response = await context.request!.patch(`/place/${place.id}`, {
+                ...place,
+                status: status.ACCEPTED
+            })
+
+            setPlaces(prev => prev.reduce((a, p) => [...a, p.id === place.id ? { ...place, status: status.ACCEPTED } : p], [] as PlaceType[]))
+        } catch (error) {
+            console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
+        }
+    }
+
     return (
         <>
+            {place.status === status.PENDING && (
+                <Popover element={<ButtonIconOnly icon={icons.check} onClick={acceptPlace}></ButtonIconOnly>}>
+                    Accept
+                </Popover>
+            )}
             <Popover element={<ButtonIconOnly icon={icons.pen} onClick={() => setIsUpdateActive(true)}></ButtonIconOnly>}>
                 Update
             </Popover>
@@ -73,6 +95,7 @@ const RowActions = ({
             )}
             {isUpdateActive && (
                 <CreatePlaceModal
+                    icon={icons.pen}
                     title='Update place'
                     textProceed='Update'
                     inputs={place}

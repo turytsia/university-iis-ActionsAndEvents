@@ -1,5 +1,20 @@
 package com.project.actionsandevents.Event;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum EventStatus {
-    PENDING, APPROVED, REJECTED
+    PENDING("Pending"),
+    ACCEPTED("Accepted"),
+    REJECTED("Rejected");
+
+    private final String status;
+
+    EventStatus(String status) {
+        this.status = status;
+    }
+
+    @JsonValue
+    public String getStatus() {
+        return status;
+    }
 }

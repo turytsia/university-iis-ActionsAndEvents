@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { AppContext, UserType } from '../../../../context/AppContextProvider'
+import { AppContext, LoadingType, UserType } from '../../../../context/AppContextProvider'
 
 import classes from "./User.module.css"
 import { Icon } from '@iconify/react'
@@ -40,15 +40,19 @@ const User = () => {
     const [user, setUser] = useState<UserType | null>(null)
 
     const fetch = async () => {
+        context.setLoading(LoadingType.FETCHING)
         try {
             const response = await context.request!.get(`/user/${id}`)
             setUser(response.data)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
     const updateUser = async (inputs: UserType) => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.patch(`/user/${id}`, inputs)
             console.log(response.data)
@@ -56,6 +60,8 @@ const User = () => {
             setIsSettingsActive(false)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 

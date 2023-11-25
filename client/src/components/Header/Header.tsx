@@ -40,7 +40,7 @@ const Header = () => {
                             <Menu setIsActive={setIsActive} />
                         )}
                     </DismissWindow>
-                    <Link to="/">Logo</Link>
+                    <Link to="/">Events & Actions</Link>
                 </div>
 
                 <div className={classes.actions}>

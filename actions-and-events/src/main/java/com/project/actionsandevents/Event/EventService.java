@@ -129,6 +129,8 @@ public class EventService {
             eventToPatch.setImage(patchRequest.getImage());
         }
 
+        eventToPatch.setStatus(patchRequest.getStatus());
+
         try {
             eventRepository.save(eventToPatch);
         } catch (DataIntegrityViolationException e) {
@@ -188,7 +190,7 @@ public class EventService {
             throw new EventNotFoundException("Event not found with id: " + eventId);
         }
 
-        event.get().setStatus(EventStatus.APPROVED);
+        event.get().setStatus(EventStatus.ACCEPTED);
 
         try {
             eventRepository.save(event.get());
