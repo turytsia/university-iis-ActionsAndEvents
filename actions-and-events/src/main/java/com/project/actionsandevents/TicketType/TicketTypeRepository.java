@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.project.actionsandevents.Event.Event;
 import com.project.actionsandevents.User.User;
@@ -21,7 +20,4 @@ public interface TicketTypeRepository extends JpaRepository<TicketType, Long> {
     List<Long> findAllIdsByUser(@Param("user") User user);
 
     List<TicketType> findAllByEvent(Event event);
-
-    // @Query("SELECT tt.id FROM TicketType tt")
-    // List<Long> findAllIds();
 }

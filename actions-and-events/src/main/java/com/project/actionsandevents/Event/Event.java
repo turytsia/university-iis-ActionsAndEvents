@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.persistence.CascadeType;
 
 import com.project.actionsandevents.Category.Category;
@@ -44,6 +45,7 @@ public class Event {
     @GeneratedValue
     private Long id;
 
+    @NotBlank(message = "Date from is required")
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateFrom;
@@ -55,6 +57,7 @@ public class Event {
     @Column(nullable = true)
     private String description;
 
+    @NotBlank(message = "Title is required")
     @Column(nullable = false)
     private String title;
 
@@ -76,10 +79,12 @@ public class Event {
     @JoinColumn(referencedColumnName = "id")
     private User userManages;
 
+    @NotBlank(message = "Place is required")
     @ManyToOne
     @JoinColumn(referencedColumnName = "id")
     private Place place;
 
+    @NotBlank(message = "Category is required")
     @ManyToOne
     @JoinColumn(referencedColumnName = "id")
     private Category category;

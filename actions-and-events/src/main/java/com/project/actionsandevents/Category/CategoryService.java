@@ -67,17 +67,19 @@ public class CategoryService {
 
         Category categoryToPatch = category.get();
 
+
+        //System.out.println("*****Before null check: Parent category: " + patchRequest.getParentCategory());
         
-        if (patchRequest.getParentCategoryId() != null) {
-            Long parentId = patchRequest.getParentCategoryId();
+        if (patchRequest.getParentCategory() != null) {
+            Long parentId = patchRequest.getParentCategory();
             Optional<Category> parent = repository.findById(parentId);
 
             if (!parent.isPresent()) {
                 throw new CategoryNotFoundException("Parent category not found with ID: " + parentId);
             }
 
-            System.out.println("*****This category: " + id);
-            System.out.println("*****Parent category: " + patchRequest.getParentCategoryId());
+            // System.out.println("*****This category: " + id);
+            // System.out.println("*****Parent category: " + patchRequest.getParentCategory());
 
             // Check if parent category is not the same as the category to patch
             if (parent.get().getId() == categoryToPatch.getId()) {

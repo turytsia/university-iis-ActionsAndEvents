@@ -1,22 +1,14 @@
 package com.project.actionsandevents.TicketType;
 
-
-import java.util.Set;
-
 import com.project.actionsandevents.Event.Event;
-import com.project.actionsandevents.User.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-//import jakarta.persistence.PrimaryKeyJoinColumn;
-import jakarta.persistence.Table;
-import jakarta.persistence.CascadeType;
+import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,33 +20,26 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-//@Table(name="_tickettype")
 public class TicketType {
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false) // unique = true, 
     private String name;
 
+    @Size(min = 0, max = 1000000)
     @Column(nullable = false)
     private Float price;
 
+    @Size(min = 0, max = 1000000)
     @Column(nullable = false)
     private Long capacity;
 
     @Column
     private String description;
 
-    //@PrimaryKeyJoinColumn(name = "_event", referencedColumnName = "id")
-    @ManyToOne //cascade = CascadeType.ALL
+    @ManyToOne
     @JoinColumn(referencedColumnName = "id")
     private Event event; 
-
-    // @ManyToMany
-    // @JoinTable(
-    //     name = "ticket_user",
-    //     joinColumns = @JoinColumn(name = "tickettype_id"), 
-    //     inverseJoinColumns = @JoinColumn(name = "user_id"))
-    // private Set<User> registeredUsers;
 }

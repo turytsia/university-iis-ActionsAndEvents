@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class CategoryPatchRequest {
-    private Long parentCategoryId;
+    private Long parentCategory;
 
     @NotBlank(message = "Name is required")
     private String name;

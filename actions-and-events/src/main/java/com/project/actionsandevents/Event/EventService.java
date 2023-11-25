@@ -6,12 +6,16 @@
 package com.project.actionsandevents.Event;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
+import com.project.actionsandevents.Event.exceptions.DuplicateEventException;
+import com.project.actionsandevents.Event.exceptions.DuplicateRegistrationException;
 import com.project.actionsandevents.Event.exceptions.RegistrationNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
+
 import com.project.actionsandevents.Event.requests.EventPatchRequest;
 import com.project.actionsandevents.Event.responses.EventUserRegisters;
 
@@ -81,7 +85,8 @@ public class EventService {
      * @param patchRequest
      * @throws EventNotFoundException
      */
-    public void patchEventById(Long id, EventPatchRequest patchRequest) throws EventNotFoundException {
+    public void patchEventById(Long id, EventPatchRequest patchRequest) 
+        throws EventNotFoundException, DuplicateEventException {
         Optional<Event> event = repository.findById(id);
 
         if (!event.isPresent()) {
@@ -114,11 +119,11 @@ public class EventService {
             eventToPatch.setImage(patchRequest.getImage());
         }
 
-        // if (patchRequest.getStatus() != null) {
-        //     eventToPatch.setStatus(patchRequest.getStatus());
-        // }
-
-        repository.save(eventToPatch);
+        try {
+            repository.save(eventToPatch);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateEventException("Event with such parameters already exists");
+        }
     }
 
     /**
@@ -126,8 +131,12 @@ public class EventService {
      * @param event
      * @return
      */
-    public Long addEvent(Event event) {
-        return repository.save(event).getId();
+    public Long addEvent(Event event) throws DuplicateEventException {
+        try {
+            return repository.save(event).getId();
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateEventException("Event with such parameters already exists");
+        }
     }
 
     /**
@@ -142,6 +151,200 @@ public class EventService {
             throw new EventNotFoundException("Event with ID " + id + " not found");
         }
     }
+
+    public String approveEvent(Long eventId) throws EventNotFoundException {
+        Optional<Event> event = repository.findById(eventId);
+
+        if (!event.isPresent()) {
+            throw new EventNotFoundException("Event not found with id: " + eventId);
+        }
+
+        event.get().setStatus(EventStatus.APPROVED);
+
+        return "Event was successfully approved";
+    }
+
+
+
+
+
+    
+
+
+
+
+
+    // get all ticket types
+    public List<Long> getTicketTypeIds(Long id) throws EventNotFoundException {
+        Optional<Event> event = repository.findById(id);
+
+        if (!event.isPresent()) {
+            throw new EventNotFoundException("Event not found with id: " + id);
+        }
+
+        return ticketTypeRepository.findAllIdsByEvent(event.get());
+    }
+
+    // TODO: Also need event id? Why?
+    public TicketType getTicketTypeById(Long id) throws TicketNotFoundException {
+        Optional<TicketType> ticketType = ticketTypeRepository.findById(id);
+
+        if (!ticketType.isPresent()) {
+            throw new TicketNotFoundException("Ticket type not found with id: " + id);
+        }
+        
+        return ticketType.get();
+    }
+
+    public String addTicketType(Long eventId, TicketType ticketType) 
+        throws EventNotFoundException, DuplicateEventException 
+    {
+        Optional<Event> event = repository.findById(eventId);
+
+        if (!event.isPresent()) {
+            throw new EventNotFoundException("Event not found with id: " + eventId);
+        }
+
+        ticketType.setEvent(event.get());
+        try {
+            ticketTypeRepository.save(ticketType);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateEventException("Ticket type with such parameters already exists");
+        }
+
+        return "Ticket type was successfully added";
+    }
+
+    public String patchTicketTypeById(Long id, TicketType ticketType) 
+        throws TicketNotFoundException, DuplicateEventException  
+    {
+        Optional<TicketType> ticketTypeToPatch = ticketTypeRepository.findById(id);
+
+        if (!ticketTypeToPatch.isPresent()) {
+            throw new TicketNotFoundException("Ticket type not found with id: " + id);
+        }
+
+        if (ticketType.getName() != null) {
+            ticketTypeToPatch.get().setName(ticketType.getName());
+        }
+
+        if (ticketType.getPrice() != null) {
+            ticketTypeToPatch.get().setPrice(ticketType.getPrice());
+        }
+
+        if (ticketType.getCapacity() != null) {
+            ticketTypeToPatch.get().setCapacity(ticketType.getCapacity());
+        }
+
+        if (ticketType.getDescription() != null) {
+            ticketTypeToPatch.get().setDescription(ticketType.getDescription());
+        }
+
+        try {
+            ticketTypeRepository.save(ticketTypeToPatch.get());
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateEventException("Ticket type with such parameters already exists");
+        }
+
+        return "Ticket type was successfully updated";
+    }
+
+    public void deleteTicketTypeById(Long id) throws TicketNotFoundException {
+        if (ticketTypeRepository.existsById(id)) {
+            ticketTypeRepository.deleteById(id);
+        } else {
+            throw new TicketNotFoundException("Ticket type with ID " + id + " not found");
+        }
+    }
+
+
+
+
+
+
+    public String registerUserForTicketType(Long ticketId, Long userId) 
+        throws TicketNotFoundException, UserNotFoundException 
+    {
+        Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
+        Optional<User> user = userRepository.findById(userId);
+
+        if (!ticketType.isPresent()) {
+            throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
+        }
+
+        if (!user.isPresent()) {
+            throw new UserNotFoundException("User not found with id: " + userId);
+        }
+
+        Optional<Registers> reg = registersRepository.findByUserAndTicketType(user.get(), ticketType.get());
+
+        if (reg.isPresent()) {
+            return "User already registered for this ticket";
+        }
+
+        Registers newRegister = new Registers();
+        newRegister.setUser(user.get());
+        newRegister.setTicketType(ticketType.get());
+        // Registration will be completed after it is accepted by event creator
+        newRegister.setStatus(RegistersStatus.PENDING);
+        newRegister.setDate(new java.util.Date());
+
+        try {
+            registersRepository.save(newRegister);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateRegistrationException("Registration with such parameters already exists");
+        }   
+
+        return "User was successfully registered";
+    }
+
+    public List<Long> getTicketRegistrations(Long ticketId) throws TicketNotFoundException {
+        Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
+
+        if (!ticketType.isPresent()) {
+            throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
+        }
+
+        List<Long> ids = registersRepository.findAllIdsByTicketType(ticketType.get());
+
+        return ids;
+    }
+
+    public Registers getTicketRegistrationById(Long id) throws RegistrationNotFoundException {
+        Optional<Registers> registers = registersRepository.findById(id);
+
+        if (!registers.isPresent()) {
+            throw new RegistrationNotFoundException("User not registered for this ticket with id: " + id);
+        }
+
+        return registers.get();
+    }
+
+
+    public String patchTicketRegistrationById(Long id, RegistersStatus status) 
+        throws RegistrationNotFoundException, DuplicateRegistrationException
+    {
+        Optional<Registers> registers = registersRepository.findById(id);
+
+        if (!registers.isPresent()) {
+            throw new RegistrationNotFoundException("Registration not found with id: " + id);
+        }
+
+        registers.get().setStatus(status);
+
+        try {
+            registersRepository.save(registers.get());
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateRegistrationException("Registration with such parameters already exists");
+        }
+
+        return "Ticket registration was successfully updated";
+    }
+
+
+
+
+
 
     // get all comments
     public List<Long> getCommentsIds(Long id) throws EventNotFoundException {
@@ -205,167 +408,10 @@ public class EventService {
         }
     }
 
-    // get all ticket types
-    public List<Long> getTicketTypeIds(Long id) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(id);
-
-        if (!event.isPresent()) {
-            throw new EventNotFoundException("Event not found with id: " + id);
-        }
-
-        return ticketTypeRepository.findAllIdsByEvent(event.get());
-    }
-
-    // TODO: Also need event id? Why?
-    public TicketType getTicketTypeById(Long id) throws TicketNotFoundException {
-        Optional<TicketType> ticketType = ticketTypeRepository.findById(id);
-
-        if (!ticketType.isPresent()) {
-            throw new TicketNotFoundException("Ticket type not found with id: " + id);
-        }
-        
-        return ticketType.get();
-    }
-
-    public String addTicketType(Long eventId, TicketType ticketType) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(eventId);
-
-        if (!event.isPresent()) {
-            throw new EventNotFoundException("Event not found with id: " + eventId);
-        }
-
-        ticketType.setEvent(event.get());
-        ticketTypeRepository.save(ticketType);
-
-        return "Ticket type was successfully added";
-    }
-
-    public String patchTicketTypeById(Long id, TicketType ticketType) throws TicketNotFoundException {
-        Optional<TicketType> ticketTypeToPatch = ticketTypeRepository.findById(id);
-
-        if (!ticketTypeToPatch.isPresent()) {
-            throw new TicketNotFoundException("Ticket type not found with id: " + id);
-        }
-
-        if (ticketType.getName() != null) {
-            ticketTypeToPatch.get().setName(ticketType.getName());
-        }
-
-        if (ticketType.getPrice() != null) {
-            ticketTypeToPatch.get().setPrice(ticketType.getPrice());
-        }
-
-        if (ticketType.getCapacity() != null) {
-            ticketTypeToPatch.get().setCapacity(ticketType.getCapacity());
-        }
-
-        if (ticketType.getDescription() != null) {
-            ticketTypeToPatch.get().setDescription(ticketType.getDescription());
-        }
-
-        ticketTypeRepository.save(ticketTypeToPatch.get());
-
-        return "Ticket type was successfully updated";
-    }
-
-    public void deleteTicketTypeById(Long id) throws TicketNotFoundException {
-        if (ticketTypeRepository.existsById(id)) {
-            ticketTypeRepository.deleteById(id);
-        } else {
-            throw new TicketNotFoundException("Ticket type with ID " + id + " not found");
-        }
-    }
-
-    public String registerUserForTicketType(Long ticketId, Long userId) 
-        throws TicketNotFoundException, UserNotFoundException 
-    {
-        Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
-        Optional<User> user = userRepository.findById(userId);
-
-        if (!ticketType.isPresent()) {
-            throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
-        }
-
-        if (!user.isPresent()) {
-            throw new UserNotFoundException("User not found with id: " + userId);
-        }
-
-        Optional<Registers> reg = registersRepository.findByUserAndTicketType(user.get(), ticketType.get());
-
-        if (reg.isPresent()) {
-            return "User already registered for this ticket";
-        }
-
-        Registers newRegister = new Registers();
-        newRegister.setUser(user.get());
-        newRegister.setTicketType(ticketType.get());
-        // Registration will be completed after it is accepted by event creator
-        newRegister.setStatus(RegistersStatus.PENDING);
-        newRegister.setDate(new java.util.Date());
-
-        registersRepository.save(newRegister);
-
-        return "User was successfully registered";
-    }
-
-
-
-    public List<Long> getTicketRegistrations(Long ticketId) throws TicketNotFoundException {
-        Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
-
-        if (!ticketType.isPresent()) {
-            throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
-        }
-
-        List<Long> ids = registersRepository.findAllIdsByTicketType(ticketType.get());
-
-
-        System.out.println("************** ids **************");
-        System.out.println(ids);
-
-        return ids;
-    }
-
-    public Registers getTicketRegistrationById(Long id) throws RegistrationNotFoundException {
-        Optional<Registers> registers = registersRepository.findById(id);
-
-        if (!registers.isPresent()) {
-            throw new RegistrationNotFoundException("User not registered for this ticket with id: " + id);
-        }
-
-        return registers.get();
-    }
-
-
-    public String patchTicketRegistrationById(Long id, RegistersStatus status) throws RegistrationNotFoundException {
-        Optional<Registers> registers = registersRepository.findById(id);
-
-        if (!registers.isPresent()) {
-            throw new RegistrationNotFoundException("Registration not found with id: " + id);
-        }
-
-        registers.get().setStatus(status);
-
-        registersRepository.save(registers.get());
-
-        return "Ticket registration was successfully updated";
-    }
-
-
-
 
     
-    public String approveEvent(Long eventId) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(eventId);
 
-        if (!event.isPresent()) {
-            throw new EventNotFoundException("Event not found with id: " + eventId);
-        }
-
-        event.get().setStatus(EventStatus.APPROVED);
-
-        return "Event was successfully approved";
-    }
+   
 
     public List<Long> getEventLogs(Long eventId) throws EventNotFoundException {
         Optional<Event> event = repository.findById(eventId);

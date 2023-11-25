@@ -7,6 +7,8 @@ package com.project.actionsandevents.User;
 
 import java.util.Set;
 
+import org.hibernate.validator.constraints.Length;
+
 import com.project.actionsandevents.Administers.Administers;
 import com.project.actionsandevents.Event.Event;
 
@@ -39,7 +41,8 @@ public class User {
     private Set<Administers> administrators;
 
     @NotBlank(message = "Login is mandatory")
-    @Column(unique = true)
+    
+    @Column(nullable = false, unique = true)
     private String login;
 
     @Column(nullable = true)
@@ -57,6 +60,7 @@ public class User {
     private String phone;
 
     @NotBlank(message = "Password is mandatory")
+    @Length(min = 8, message = "Password must be at least 8 characters long")
     @Column(nullable = false)
     private String password;
 

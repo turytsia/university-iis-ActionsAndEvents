@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.project.actionsandevents.Event.exceptions.DuplicateEventException;
 import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
 import com.project.actionsandevents.Event.exceptions.RegistrationNotFoundException;
@@ -88,12 +89,13 @@ public class EventController {
 
     @GetMapping("/event/{id}")
     public ResponseEntity<Object> getEventById(@PathVariable Long id, Authentication authentication)
-            throws EventNotFoundException {
-
-        // return ResponseEntity.ok(
-        // new EventResponse(eventService.getEventById(id),
-        // eventService.getEventCategories(id)));
-        return ResponseEntity.ok(new EventResponse(eventService.getEventById(id)));
+    {
+        try {
+            return ResponseEntity.ok(new EventResponse(eventService.getEventById(id)));
+        } catch (EventNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @GetMapping("/events")
@@ -107,16 +109,22 @@ public class EventController {
             @PathVariable Long id,
             @Valid @RequestBody EventPatchRequest patchRequest,
             BindingResult bindingResult,
-            Authentication authentication) throws EventNotFoundException {
+            Authentication authentication)  
+    {
 
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
-        eventService.patchEventById(id, patchRequest);
-
-        return ResponseEntity.ok(new ResponseMessage("Event was successfully updated", ResponseMessage.Status.SUCCESS));
+        try {
+            eventService.patchEventById(id, patchRequest);
+            return ResponseEntity.ok(new ResponseMessage(
+                            "Event was successfully updated", ResponseMessage.Status.SUCCESS));
+        } catch (EventNotFoundException | DuplicateEventException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @PostMapping("/event")
@@ -124,8 +132,8 @@ public class EventController {
     public ResponseEntity<Object> addEvent(
             @Valid @RequestBody Event event,
             BindingResult bindingResult,
-            Authentication authentication) throws UserNotFoundException {
-
+            Authentication authentication) 
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new EventPostResponse(null,
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
@@ -133,40 +141,58 @@ public class EventController {
 
         UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
 
-        User author = userService.getUserById(userDetails.getId());
-        event.setAuthor(author);
+        try {
+            User author = userService.getUserById(userDetails.getId());
+            event.setAuthor(author);
 
-        return ResponseEntity.ok(
+            return ResponseEntity.ok(
                 new EventPostResponse(eventService.addEvent(event),
-                        "Event was successfully added", ResponseMessage.Status.SUCCESS));
+                                "Event was successfully added", ResponseMessage.Status.SUCCESS));
+        } catch (UserNotFoundException | DuplicateEventException ex) {
+            return ResponseEntity.badRequest().body(new EventPostResponse(null,
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @DeleteMapping("/event/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> deleteEvent(@PathVariable Long id, Authentication authentication)
-            throws EventNotFoundException {
+    {
+        try {
+            if (!hasPrivilegesOnEvent(authentication, eventService.getEventById(id))) {
+                return ResponseEntity.badRequest().body(new ResponseMessage(
+                        "You are not allowed to delete this event", ResponseMessage.Status.ERROR));
+            }
 
-        System.out.println("***************DELETE EVENT");
-        if (!hasPrivilegesOnEvent(authentication, eventService.getEventById(id))) {
+            eventService.deleteEventById(id);
+        } catch (EventNotFoundException ex) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
-                    "You are not allowed to delete this event", ResponseMessage.Status.ERROR));
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
         }
-
-        eventService.deleteEventById(id);
 
         return ResponseEntity.ok(new ResponseMessage("Event was successfully removed", ResponseMessage.Status.SUCCESS));
     }
 
     @GetMapping("/event/{id}/comments")
     public ResponseEntity<Object> getEventComments(@PathVariable Long id, Authentication authentication)
-            throws EventNotFoundException {
-        return ResponseEntity.ok(new CommentsResponse(eventService.getCommentsIds(id)));
+    {
+        try {
+            return ResponseEntity.ok(new CommentsResponse(eventService.getCommentsIds(id)));
+        } catch (EventNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @GetMapping("/event/comment/{id}")
     public ResponseEntity<Object> getEventCommentById(@PathVariable Long id, Authentication authentication)
-            throws EventNotFoundException {
-        return ResponseEntity.ok(new CommentResponse(eventService.getCommentById(id)));
+    {
+        try {
+            return ResponseEntity.ok(new CommentResponse(eventService.getCommentById(id)));
+        } catch (EventNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @PostMapping("/event/{id}/comment")
