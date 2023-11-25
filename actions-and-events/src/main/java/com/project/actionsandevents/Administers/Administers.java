@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.GeneratedValue;
 
 import lombok.AllArgsConstructor;
@@ -37,12 +38,24 @@ public class Administers {
     @ManyToOne
     private User admin;
     
-    @ManyToOne
-    private User user;
+    // @ManyToOne
+    // private User user;
 
+    @NotNull(message = "User login cannot be null")
+    private String userLogin;
+
+    @NotNull(message = "Date cannot be null")
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
     @Column(nullable = true)
     private String text;
+
+    public Administers(User admin, String userLogin, String text) {
+        this.admin = admin;
+        // this.user = user;
+        this.userLogin = userLogin;
+        this.date = new Date();
+        this.text = text;
+    }
 }

@@ -37,8 +37,8 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Administers> administrators;
+    // @OneToMany(mappedBy = "user")
+    // private Set<Administers> administrators;
 
     @NotBlank(message = "Login is mandatory")
     

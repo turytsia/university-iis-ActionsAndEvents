@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.actionsandevents.Administers.responses.LogResponse;
 import com.project.actionsandevents.Administers.responses.LogsResponse;
+import com.project.actionsandevents.common.ResponseMessage;
+import com.project.actionsandevents.Administers.exceptions.AdministerLogNotFoundException;
+
 
 @RestController
 @RequestMapping("/admin")
@@ -26,10 +28,13 @@ public class AdministersController {
     }
 
     @GetMapping("/log/{id}")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PreAuthorize("hasAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getAdministerById(@PathVariable Long id, Authentication authentication) {
-        // return ResponseEntity.ok(new LogResponse(administersService.getAdministerById()));
-        // TODO administer's id
-        return null;
+        try {
+            return ResponseEntity.ok(administersService.getAdministerById(id));
+        } catch (AdministerLogNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 }

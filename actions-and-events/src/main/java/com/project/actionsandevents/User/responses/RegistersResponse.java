@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.project.actionsandevents.Event.Registers;
 import com.project.actionsandevents.Event.RegistersStatus;
-import com.project.actionsandevents.TicketType.TicketType;
+import com.project.actionsandevents.Event.TicketType;
 import com.project.actionsandevents.User.User;
 
 import lombok.Getter;

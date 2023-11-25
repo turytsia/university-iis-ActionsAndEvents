@@ -23,7 +23,6 @@ import jakarta.persistence.CascadeType;
 
 import com.project.actionsandevents.Category.Category;
 import com.project.actionsandevents.Place.Place;
-import com.project.actionsandevents.TicketType.TicketType;
 import com.project.actionsandevents.User.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -97,4 +96,7 @@ public class Event {
     // Delete all comments when event is deleted
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    private List<EventLog> eventLogs;
 }

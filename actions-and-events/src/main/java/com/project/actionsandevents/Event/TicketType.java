@@ -1,21 +1,22 @@
-package com.project.actionsandevents.TicketType;
+package com.project.actionsandevents.Event;
 
 import org.hibernate.validator.constraints.Range;
 
-import com.project.actionsandevents.Event.Event;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -43,5 +44,8 @@ public class TicketType {
 
     @ManyToOne
     @JoinColumn(referencedColumnName = "id")
-    private Event event; 
+    private Event event;
+
+    @OneToMany(mappedBy = "ticketType", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Registers> registers;
 }

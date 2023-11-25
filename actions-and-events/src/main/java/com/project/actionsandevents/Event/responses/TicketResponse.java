@@ -1,6 +1,6 @@
 package com.project.actionsandevents.Event.responses;
 
-import com.project.actionsandevents.TicketType.TicketType;
+import com.project.actionsandevents.Event.TicketType;
 
 import lombok.Getter;
 import lombok.Setter;

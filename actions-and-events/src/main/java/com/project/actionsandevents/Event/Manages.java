@@ -10,10 +10,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+
+import jakarta.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ import lombok.Setter;
 import java.util.Date;
 
 import com.project.actionsandevents.User.User;
+
 
 @Getter
 @Setter
@@ -40,6 +42,7 @@ public class Manages {
     @ManyToOne
     private Event event;
 
+    @NotNull(message = "Date cannot be null")
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 

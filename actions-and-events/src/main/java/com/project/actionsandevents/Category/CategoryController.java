@@ -60,7 +60,8 @@ public class CategoryController {
             @PathVariable Long id,
             @Valid @RequestBody CategoryPatchRequest patchRequest,
             BindingResult bindingResult,
-            Authentication authentication) {
+            Authentication authentication) 
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
