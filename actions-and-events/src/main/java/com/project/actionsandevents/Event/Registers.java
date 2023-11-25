@@ -22,7 +22,6 @@ import lombok.Setter;
 import java.util.Date;
 
 import com.project.actionsandevents.User.User;
-import com.project.actionsandevents.TicketType.TicketType;
 
 @Getter
 @Setter

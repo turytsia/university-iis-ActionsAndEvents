@@ -35,14 +35,19 @@ public class UserController {
 
     @GetMapping("/user")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> getUser(Authentication authentication) throws UserNotFoundException 
+    public ResponseEntity<Object> getUser(Authentication authentication)
     {
         User user = null;
 
         if (authentication != null) {
             // Get the authenticated user's details from the Authentication object
             UserInfoDetails userInfoDetails = (UserInfoDetails) authentication.getPrincipal();
-            user = userService.getUserById(userInfoDetails.getId());
+            try {
+                user = userService.getUserById(userInfoDetails.getId());
+            } catch (UserNotFoundException ex) {
+                return ResponseEntity.badRequest().body(new ResponseMessage(
+                        ex.getMessage(), ResponseMessage.Status.ERROR));
+            }
         }
 
         if (user == null) {
@@ -53,11 +58,14 @@ public class UserController {
     }
 
     @GetMapping("/user/{id}")
-    // @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> getUserById(@PathVariable Long id, Authentication authentication) throws UserNotFoundException {
-        User user = userService.getUserById(id);
-
-        return ResponseEntity.ok(new UserResponse(user));
+    public ResponseEntity<Object> getUserById(@PathVariable Long id, Authentication authentication) 
+    {
+        try {
+            return ResponseEntity.ok(new UserResponse(userService.getUserById(id)));
+        } catch (UserNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @PatchMapping("/user/{id}")
@@ -73,14 +81,17 @@ public class UserController {
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
+        UserInfoDetails userInfoDetails = (UserInfoDetails) authentication.getPrincipal();
+        Long adminId = userInfoDetails.getId();
         try {
-            userService.patchUserById(id, patchRequest);
+            userService.patchUserById(id, patchRequest, adminId);
         } catch (UserNotFoundException | DuplicateUserException ex) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     ex.getMessage(), ResponseMessage.Status.ERROR));
         }
 
-        return ResponseEntity.ok(new ResponseMessage("User was successfully updated", ResponseMessage.Status.SUCCESS));
+        return ResponseEntity.ok(new ResponseMessage(
+            "User was successfully updated", ResponseMessage.Status.SUCCESS));
     }
     
     @GetMapping("/users")
@@ -91,26 +102,43 @@ public class UserController {
 
     @DeleteMapping("/user/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteUser(@PathVariable Long id, Authentication authentication) throws UserNotFoundException 
+    public ResponseEntity<Object> deleteUser(@PathVariable Long id, Authentication authentication)
     {
-        userService.deleteUserById(id);
+        try {
+            UserInfoDetails userInfoDetails = (UserInfoDetails) authentication.getPrincipal();
+            Long adminId = userInfoDetails.getId();
 
-        // TODO add log to db
+            userService.deleteUserById(id, adminId);
+        } catch (UserNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
 
-        return ResponseEntity.ok(new ResponseMessage("User was successfully removed", ResponseMessage.Status.SUCCESS));
+        return ResponseEntity.ok(new ResponseMessage(
+            "User was successfully removed", ResponseMessage.Status.SUCCESS));
     }
 
 
     @GetMapping("/user/{id}/events")
     public ResponseEntity<Object> getUserEvents(@PathVariable Long id, Authentication authentication)
-            throws UserNotFoundException {
-        return ResponseEntity.ok(new EventsResponse(userService.getUserEvents(id)));
+    {
+        try {
+            return ResponseEntity.ok(new EventsResponse(userService.getUserEvents(id)));
+        } catch (UserNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
     
     @GetMapping("/user/{id}/tickets")
     public ResponseEntity<Object> getUserTickets(@PathVariable Long id, Authentication authentication)
-            throws UserNotFoundException {
-        return ResponseEntity.ok(new TicketsResponse(userService.getUserTickets(id)));
+    {
+        try {
+            return ResponseEntity.ok(new TicketsResponse(userService.getUserTickets(id)));
+        } catch (UserNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @GetMapping("/user/{id}/ticket/{ticketId}")
@@ -118,8 +146,13 @@ public class UserController {
             @PathVariable Long id,
             @PathVariable Long ticketId,
         Authentication authentication)
-            throws UserNotFoundException {
-        return ResponseEntity.ok(new RegistersResponse(userService.getUserTicketRegistration(id, ticketId)));
+    {
+        try {
+            return ResponseEntity.ok(new RegistersResponse(userService.getUserTicketRegistration(id, ticketId)));
+        } catch (UserNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
 }

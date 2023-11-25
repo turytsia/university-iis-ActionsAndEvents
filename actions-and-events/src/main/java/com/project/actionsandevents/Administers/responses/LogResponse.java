@@ -12,13 +12,15 @@ import java.util.Date;
 @Getter
 public class LogResponse {
     private UserResponse admin;
-    private UserResponse user;
+    //private UserResponse user;
+    private String userLogin;
     private Date date;
     private String text;
 
     public LogResponse(Administers administers) {
         this.admin = new UserResponse(administers.getAdmin());
-        this.user = new UserResponse(administers.getUser());
+        //this.user = new UserResponse(administers.getUser());
+        this.userLogin = administers.getUserLogin();
         this.date = administers.getDate();
         this.text = administers.getText();
     }

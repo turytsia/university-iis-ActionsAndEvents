@@ -13,11 +13,14 @@ public class AdministersService {
     @Autowired
     private AdministersRepository administersRepository;
 
-    public List<Long> getAdministerIds() {
+    public List<Long> getAdministerIds() 
+    {
         return administersRepository.findAllIds();
     }
 
-    public Administers getAdministerById(Long id) throws AdministerLogNotFoundException {
+    public Administers getAdministerById(Long id) 
+        throws AdministerLogNotFoundException 
+    {
         Optional<Administers> administers = administersRepository.findById(id);
 
         if (!administers.isPresent()) {

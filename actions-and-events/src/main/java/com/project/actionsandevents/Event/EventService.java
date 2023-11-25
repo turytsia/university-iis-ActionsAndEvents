@@ -11,32 +11,27 @@ import org.springframework.stereotype.Service;
 
 import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
+import com.project.actionsandevents.Event.exceptions.ManagelogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.DuplicateEventException;
 import com.project.actionsandevents.Event.exceptions.DuplicateRegistrationException;
 import com.project.actionsandevents.Event.exceptions.RegistrationNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
 
 import com.project.actionsandevents.Event.requests.EventPatchRequest;
-import com.project.actionsandevents.Event.responses.EventUserRegisters;
-
-
-import com.project.actionsandevents.TicketType.TicketType;
-import com.project.actionsandevents.TicketType.TicketTypeRepository;
-
 import com.project.actionsandevents.User.User;
 import com.project.actionsandevents.User.UserRepository;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
+import com.project.actionsandevents.common.exceptions.UnknownDatabaseException;
 
 import java.util.List;
 import java.util.Optional;
-
-import java.util.ArrayList;
+import java.util.Date;
 
 @Service
 public class EventService {
     
     @Autowired
-    private EventRepository repository;
+    private EventRepository eventRepository;
 
     @Autowired
     private TicketTypeRepository ticketTypeRepository;
@@ -48,11 +43,25 @@ public class EventService {
     private UserRepository userRepository;
 
     @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
     private EventLogRepository eventLogRepository;
 
     @Autowired
-    private CommentRepository commentRepository;
+    private ManagesRepository managesRepository;
 
+
+    private void addEventLog(Event event, EventLogAction action, String text)
+        throws UnknownDatabaseException
+    {
+        EventLog eventLog = new EventLog(event, action, text);
+        try {
+            eventLogRepository.save(eventLog);
+        } catch (DataIntegrityViolationException e) {
+            throw new UnknownDatabaseException("Unknown DB error: Event log could not be saved");
+        }
+    }
 
 
     /**
@@ -62,7 +71,7 @@ public class EventService {
      * @throws EventNotFoundException
      */
     public Event getEventById(Long id) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(id);
+        Optional<Event> event = eventRepository.findById(id);
 
         if (!event.isPresent()) {
             throw new EventNotFoundException("Event not found with id: " + id);
@@ -76,7 +85,7 @@ public class EventService {
      * @return
      */
     public List<Long> getEventIds() {
-        return repository.findAllIds();
+        return eventRepository.findAllIds();
     }
 
     /**
@@ -86,8 +95,9 @@ public class EventService {
      * @throws EventNotFoundException
      */
     public void patchEventById(Long id, EventPatchRequest patchRequest) 
-        throws EventNotFoundException, DuplicateEventException {
-        Optional<Event> event = repository.findById(id);
+        throws EventNotFoundException, DuplicateEventException, UnknownDatabaseException 
+    {
+        Optional<Event> event = eventRepository.findById(id);
 
         if (!event.isPresent()) {
             throw new EventNotFoundException("Event not found with ID: " + id);
@@ -120,10 +130,12 @@ public class EventService {
         }
 
         try {
-            repository.save(eventToPatch);
+            eventRepository.save(eventToPatch);
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateEventException("Event with such parameters already exists");
         }
+
+        addEventLog(eventToPatch, EventLogAction.UPDATED, "Event was updated");
     }
 
     /**
@@ -131,9 +143,14 @@ public class EventService {
      * @param event
      * @return
      */
-    public Long addEvent(Event event) throws DuplicateEventException {
+    public Long addEvent(Event event) 
+        throws DuplicateEventException, UnknownDatabaseException 
+    {
         try {
-            return repository.save(event).getId();
+            Long id = eventRepository.save(event).getId();
+
+            addEventLog(event, EventLogAction.CREATED, "Event was created");
+            return id;
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateEventException("Event with such parameters already exists");
         }
@@ -144,22 +161,42 @@ public class EventService {
      * @param id
      * @throws EventNotFoundException
      */
-    public void deleteEventById(Long id) throws EventNotFoundException {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-        } else {
+    public void deleteEventById(Long id) 
+        throws EventNotFoundException, UnknownDatabaseException
+    {
+        if (!eventRepository.existsById(id)) {
             throw new EventNotFoundException("Event with ID " + id + " not found");
         }
+
+        Event event = getEventById(id);
+
+        addEventLog(event, EventLogAction.DELETED, "Event was deleted");
+
+        // Set the event field in all related EventLog entities to null
+        for (EventLog eventLog : event.getEventLogs()) {
+            eventLog.setEvent(null);
+            eventLogRepository.save(eventLog);
+        }
+
+        eventRepository.deleteById(id);
     }
 
     public String approveEvent(Long eventId) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(eventId);
+        Optional<Event> event = eventRepository.findById(eventId);
 
         if (!event.isPresent()) {
             throw new EventNotFoundException("Event not found with id: " + eventId);
         }
 
         event.get().setStatus(EventStatus.APPROVED);
+
+        try {
+            eventRepository.save(event.get());
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateEventException("Event with such parameters already exists");
+        }
+
+        addEventLog(event.get(), EventLogAction.APPROVED, "Event was approved");
 
         return "Event was successfully approved";
     }
@@ -176,7 +213,7 @@ public class EventService {
 
     // get all ticket types
     public List<Long> getTicketTypeIds(Long id) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(id);
+        Optional<Event> event = eventRepository.findById(id);
 
         if (!event.isPresent()) {
             throw new EventNotFoundException("Event not found with id: " + id);
@@ -199,7 +236,7 @@ public class EventService {
     public String addTicketType(Long eventId, TicketType ticketType) 
         throws EventNotFoundException, DuplicateEventException 
     {
-        Optional<Event> event = repository.findById(eventId);
+        Optional<Event> event = eventRepository.findById(eventId);
 
         if (!event.isPresent()) {
             throw new EventNotFoundException("Event not found with id: " + eventId);
@@ -287,7 +324,7 @@ public class EventService {
         newRegister.setTicketType(ticketType.get());
         // Registration will be completed after it is accepted by event creator
         newRegister.setStatus(RegistersStatus.PENDING);
-        newRegister.setDate(new java.util.Date());
+        newRegister.setDate(new Date());
 
         try {
             registersRepository.save(newRegister);
@@ -348,7 +385,7 @@ public class EventService {
 
     // get all comments
     public List<Long> getCommentsIds(Long id) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(id);
+        Optional<Event> event = eventRepository.findById(id);
 
         if (!event.isPresent()) {
             throw new EventNotFoundException("Event not found with id: " + id);
@@ -370,7 +407,7 @@ public class EventService {
 
     // add comment
     public String addComment(Long id, Comment comment) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(id);
+        Optional<Event> event = eventRepository.findById(id);
 
         if (!event.isPresent()) {
             throw new EventNotFoundException("Event not found with id: " + id);
@@ -413,8 +450,10 @@ public class EventService {
 
    
 
-    public List<Long> getEventLogs(Long eventId) throws EventNotFoundException {
-        Optional<Event> event = repository.findById(eventId);
+    public List<Long> getEventLogs(Long eventId) 
+        throws EventNotFoundException 
+    {
+        Optional<Event> event = eventRepository.findById(eventId);
 
         if (!event.isPresent()) {
             throw new EventNotFoundException("Event not found with id: " + eventId);
@@ -424,7 +463,8 @@ public class EventService {
     }
 
     public EventLog getEventLogById(Long id) 
-            throws EventLogNotFoundException {
+            throws EventLogNotFoundException 
+    {
         Optional<EventLog> eventLog = eventLogRepository.findById(id);
 
         if (!eventLog.isPresent()) {
@@ -435,7 +475,8 @@ public class EventService {
     }
 
     public String deleteEventLogById(Long id) 
-            throws EventLogNotFoundException {
+            throws EventLogNotFoundException 
+    {
         if (eventLogRepository.existsById(id)) {
             eventLogRepository.deleteById(id);
         } else {
@@ -443,6 +484,45 @@ public class EventService {
         }
 
         return "Event log was successfully deleted";
+    }
+
+
+
+
+    public List<Long> getManagelogIds(Long eventId) 
+        throws EventNotFoundException 
+    {
+        Optional<Event> event = eventRepository.findById(eventId);
+
+        if (!event.isPresent()) {
+            throw new EventNotFoundException("Event not found with id: " + eventId);
+        }
+
+        return managesRepository.findAllIdsByEvent(event.get());
+    }
+
+    public Manages getManagelogById(Long id)
+        throws ManagelogNotFoundException
+    {
+        Optional<Manages> manages = managesRepository.findById(id);
+
+        if (!manages.isPresent()) {
+            throw new ManagelogNotFoundException("Managelog not found with id: " + id);
+        }
+
+        return manages.get();
+    }
+
+    public String deleteManagelogById(Long id) 
+        throws ManagelogNotFoundException 
+    {
+        if (managesRepository.existsById(id)) {
+            managesRepository.deleteById(id);
+        } else {
+            throw new ManagelogNotFoundException("Managelog with ID " + id + " not found");
+        }
+
+        return "Managelog was successfully deleted";
     }
 
 }

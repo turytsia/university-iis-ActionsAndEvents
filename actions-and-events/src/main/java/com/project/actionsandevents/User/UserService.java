@@ -13,15 +13,19 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.project.actionsandevents.Administers.Administers;
+import com.project.actionsandevents.Administers.AdministersRepository;
 import com.project.actionsandevents.Event.Event;
 import com.project.actionsandevents.Event.EventRepository;
 import com.project.actionsandevents.Event.Registers;
 import com.project.actionsandevents.Event.RegistersRepository;
-import com.project.actionsandevents.TicketType.TicketType;
-import com.project.actionsandevents.TicketType.TicketTypeRepository;
+import com.project.actionsandevents.Event.TicketType;
+import com.project.actionsandevents.Event.TicketTypeRepository;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
 import com.project.actionsandevents.User.exceptions.DuplicateUserException;
 import com.project.actionsandevents.User.requests.UserPatchRequest;
+
+
 
 
 import java.util.List;
@@ -33,7 +37,7 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     @Autowired
-    private UserRepository repository;
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -47,13 +51,22 @@ public class UserService implements UserDetailsService {
     @Autowired
     private RegistersRepository registersRepository;
 
+    @Autowired
+    private AdministersRepository administersRepository;
+
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        Optional<User> userDetail = repository.findByLogin(login);
+        Optional<User> userDetail = userRepository.findByLogin(login);
 
         // Converting userDetail to UserDetails
         return userDetail.map(UserInfoDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found " + login));
+    }
+
+
+    private void addAdministersLog(User admin, String userLogin, String text) {
+        Administers administers = new Administers(admin, userLogin, text);
+        administersRepository.save(administers);
     }
 
     /**
@@ -65,7 +78,7 @@ public class UserService implements UserDetailsService {
     public Long addUser(User user) throws DuplicateUserException {
     try {
         user.setPassword(encoder.encode(user.getPassword()));
-        return repository.save(user).getId();
+        return userRepository.save(user).getId();
     } catch (DataIntegrityViolationException e) {
         // Handle the exception here. For example, you might want to log the error and throw a custom exception.
         throw new DuplicateUserException("A user with this email or username already exists.");
@@ -79,7 +92,7 @@ public class UserService implements UserDetailsService {
      * @throws UserNotFoundException
      */
     public User getUserById(Long id) throws UserNotFoundException {
-        Optional<User> user = repository.findById(id);
+        Optional<User> user = userRepository.findById(id);
 
         if (!user.isPresent()) {
             throw new UserNotFoundException("User not found with ID: " + id);
@@ -93,12 +106,16 @@ public class UserService implements UserDetailsService {
      * @param id
      * @throws UserNotFoundException
      */
-    public void deleteUserById(Long id) throws UserNotFoundException {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-        } else {
+    public void deleteUserById(Long id, Long adminId) throws UserNotFoundException {
+        if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User with ID " + id + " not found");
         }
+
+        userRepository.deleteById(id);
+
+        Optional<User> admin = userRepository.findById(adminId);
+        Optional<User> user = userRepository.findById(id);
+        addAdministersLog(admin.get(), user.get().getLogin(), "User deleted");
     }
 
     /**
@@ -108,10 +125,10 @@ public class UserService implements UserDetailsService {
      * @return
      * @throws UserNotFoundException
      */
-    public void patchUserById(Long id, UserPatchRequest patchRequest) 
+    public void patchUserById(Long id, UserPatchRequest patchRequest, Long adminId) 
         throws UserNotFoundException, DuplicateUserException
     {
-        Optional<User> user = repository.findById(id);
+        Optional<User> user = userRepository.findById(id);
 
         if (!user.isPresent()) {
             throw new UserNotFoundException("User not found with ID: " + id);
@@ -136,11 +153,13 @@ public class UserService implements UserDetailsService {
         }
 
         try {
-            repository.save(existingUser);
+            userRepository.save(existingUser);
         } catch (DataIntegrityViolationException e) {
             // Handle the exception here. For example, you might want to log the error and throw a custom exception.
             throw new DuplicateUserException("A user with this email or username already exists.");
         }
+
+        addAdministersLog(userRepository.findById(adminId).get(), existingUser.getLogin(), "User updated");
     }
 
     /**
@@ -148,12 +167,12 @@ public class UserService implements UserDetailsService {
      * @return
      */
     public List<Long> getUserIds() {
-        return repository.findAllIds();
+        return userRepository.findAllIds();
     }
 
 
     public List<Long> getUserEvents(Long id) throws UserNotFoundException {
-        Optional<User> user = repository.findById(id);
+        Optional<User> user = userRepository.findById(id);
 
         if (!user.isPresent()) {
             throw new UserNotFoundException("User not found with ID: " + id);
@@ -163,7 +182,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<Long> getUserTickets(Long id) throws UserNotFoundException {
-        Optional<User> user = repository.findById(id);
+        Optional<User> user = userRepository.findById(id);
 
         if (!user.isPresent()) {
             throw new UserNotFoundException("User not found with ID: " + id);
@@ -178,7 +197,7 @@ public class UserService implements UserDetailsService {
     }
 
     public Registers getUserTicketRegistration(Long id, Long ticketId) throws UserNotFoundException {
-        Optional<User> user = repository.findById(id);
+        Optional<User> user = userRepository.findById(id);
 
         if (!user.isPresent()) {
             throw new UserNotFoundException("User not found with ID: " + id);

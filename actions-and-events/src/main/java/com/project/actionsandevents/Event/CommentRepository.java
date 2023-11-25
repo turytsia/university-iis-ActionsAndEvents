@@ -12,8 +12,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.project.actionsandevents.TicketType.TicketType;
-
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c.id FROM Comment c WHERE c.event = :event")
