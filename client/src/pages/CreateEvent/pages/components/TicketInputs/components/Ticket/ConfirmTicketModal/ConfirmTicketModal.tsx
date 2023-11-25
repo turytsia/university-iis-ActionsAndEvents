@@ -27,7 +27,7 @@ const ConfirmTicketModal = ({
           onClose={onClose}
           onSubmit={onSubmit}
           icon={icons.danger}>
-          Do you want to get a ticket "{ticketName}" for an event "{eventName}"?
+          Do you want to get a ticket "{ticketName}"?
       </Modal>
   )
 }

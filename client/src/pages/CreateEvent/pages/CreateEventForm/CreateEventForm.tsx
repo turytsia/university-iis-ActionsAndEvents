@@ -134,10 +134,6 @@ const CreateEventForm = () => {
             const responses = await Promise.allSettled(
                 tickets.map(async ticket => await context.request!.post(`/event/${eventId}/ticket`, { ...ticket }))
             );
-            const fulfilledResponses = responses
-                .filter((r): r is PromiseFulfilledResult<AxiosResponse<SpringResponseType<ResponseMessageType>>> => r.status === "fulfilled")
-                .map((r) => r.value)
-                .filter((v) => v);
             
             navigate("/")
         } catch (error) {
@@ -145,6 +141,18 @@ const CreateEventForm = () => {
         } finally {
             context.setLoading(LoadingType.NONE)
         }
+    }
+
+    const createTicket = (inputs: TicketTypeWithRegister) => {
+        setTickets(prev => [...prev, inputs])
+    }
+
+    const deleteTicket = (i: number) => () => {
+        setTickets(prev => prev.filter((_, __i) => __i !== i))
+    }
+
+    const updateTicket = (i: number) => (input: TicketTypeWithRegister) => {
+        setTickets(prev => prev.reduce((a, t, __i) => [...a, __i === i ? input : t], [] as TicketTypeWithRegister[]))
     }
 
     useEffect(() => {
@@ -172,7 +180,13 @@ const CreateEventForm = () => {
                 <StarRequire/>
             </h3>
             <div className={classes.tickets}>
-                <TicketInputs tickets={tickets} setTickets={setTickets} />
+                <TicketInputs
+                    enableNewTicket
+                    tickets={tickets}
+                    createTicket={createTicket}
+                    updateTicket={updateTicket}
+                    deleteTicket={deleteTicket}
+                />
             </div>
             <div className={classes.actions}>
                 <Button onClick={() => navigate(-1)}>

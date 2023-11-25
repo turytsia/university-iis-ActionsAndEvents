@@ -3,6 +3,7 @@ import React, { createContext, useEffect, useMemo, useState } from 'react'
 import { roles } from '../utils/common'
 import Loading from '../components/Loading/Loading'
 import { useNavigate } from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify';
 
 type PropsType = {
   children: React.ReactNode
@@ -111,9 +112,11 @@ const AppContextProvider = ({ children }: PropsType) => {
         email,
         roles: role
       })
+      if (response.status === 200) {
+        navigate("/login")
+      }
       // setUser(response.data)
       // localStorage.setItem("user", JSON.stringify(response.data))
-      navigate("/login")
     } catch (error) {
       setUser(initialUser)
     }
@@ -121,13 +124,13 @@ const AppContextProvider = ({ children }: PropsType) => {
 
   const login = async (login: string, password: string) => {
     try {
-      const response = await request.post<string>("/auth/login", {
+      const response = await request.post<{ token: string }>("/auth/login", {
         login,
         password
       })
-      setToken(response.data)
-      localStorage.setItem("token", response.data)
-      localStorage.setItem("user", JSON.stringify(response.data))
+      setToken(response.data.token)
+      localStorage.setItem("token", response.data.token)
+      localStorage.setItem("user", JSON.stringify(response.data.token))
     } catch (error) {
       logout()
     }
@@ -151,12 +154,47 @@ const AppContextProvider = ({ children }: PropsType) => {
   }
 
   useEffect(() => {
+    const displayMessage = (data: any) => {
+      const message = data?.message?.message ? data?.message?.message : data?.message
+      const status: "error" | "success" = data?.message?.status ? data?.message?.status : data?.status
+      toast[status](message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    }
+    request.interceptors.response.use(response => {
+      if (response?.data?.message) {
+        displayMessage(response?.data)
+      }
+      return response
+    }, error => {
+      // console.log(error)
+      if (error?.response?.data?.message) {
+        displayMessage(error?.response?.data)
+      }
+      if (error.response.data.message === 'Invalid token') {
+        console.log("Token expired")
+        logout()
+        navigate('/login')
+      }
+    })
+  }, [request])
+
+  useEffect(() => {
+
     getUser()
   }, [token])
 
 
   return (
     <AppContext.Provider value={value}>
+      <ToastContainer />
       {[LoadingType.LOADING, LoadingType.FETCHING].includes(loading) && <Loading />}
       {children}
     </AppContext.Provider>

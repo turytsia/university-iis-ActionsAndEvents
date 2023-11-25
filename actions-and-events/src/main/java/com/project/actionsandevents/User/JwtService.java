@@ -8,10 +8,15 @@
 package com.project.actionsandevents.User;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
   
@@ -49,7 +54,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(userName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
     
@@ -69,7 +74,8 @@ public class JwtService {
      * @param token JWT token
      * @return Username
      */
-    public String extractUsername(String token) {
+    public String extractUsername(String token) throws ExpiredJwtException, UnsupportedJwtException,
+            MalformedJwtException, SignatureException, IllegalArgumentException {
         return extractClaim(token, Claims::getSubject);
     }
     
@@ -79,7 +85,8 @@ public class JwtService {
      * @param token JWT token
      * @return Expiration date
      */
-    public Date extractExpiration(String token) {
+    public Date extractExpiration(String token) throws ExpiredJwtException, UnsupportedJwtException,
+            MalformedJwtException, SignatureException, IllegalArgumentException {
         return extractClaim(token, Claims::getExpiration);
     }
     
@@ -91,7 +98,8 @@ public class JwtService {
      * @param claimsResolver Specifies what should be extracted from the payload
      * @return Extracted data from the token
      */
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws ExpiredJwtException,
+            UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
@@ -104,7 +112,7 @@ public class JwtService {
      * @param token JWT token
      * @return Claims
      */
-    private Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(String token) throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignKey())

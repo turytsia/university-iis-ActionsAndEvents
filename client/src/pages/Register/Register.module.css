@@ -1,12 +1,23 @@
 .container {
+    width: 360px;
+    
+}
+
+.inner {
+    border-radius: 0px 3px 3px 3px;
+    padding: 16px;
     background-color: white;
     display: flex;
-    flex-direction: column;
-    margin: 120px auto 0;
-    width: 360px;
-    padding: 16px;
     gap: 16px;
-    border-radius: 3px;
+    flex-direction: column;
+}
+
+.outer{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .title h4 {

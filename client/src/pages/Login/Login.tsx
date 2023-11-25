@@ -33,7 +33,7 @@ const Login = () => {
             <Input value={inputs.password} name="password" onChange={onChange} placeholder='Password' type='password' />
             <div className={classes.actions}>
                 <Button style='invert' onClick={onSubmit}>Login</Button>
-                <Link to="/user/register">I don't have an account</Link>
+                <Link to="/register/user">I don't have an account</Link>
             </div>
         </div>
     )

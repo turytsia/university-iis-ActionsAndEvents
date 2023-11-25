@@ -100,7 +100,7 @@ const Ticket = ({
             case "Rejected":
                 return <>
                     <Popover element={
-                        <ButtonIconOnly to={`/event/${ticket.eventId}`} icon={icons.link} iconWidth={20} iconHeight={20} />
+                        <ButtonIconOnly to={`/events/${ticket.eventId}`} icon={icons.link} iconWidth={20} iconHeight={20} />
                     }>
                         Open event
                     </Popover>
@@ -112,7 +112,7 @@ const Ticket = ({
                 return (
                     <>
                         <Popover element={
-                            <ButtonIconOnly to={`/event/${ticket.eventId}`} icon={icons.link} iconWidth={20} iconHeight={20} />
+                            <ButtonIconOnly to={`/events/${ticket.eventId}`} icon={icons.link} iconWidth={20} iconHeight={20} />
                         }>
                             Open event
                         </Popover>
@@ -124,7 +124,7 @@ const Ticket = ({
             case "Accepted":
                 return <>
                     <Popover element={
-                        <ButtonIconOnly to={`/event/${ticket.eventId}`} icon={icons.link} iconWidth={20} iconHeight={20} />
+                        <ButtonIconOnly to={`/events/${ticket.eventId}`} icon={icons.link} iconWidth={20} iconHeight={20} />
                     }>
                         Open event
                     </Popover>
@@ -169,7 +169,14 @@ const Ticket = ({
             )} */}
 
             {isActive && (
-                <CreateTicketModal onSubmit={onSubmit} onClose={onClose} defaultInputs={ticket} />
+                <CreateTicketModal
+                    title={`Update ticket`}
+                    icon={icons.pen}
+                    textProceed='Save'
+                    onSubmit={onSubmit}
+                    onClose={onClose}
+                    defaultInputs={ticket}
+                />
             )}
             {isGetActive && (
                 <ConfirmTicketModal onSubmit={getTicket} onClose={() => setIsGetActive(false)} ticketName={ticket.name} eventName={'...'} />

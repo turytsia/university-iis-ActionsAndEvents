@@ -25,9 +25,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.actionsandevents.common.ResponseMessage;
+import com.project.actionsandevents.common.ResponseMessage.Status;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
   
 // This class helps us to validate the generated jwt token
 @Component
@@ -44,27 +46,59 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            username = jwtService.extractUsername(token);
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+                username = jwtService.extractUsername(token);
+            }
+        } catch (Exception e) {
+            Map<String, Object> message = new HashMap<>();
+            message.put("message", "Invalid token");
+            message.put("status", Status.ERROR);
+
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writeValue(response.getWriter(), message);
         }
 
         
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtService.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
-                        null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            } else {
-                ResponseMessage message = new ResponseMessage("Invalid token", null);
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtService.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+                            null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    Map<String, Object> message = new HashMap<>();
+                    message.put("message", "Invalid token");
+                    message.put("status", Status.ERROR);
+    
+                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.writeValue(response.getWriter(), message);
+    
+                    // Return here to stop further processing
+                    return;
+                }
+            } catch (Exception e) {
+                Map<String, Object> message = new HashMap<>();
+                message.put("message", "Invalid token");
+                message.put("status", Status.ERROR);
 
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.writeValue(response.getWriter(), message);
+
+                // Return here to stop further processing
+                return;
             }
         }
 

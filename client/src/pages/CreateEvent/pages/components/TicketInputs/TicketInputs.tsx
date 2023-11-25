@@ -7,30 +7,24 @@ import { TicketTypeWithRegister } from '../../Tickets/Tickets'
 
 type PropsType = {
     tickets: TicketTypeWithRegister[],
-    setTickets: React.Dispatch<React.SetStateAction<TicketTypeWithRegister[]>>
+    createTicket: (inputs: TicketTypeWithRegister) => void
+    deleteTicket: (i: number) => () => void
+    updateTicket: (i: number) => (input: TicketTypeWithRegister) => void
+    enableNewTicket?: boolean
 }
 
 const TicketInputs = ({
     tickets,
-    setTickets
+    createTicket,
+    deleteTicket,
+    updateTicket,
+    enableNewTicket
 }: PropsType) => {
-
-    const createTicket = (inputs: TicketTypeWithRegister) => {
-        setTickets(prev => [...prev, inputs])
-    }
-
-    const deleteTicket = (i: number) => () => {
-        setTickets(prev => prev.filter((_, __i) => __i !== i))
-    }
-
-    const updateTicket = (i: number) => (input: TicketTypeWithRegister) => {
-        setTickets(prev => prev.reduce((a, t, __i) => [...a, __i === i ? input : t], [] as TicketTypeWithRegister[]))
-    }
     
     return (
         <div className={classes.container}>
-            {tickets.map((ticket, i) => <Ticket ticket={ticket} deleteTicket={deleteTicket(i)} updateTicket={updateTicket(i)} />)}
-            <NewTicket createTicket={createTicket} />
+            {tickets.map((ticket, i) => <Ticket ticket={ticket} deleteTicket={deleteTicket(ticket.id!)} updateTicket={updateTicket(ticket.id!)} />)}
+            {enableNewTicket && <NewTicket createTicket={createTicket} />}
         </div>
     )
 }

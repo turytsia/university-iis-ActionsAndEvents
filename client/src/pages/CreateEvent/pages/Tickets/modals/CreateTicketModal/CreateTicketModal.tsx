@@ -6,6 +6,9 @@ import Textarea from '../../../../../../components/Textarea/Textarea'
 import { TicketTypeWithRegister } from '../../Tickets'
 
 type PropsType = {
+    title: string,
+    icon: icons,
+    textProceed: string,
     defaultInputs?: TicketTypeWithRegister
     onClose: () => void,
     onSubmit: (inputs: TicketTypeWithRegister) => void,
@@ -32,6 +35,9 @@ const initialInputs: TicketTypeWithRegister = {
 }
 
 const CreateTicketModal = ({
+    title,
+    textProceed,
+    icon,
     defaultInputs,
     onClose,
     onSubmit,
@@ -53,12 +59,13 @@ const CreateTicketModal = ({
     )
 
     return (
-        <Modal title="Create new ticket"
-            textProceed="Save"
+        <Modal
+            title={title}
+            textProceed={textProceed}
             textCancel="Cancel"
             onClose={onClose}
             onSubmit={__onSubmit}
-            icon={icons.plus}
+            icon={icon}
             disabled={isDisabled}
         type={ModalStyles.Inputs}>
             <Input required label='Name' name='name' value={inputs.name} onChange={onChange} />

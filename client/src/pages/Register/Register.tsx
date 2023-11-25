@@ -6,6 +6,7 @@ import classes from "./Register.module.css"
 import { roles } from '../../utils/common'
 import Input from '../../components/Input/Input'
 import Button from '../../components/Button/Button'
+import Tabs, { TabsType } from '../../components/Tabs/Tabs'
 
 type PropsType = {
     role: roles
@@ -21,6 +22,21 @@ const initialInputs = {
     // "email": "xturyt00@fit.vut.cz",
     // "roles": "ROLE_USER"
 }
+
+const tabs: TabsType = [
+    {
+        to: "/register/user",
+        text: "User"
+    },
+    {
+        to: "/register/manager",
+        text: "Manager"
+    },
+    {
+        to: "/register/admin",
+        text: "Admin"
+    }
+]
 
 const Register = ({
     role
@@ -38,16 +54,21 @@ const Register = ({
     }
 
     return (
-        <div className={classes.container}>
-            <div className={classes.title}>
-                <h4>Register</h4>
-            </div>
-            <Input value={inputs.login} name="login" onChange={onChange} placeholder='Login' type='text' />
-            <Input value={inputs.email} name="email" onChange={onChange} placeholder='Email' type='email' />
-            <Input value={inputs.password} name="password" onChange={onChange} placeholder='Password' type='password' />
-            <div className={classes.actions}>
-                <Button style='invert' onClick={onSubmit}>Register</Button>
-                <Link to="/login">Already have an account?</Link>
+        <div className={classes.outer}>
+            <div className={classes.container}>
+                <Tabs tabs={tabs} prefix={''} />
+                <div className={classes.inner}>
+                    <div className={classes.title}>
+                        <h4>Register</h4>
+                    </div>
+                    <Input value={inputs.login} name="login" onChange={onChange} placeholder='Login' type='text' />
+                    <Input value={inputs.email} name="email" onChange={onChange} placeholder='Email' type='email' />
+                    <Input value={inputs.password} name="password" onChange={onChange} placeholder='Password' type='password' />
+                    <div className={classes.actions}>
+                        <Button style='invert' onClick={onSubmit}>Register</Button>
+                        <Link to="/login">Already have an account?</Link>
+                    </div>
+                </div>
             </div>
         </div>
     )

@@ -23,6 +23,7 @@ import Menu from './components/Menu/Menu';
 import Content from './components/Content/Content';
 
 import "react-datepicker/dist/react-datepicker.css";
+import 'react-toastify/dist/ReactToastify.css';
 import EventDetail from './pages/EventDetail/EventDetail';
 import EventUsers from './pages/EventUsers/EventUsers';
 import EventView from './pages/EventView/EventView';
@@ -70,9 +71,9 @@ function App() {
             {
               !context.isAuth && (
                 <>
-                  <Route path="/user/register" element={<Register role={roles.USER} />} />
-                  <Route path="/manager/register" element={<Register role={roles.MANAGER} />} />
-                  <Route path="/admin/register" element={<Register role={roles.ADMIN} />} />
+                  <Route path="/register/user" element={<Register role={roles.USER} />} />
+                  <Route path="/register/manager" element={<Register role={roles.MANAGER} />} />
+                  <Route path="/register/admin" element={<Register role={roles.ADMIN} />} />
                   <Route path="/login" element={<Login />} />
                 </>
               )

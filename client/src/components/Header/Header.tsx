@@ -71,7 +71,7 @@ const Header = () => {
                         (
                             <>
                                 <Button to='/login'>Login</Button>
-                                <Button style='invert' to='/user/register'>Register</Button>
+                                <Button style='invert' to='/register/user'>Register</Button>
                             </>
                         )
                     }

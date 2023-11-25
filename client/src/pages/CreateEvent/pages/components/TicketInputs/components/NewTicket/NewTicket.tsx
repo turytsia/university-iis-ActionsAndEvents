@@ -30,7 +30,13 @@ const NewTicket = ({
               </span>
           </button>
           {isActive && (
-              <CreateTicketModal onSubmit={onSubmit} onClose={onClose} />
+              <CreateTicketModal
+                title='Create new ticket'
+                textProceed='Save'
+                icon={icons.plus}
+                onSubmit={onSubmit}
+                onClose={onClose}
+              />
           )}
       </>
   )
