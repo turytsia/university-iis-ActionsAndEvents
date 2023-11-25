@@ -48,7 +48,6 @@ public class Place {
     @Column(unique = true, nullable = false)
     private String address;
 
-    //@NotBlank(message = "Status is mandatory")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PlaceStatus status;

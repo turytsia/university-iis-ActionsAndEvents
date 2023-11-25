@@ -1,5 +1,7 @@
 package com.project.actionsandevents.TicketType;
 
+import org.hibernate.validator.constraints.Range;
+
 import com.project.actionsandevents.Event.Event;
 
 import jakarta.persistence.Column;
@@ -28,11 +30,11 @@ public class TicketType {
     @Column(nullable = false) // unique = true, 
     private String name;
 
-    @Size(min = 0, max = 1000000)
+    @Range(min = 0, max = 1000000)
     @Column(nullable = false)
     private Float price;
 
-    @Size(min = 0, max = 1000000)
+    @Range(min = 0, max = 1000000)
     @Column(nullable = false)
     private Long capacity;
 

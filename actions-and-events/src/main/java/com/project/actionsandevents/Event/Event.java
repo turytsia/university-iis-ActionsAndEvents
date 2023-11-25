@@ -18,6 +18,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.persistence.CascadeType;
 
 import com.project.actionsandevents.Category.Category;
@@ -45,7 +46,7 @@ public class Event {
     @GeneratedValue
     private Long id;
 
-    @NotBlank(message = "Date from is required")
+    @NotNull(message = "Date from is required")
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateFrom;
@@ -79,12 +80,12 @@ public class Event {
     @JoinColumn(referencedColumnName = "id")
     private User userManages;
 
-    @NotBlank(message = "Place is required")
+    @NotNull(message = "Place is required")
     @ManyToOne
     @JoinColumn(referencedColumnName = "id")
     private Place place;
 
-    @NotBlank(message = "Category is required")
+    @NotNull(message = "Category is required")
     @ManyToOne
     @JoinColumn(referencedColumnName = "id")
     private Category category;
@@ -92,4 +93,8 @@ public class Event {
     // Delete all ticket types when event is deleted
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TicketType> ticketTypes;
+
+    // Delete all comments when event is deleted
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 }

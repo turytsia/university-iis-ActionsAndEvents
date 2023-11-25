@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,18 +29,15 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-//@IdClass(CommentId.class)
 public class Comment {
     @Id
     @GeneratedValue
     private Long id;
 
     @ManyToOne
-    //@JoinColumn(name = "_user", referencedColumnName = "id")
     private User user;
 
     @ManyToOne
-    //@JoinColumn(name = "_event", referencedColumnName = "id")
     private Event event;
 
     @Column(nullable = false)
@@ -49,6 +47,7 @@ public class Comment {
     @Column(nullable = true)
     private int rating;
 
+    @NotBlank(message = "Text is mandatory")
     @Column(nullable = true)
     private String text;
 }
