@@ -13,6 +13,12 @@ export enum roles {
     ADMIN = "ROLE_ADMIN"
 }
 
+export enum status {
+    PENDING = "Pending",
+    ACCEPTED = "Accepted",
+    REJECTED = "Rejected"
+}
+
 export type SpringResponseType<T> = {
     data: T
 }

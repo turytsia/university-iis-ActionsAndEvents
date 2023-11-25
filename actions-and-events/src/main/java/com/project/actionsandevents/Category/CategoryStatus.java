@@ -1,5 +1,20 @@
 package com.project.actionsandevents.Category;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum CategoryStatus {
-    PENDING, APPROVED, REJECTED
+    PENDING("Pending"),
+    ACCEPTED("Accepted"),
+    REJECTED("Rejected");
+
+    private final String status;
+
+    CategoryStatus(String status) {
+        this.status = status;
+    }
+
+    @JsonValue
+    public String getStatus() {
+        return status;
+    }
 }

@@ -74,10 +74,11 @@ const AppContextProvider = ({ children }: PropsType) => {
   const [user, setUser] = useState<UserType>(localUser ? JSON.parse(localUser) : initialUser)
 
   // http://localhost:8080
+  // https://actions-and-events.azurewebsites.net
 
   const request = useMemo(
     () => axios.create({
-      baseURL: 'https://actions-and-events.azurewebsites.net',
+      baseURL: 'http://localhost:8080',
       headers: token ? {
         "Authorization": `Bearer ${token}`
       } : {}

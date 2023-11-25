@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../../../context/AppContextProvider'
 import Dropdown from '../../../../components/Dropdown/Dropdown'
-import { SpringResponseType } from '../../../../utils/common'
+import { SpringResponseType, status } from '../../../../utils/common'
 
 import classes from "./Categories.module.css"
 import Input from '../../../../components/Input/Input'
@@ -44,7 +44,7 @@ const Categories = () => {
             const response = await context.request!.post("/category", {
                 name: inputs.name,
                 parentCategory: inputs.parentCategory,
-                status: "APPROVED"
+                status: status.ACCEPTED
             })
             setCategories(prev => [...prev, { id: response.data.categoryId, ...inputs } as CategoryType])
             setIsCreateActive(false)

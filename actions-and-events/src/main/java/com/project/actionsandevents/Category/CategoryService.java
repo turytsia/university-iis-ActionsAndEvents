@@ -149,7 +149,7 @@ public class CategoryService {
             throw new CategoryNotFoundException("Category not found with ID: " + categoryId);
         }
 
-        category.get().setStatus(CategoryStatus.APPROVED);
+        category.get().setStatus(CategoryStatus.ACCEPTED);
 
         return "Category was successfully approved";
     }
