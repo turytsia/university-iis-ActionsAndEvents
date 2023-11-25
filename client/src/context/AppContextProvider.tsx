@@ -73,9 +73,11 @@ const AppContextProvider = ({ children }: PropsType) => {
   const [token, setToken] = useState(localStorage.getItem("token"))
   const [user, setUser] = useState<UserType>(localUser ? JSON.parse(localUser) : initialUser)
 
+  // http://localhost:8080
+
   const request = useMemo(
     () => axios.create({
-      baseURL: 'http://localhost:8080',
+      baseURL: 'https://actions-and-events.azurewebsites.net',
       headers: token ? {
         "Authorization": `Bearer ${token}`
       } : {}
