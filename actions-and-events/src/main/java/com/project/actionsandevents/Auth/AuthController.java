@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,11 @@ import com.project.actionsandevents.User.AuthRequest;
 import com.project.actionsandevents.User.JwtService;
 import com.project.actionsandevents.User.User;
 import com.project.actionsandevents.User.UserService;
-import com.project.actionsandevents.User.responses.UserResponse;
+import com.project.actionsandevents.User.exceptions.DuplicateUserException;
+import com.project.actionsandevents.User.responses.UserPostResponse;
+import com.project.actionsandevents.common.ResponseMessage;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -30,10 +35,21 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
   
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@RequestBody User userInfo) {
-        User user = service.addUser(userInfo);
+    public ResponseEntity<Object> register(@Valid @RequestBody User userInfo, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new UserPostResponse(null,
+                    "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
+        }
 
-        return ResponseEntity.ok().body(new UserResponse(user));
+        try {
+            Long userId = service.addUser(userInfo);
+            return ResponseEntity.ok(
+                new UserPostResponse(userId,
+                        "User was successfully registered", ResponseMessage.Status.SUCCESS));
+        } catch (DuplicateUserException ex) {
+            return ResponseEntity.badRequest().body(new UserPostResponse(null,
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @PostMapping("/login")

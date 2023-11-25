@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import PageView from '../../components/PageView/PageView'
 import { useNavigate, useParams } from 'react-router-dom'
-import AppContextProvider, { AppContext, UserType } from '../../context/AppContextProvider'
+import AppContextProvider, { AppContext, LoadingType, UserType } from '../../context/AppContextProvider'
 import { EventType } from '../../utils/types'
 
 import classes from "./EventDetail.module.css"
@@ -48,6 +48,7 @@ const EventDetail = () => {
 
 
     const fetch = async () => {
+        context.setLoading(LoadingType.FETCHING)
         try {
             const response = await context.request!.get(`/event/${id}`)
 
@@ -113,20 +114,26 @@ const EventDetail = () => {
         } catch (error) {
             console.error(error)
             navigate("/")
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
     const updateEvent = async (event: EventType) => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.patch(`/event/${id}`, event)
             setEvent(event)
             setIsUpdateActive(false)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
     const deleteEvent = async () => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.delete(`/event/${id}`)
 
@@ -134,8 +141,36 @@ const EventDetail = () => {
             navigate("/")
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
+
+    const updateTicket = async (inputs: TicketTypeWithRegister) => {
+        context.setLoading(LoadingType.LOADING)
+        try {
+            const response = await context.request!.patch(`/event/ticket/${inputs.id}`, inputs)
+            setTickets(prev => prev.map((ticket) => ticket.id === inputs.id ? inputs : ticket))
+        } catch (error) {
+            console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
+        }
+    }
+
+    // const deleteTicket = (id: number) => {
+    //     return async () => {
+    //         context.setLoading(LoadingType.LOADING)
+    //         try {
+    //             const response = await context.request!.delete(`/event/ticket/${id}`)
+    //             setTickets(prev => prev.filter((ticket) => ticket.id !== id))
+    //         } catch (error) {
+    //             console.error(error)
+    //         } finally {
+    //             context.setLoading(LoadingType.NONE)
+    //         }
+    //     }
+    // }
 
     const handleRatingChange = (newRating: number) => {
         setRating(newRating)
@@ -146,6 +181,7 @@ const EventDetail = () => {
     }
 
     const handleCommentSubmit = async () => {
+        context.setLoading(LoadingType.LOADING)
         try {
             await context.request!.post(`/event/${id}/comment`, {
                 text: comment,
@@ -154,6 +190,8 @@ const EventDetail = () => {
             })
         } catch (error) {
             console.error('Failed to submit comment:', error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
@@ -200,17 +238,24 @@ const EventDetail = () => {
                         )}
                     </div>
                     <div className={classes.section}>
-                        <h4 className={classes.title}>Description</h4>
+                        <h3 className={classes.title}>Description</h3>
                         <p className={classes.description}>{event.description}</p>
                     </div>
                     <div className={classes.section}>
-                        <h4 className={classes.title}>Tickets</h4>
+                        <h3 className={classes.title}>Tickets</h3>
                         <div className={classes.tickets}>
-                            {tickets.map(ticket => <Ticket key={ticket.id} ticket={ticket} />)}
+                            {tickets.map(ticket => (
+                                <Ticket
+                                    key={ticket.id}
+                                    ticket={ticket}
+                                    updateTicket={updateTicket}
+                                    // deleteTicket={tickets.length > 1 ? deleteTicket(ticket.id!) : undefined}
+                                />
+                            ))}
                         </div>
                     </div>
                     <div className={classes.section}>
-                        <h4 className={classes.title}>Managed by</h4>
+                        <h3 className={classes.title}>Managed by</h3>
                         {author && <ProfileCard className={classes.profile} user={author} />}
                     </div>
                 </div>
@@ -218,7 +263,7 @@ const EventDetail = () => {
             <div className={classes.comment}>
                 {context.isAuth && (
                     <>
-                        <h4 className={classes.title}>Comment as {context.user.email}</h4>
+                        <h3 className={classes.title}>Comment as {context.user.email}</h3>
                         <div>
                             <Textarea value={comment} onChange={handleCommentChange} />
                             <div>

@@ -1,11 +1,12 @@
 import React, { useContext, useState } from 'react'
-import { AppContext } from '../../../../../../context/AppContextProvider'
+import { AppContext, LoadingType } from '../../../../../../context/AppContextProvider'
 import { PlaceType } from '../../Places'
 import ButtonIconOnly from '../../../../../../components/ButtonIconOnly/ButtonIconOnly'
 import icons from '../../../../../../utils/icons'
 import DeleteModal from '../../../../../../modals/DeleteModal/DeleteModal'
 import CreateCategoryModal from '../../../Categories/modals/CreateCategoryModal/CreateCategoryModal'
 import CreatePlaceModal from '../../modals/CreatePlaceModal/CreatePlaceModal'
+import Popover from '../../../../../../components/Popover/Popover'
 
 type PropsType = {
     place: PlaceType
@@ -25,6 +26,7 @@ const RowActions = ({
     const [isDeleteActive, setIsDeleteActive] = useState(false)
 
     const updatePlace = async (inputs: PlaceType) => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const newCategory = {
                 ...inputs
@@ -35,10 +37,13 @@ const RowActions = ({
             setIsUpdateActive(false)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
     const deletePlace = async () => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.delete(`/place/${place.id}`)
 
@@ -46,13 +51,19 @@ const RowActions = ({
             setIsDeleteActive(false)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
     return (
         <>
-            <ButtonIconOnly icon={icons.pen} onClick={() => setIsUpdateActive(true)}></ButtonIconOnly>
-            <ButtonIconOnly icon={icons.trash} onClick={() => setIsDeleteActive(true)}></ButtonIconOnly>
+            <Popover element={<ButtonIconOnly icon={icons.pen} onClick={() => setIsUpdateActive(true)}></ButtonIconOnly>}>
+                Update
+            </Popover>
+            <Popover element={<ButtonIconOnly icon={icons.trash} onClick={() => setIsDeleteActive(true)}></ButtonIconOnly>}>
+                Delete
+            </Popover>
             {isDeleteActive && (
                 <DeleteModal
                     title='Delete place?'

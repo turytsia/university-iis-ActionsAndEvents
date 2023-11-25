@@ -29,7 +29,7 @@ export type ResponseMessageType = {
 }
 
 export const formatDate = (date: string | null) => {
-    if (!date) return "--"
+    if (!date) return ""
 
     const format = timeFormat("%d.%m.%Y");
     

@@ -87,7 +87,15 @@
 }
 
 .contentInputs {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
     gap: 12px;
+}
+
+.requireText{
+    text-align: right;
+    color: #B9B9B9;
+    /* font-style: italic */
+    font-size: 14px;
+    margin-bottom: 12px;
 }

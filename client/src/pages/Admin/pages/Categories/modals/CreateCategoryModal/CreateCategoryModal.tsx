@@ -6,6 +6,7 @@ import Dropdown from '../../../../../../components/Dropdown/Dropdown'
 import icons from '../../../../../../utils/icons'
 import { CategoryType, categoriesToDropdown } from '../../Categories'
 import classes from './CreateCategoryModal.module.css'
+import { status } from '../../../../../../utils/common'
 
 export type CategoryInput = {
     name: string,
@@ -15,7 +16,7 @@ export type CategoryInput = {
 
 const initialInputs: CategoryInput = {
     name: "",
-    status: "",
+    status: status.ACCEPTED,
     parentCategory: null
 }
 
@@ -26,6 +27,7 @@ type PropsType = {
     onClose: () => void
     title: string,
     textProceed: string
+    icon: icons
 }
 
 const CreateCategoryModal = ({
@@ -34,7 +36,8 @@ const CreateCategoryModal = ({
     onSubmit,
     onClose,
     title,
-    textProceed
+    textProceed,
+    icon
 }: PropsType) => {
 
     const [inputs, setInputs] = useState<CategoryInput>(defaultInputs ?? initialInputs)
@@ -57,9 +60,10 @@ const CreateCategoryModal = ({
             textCancel={'Cancel'}
             onClose={onClose}
             onSubmit={__onSubmit}
-            icon={icons.pen}
-            type={ModalStyles.Inputs}>
-            <Input label='Name' name='name' value={inputs.name} onChange={onChange} />
+            icon={icon}
+            type={ModalStyles.Inputs}
+            disabled={inputs.name.length === 0}>
+            <Input required label='Name' name='name' value={inputs.name} onChange={onChange} />
             <InputLabel value='Parent category'>
                 <Dropdown value={String(inputs.parentCategory)} items={categoriesToDropdown(categories)} onChange={onDropdownChange} />
             </InputLabel>

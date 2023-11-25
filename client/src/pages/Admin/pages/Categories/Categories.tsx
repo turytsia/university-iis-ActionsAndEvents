@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { AppContext } from '../../../../context/AppContextProvider'
+import { AppContext, LoadingType } from '../../../../context/AppContextProvider'
 import Dropdown from '../../../../components/Dropdown/Dropdown'
 import { SpringResponseType, status } from '../../../../utils/common'
 
@@ -13,6 +13,7 @@ import CreateCategoryModal, { CategoryInput } from './modals/CreateCategoryModal
 import ButtonIconOnly from '../../../../components/ButtonIconOnly/ButtonIconOnly'
 import icons from '../../../../utils/icons'
 import RowActions from './components/RowActions/RowActions'
+import { Icon } from '@iconify/react'
 
 export type CategoryType = {
     id: number,
@@ -40,20 +41,22 @@ const Categories = () => {
     const [categories, setCategories] = useState<CategoryType[]>([])
 
     const onSubmit = async (inputs: CategoryInput) => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.post("/category", {
-                name: inputs.name,
-                parentCategory: inputs.parentCategory,
-                status: status.ACCEPTED
+                ...inputs
             })
             setCategories(prev => [...prev, { id: response.data.categoryId, ...inputs } as CategoryType])
             setIsCreateActive(false)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
     const fetchCategories = async () => {
+        context.setLoading(LoadingType.FETCHING)
         try {
             const response = await context.request!.get("/categories")
 
@@ -69,6 +72,8 @@ const Categories = () => {
             setCategories(fulfilledResponses.map(({ data }) => data))
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
@@ -90,9 +95,13 @@ const Categories = () => {
                 )}
                 actions={
                     <>
-                        <Button style='invert' onClick={() => setIsCreateActive(true)}>Create category</Button>
+                        <Button style='invert' onClick={() => setIsCreateActive(true)}>
+                            <Icon icon={icons.plus} width={20} height={20} />
+                            Create category
+                        </Button>
                         {isCreateActive && (
                             <CreateCategoryModal
+                                icon={icons.plus}
                                 textProceed='Create'
                                 title='Create category'
                                 categories={categories}

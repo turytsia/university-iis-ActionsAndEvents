@@ -5,13 +5,15 @@ import { PlaceType } from '../../Places'
 import Input from '../../../../../../components/Input/Input'
 import icons from '../../../../../../utils/icons'
 import { CategoryType } from '../../../Categories/Categories'
+import Textarea from '../../../../../../components/Textarea/Textarea'
+import { status } from '../../../../../../utils/common'
 
 const initialInputs: PlaceType = {
     "id": -1,
     "name": "",
     "description": "",
     "address": "",
-    "status": "APPROVED"
+    "status": status.ACCEPTED
 }
 
 type PropsType = {
@@ -33,7 +35,7 @@ const CreatePlaceModal = ({
 }: PropsType) => {
     const [inputs, setInputs] = useState(defaultInputs ?? initialInputs)
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }))
     }
 
@@ -49,10 +51,11 @@ const CreatePlaceModal = ({
           onClose={onClose}
           onSubmit={__onSubmit}
           icon={icons.pen}
-          type={ModalStyles.Inputs}>
-          <Input label='Name' name='name' value={inputs.name} onChange={onChange} />
-          <Input label='Description' name='description' value={inputs.description} onChange={onChange} />
-          <Input label='Address' name='address' value={inputs.address} onChange={onChange} />
+          type={ModalStyles.Inputs}
+          disabled={inputs.name.length === 0 || inputs.address.length === 0}>
+          <Input required label='Name' name='name' value={inputs.name} onChange={onChange} />
+          <Input required label='Address' name='address' value={inputs.address} onChange={onChange} />
+          <Textarea label='Description' name='description' value={inputs.description} onChange={onChange} />
       </Modal>
   )
 }

@@ -11,8 +11,11 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import com.project.actionsandevents.Place.exceptions.DuplicatePlaceException;
 import com.project.actionsandevents.Place.exceptions.PlaceNotFoundException;
+
 import com.project.actionsandevents.Place.requests.PlacePatchRequest;
 
 @Service
@@ -51,7 +54,9 @@ public class PlaceService {
      * @param patchRequest
      * @throws PlaceNotFoundException
      */
-    public void patchPlaceById(Long id, PlacePatchRequest patchRequest) throws PlaceNotFoundException {
+    public void patchPlaceById(Long id, PlacePatchRequest patchRequest) 
+        throws PlaceNotFoundException, DuplicatePlaceException 
+    {
         Optional<Place> place = repository.findById(id);
         if (!place.isPresent()) {
             throw new PlaceNotFoundException("Place not found with ID: " + id);
@@ -79,7 +84,11 @@ public class PlaceService {
             placeToPatch.setStatus(patchRequest.getStatus());
         }
 
-        repository.save(placeToPatch);
+        try {
+            repository.save(placeToPatch);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicatePlaceException("Place with such parameters already exists");
+        }
     }
 
     /**
@@ -87,8 +96,14 @@ public class PlaceService {
      * @param place
      * @return
      */
-    public Long addPlace(Place place) {
-        return repository.save(place).getId();
+    public Long addPlace(Place place) 
+        throws DuplicatePlaceException
+    {
+        try {
+            return repository.save(place).getId();
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicatePlaceException("Place with such parameters already exists");
+        }
     }
 
     /**
@@ -117,7 +132,7 @@ public class PlaceService {
             throw new PlaceNotFoundException("Place not found with ID: " + placeId);
         }
 
-        place.get().setStatus(PlaceStatus.APPROVED);
+        place.get().setStatus(PlaceStatus.ACCEPTED);
 
         return "Place was successfully approved";
     }

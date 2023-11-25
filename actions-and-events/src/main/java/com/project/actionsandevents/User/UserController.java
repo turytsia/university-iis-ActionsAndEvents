@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import com.project.actionsandevents.Event.responses.EventsResponse;
 import com.project.actionsandevents.Event.responses.TicketsResponse;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
+import com.project.actionsandevents.User.exceptions.DuplicateUserException;
 import com.project.actionsandevents.User.requests.UserPatchRequest;
 import com.project.actionsandevents.User.responses.RegistersResponse;
 import com.project.actionsandevents.User.responses.UserResponse;
@@ -34,7 +35,8 @@ public class UserController {
 
     @GetMapping("/user")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> getUser(Authentication authentication) throws UserNotFoundException {
+    public ResponseEntity<Object> getUser(Authentication authentication) throws UserNotFoundException 
+    {
         User user = null;
 
         if (authentication != null) {
@@ -64,13 +66,19 @@ public class UserController {
             @PathVariable Long id,
             @Valid @RequestBody UserPatchRequest patchRequest,
             BindingResult bindingResult,
-            Authentication authentication) throws UserNotFoundException {
+            Authentication authentication) 
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
-        userService.patchUserById(id, patchRequest);
+        try {
+            userService.patchUserById(id, patchRequest);
+        } catch (UserNotFoundException | DuplicateUserException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
 
         return ResponseEntity.ok(new ResponseMessage("User was successfully updated", ResponseMessage.Status.SUCCESS));
     }
@@ -83,7 +91,8 @@ public class UserController {
 
     @DeleteMapping("/user/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteUser(@PathVariable Long id, Authentication authentication) throws UserNotFoundException {
+    public ResponseEntity<Object> deleteUser(@PathVariable Long id, Authentication authentication) throws UserNotFoundException 
+    {
         userService.deleteUserById(id);
 
         // TODO add log to db

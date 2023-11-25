@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react'
 import TableView from '../../components/TableView/TableView'
-import { AppContext, UserType } from '../../context/AppContextProvider'
+import { AppContext, LoadingType, UserType } from '../../context/AppContextProvider'
 import { useParams } from 'react-router-dom'
 import { SpringResponseType } from '../../utils/common'
 import Table, { TableHeaderType } from '../../components/Table/Table'
 import RowActions from './components/RowActions/RowActions'
 import { TicketType } from '../CreateEvent/pages/Tickets/modals/CreateTicketModal/CreateTicketModal'
 
-export type UserWithStatus = UserType & { status: string, ticketId: number }
+export type UserWithStatus = UserType & { status: string, ticketId: number, registerId: number }
 
 const dataKeys: TableHeaderType = {
     id: "Id",
@@ -27,6 +27,7 @@ const EventUsers = () => {
     const [users, setUsers] = useState<UserWithStatus[]>([])
 
     const fetch = async () => {
+        context.setLoading(LoadingType.FETCHING)
         try {
 
             const ticketsResponse = await context.request!.get(`/event/${id}/tickets`)
@@ -61,13 +62,15 @@ const EventUsers = () => {
             console.log(usersFulfilledResponses)
 
             setUsers(registersDataFulfilledResponses.map(({ data }) => {
-                const { userId, status, ticketId } = data
+                const { userId, status, ticketId, id } = data
 
                 const user = usersFulfilledResponses.map(({ data }) => data).find(({ id }) => id === userId)
-                return { ...user, status, ticketId }
+                return { ...user, status, ticketId, registerId: id }
             }))
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 

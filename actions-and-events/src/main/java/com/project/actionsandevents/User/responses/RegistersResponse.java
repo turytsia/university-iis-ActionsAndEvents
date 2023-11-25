@@ -13,12 +13,14 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RegistersResponse {
+    private Long id;
     private RegistersStatus status;
     private Date date;
     private Long ticketId;
     private Long userId;
 
     public RegistersResponse(Registers registers) {
+        this.id = registers.getId();
         this.status = registers.getStatus();
         this.date = registers.getDate();
         this.ticketId = registers.getTicketType().getId();

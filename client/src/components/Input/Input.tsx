@@ -12,6 +12,8 @@ type PropsType = {
     inactive?: boolean
     className?: string
     placeholder?: string
+    required?: boolean
+    min?: number
 }
 
 const Input = ({
@@ -22,11 +24,15 @@ const Input = ({
     name,
     inactive,
     className = "",
-    placeholder = ""
+    placeholder = "",
+    required,
+    min
+
 }: PropsType) => {
     return (
-        <InputLabel htmlFor={classes.input} value={label}>
+        <InputLabel required={required} htmlFor={classes.input} value={label}>
             <input
+                min={min}
                 id={classes.input}
                 name={name}
                 type={type}

@@ -14,14 +14,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-  
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.actionsandevents.common.ResponseMessage;
+
 import java.io.IOException;
+import java.util.HashMap;
   
 // This class helps us to validate the generated jwt token
 @Component
@@ -52,7 +58,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
-                // TODO https://stackoverflow.com/questions/57194249/how-to-return-response-as-json-from-spring-filter
+                ResponseMessage message = new ResponseMessage("Invalid token", null);
+
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.writeValue(response.getWriter(), message);
             }
         }
 

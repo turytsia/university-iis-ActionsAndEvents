@@ -3,7 +3,8 @@ import ButtonIconOnly from '../../../../../../components/ButtonIconOnly/ButtonIc
 import icons from '../../../../../../utils/icons'
 import DeleteModal from '../../../../../../modals/DeleteModal/DeleteModal'
 import { UserType } from '../../Users'
-import { AppContext } from '../../../../../../context/AppContextProvider'
+import { AppContext, LoadingType } from '../../../../../../context/AppContextProvider'
+import Popover from '../../../../../../components/Popover/Popover'
 
 type PropsType = {
     user: UserType
@@ -25,6 +26,7 @@ const RowActions = ({
     }
 
     const deleteCategory = async () => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.delete(`/user/${user.id}`)
 
@@ -32,11 +34,17 @@ const RowActions = ({
             setIsDeleteActive(false)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
     return (
         <>
-            <ButtonIconOnly icon={icons.trash} onClick={() => setIsDeleteActive(true)}></ButtonIconOnly>
+            <Popover element={
+                <ButtonIconOnly icon={icons.trash} onClick={() => setIsDeleteActive(true)}></ButtonIconOnly>
+            }>
+                Delete
+            </Popover>
             {isDeleteActive && (
                 <DeleteModal
                     title={`Delete user "${user.login}"?`}

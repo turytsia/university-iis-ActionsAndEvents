@@ -12,6 +12,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.persistence.CascadeType;
 
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class Place {
     @GeneratedValue
     private Long id;
 
+    @NotBlank(message = "Name is mandatory")
     @Column(unique = true, nullable = false)
     private String name;
 
@@ -42,9 +44,11 @@ public class Place {
     @Column(nullable = true)
     private String description;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Address is mandatory")
+    @Column(unique = true, nullable = false)
     private String address;
 
+    //@NotBlank(message = "Status is mandatory")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PlaceStatus status;

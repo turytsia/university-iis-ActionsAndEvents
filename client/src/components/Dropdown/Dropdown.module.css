@@ -63,3 +63,18 @@
 .item.dark:hover{
     background-color: var(--dark-blue-light);
 }
+
+.dropdownInput{
+    font-size: 12px;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 3px;
+    border: 1px solid gray;
+    width: 100%;
+    height: 33.6px;
+}
+
+.dropdownInputContainer{
+    cursor: pointer;
+    position: relative;
+}

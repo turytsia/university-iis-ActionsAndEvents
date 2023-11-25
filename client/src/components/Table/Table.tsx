@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react'
 import classes from "./Table.module.css"
 import classNames from 'classnames'
-import Input from '../Input/Input'
+import { status } from '../../utils/common'
+import uuid from 'react-uuid';
 
 export type TableHeaderType = {
     [k: string]: string
@@ -21,6 +22,23 @@ type PropsType = {
 
 export const fmt = (v: any): string => {
     return [null, undefined, ""].includes(v) ? "--" : String(v)
+}
+
+const specFmt = (v: string) => {
+
+    const statusClass = {
+        [status.ACCEPTED]: classes.accepted,
+        [status.PENDING]: classes.pending,
+        [status.REJECTED]: classes.rejected,
+    }[v]
+
+    const cellStyles = classNames(classes.status, statusClass)
+
+    if (statusClass) {
+        return <span className={cellStyles}>{v}</span>
+    }
+
+    return v
 }
 
 /**
@@ -48,8 +66,8 @@ const Table = ({
 
     const headStyles = classNames(classes.cell, classes.head)
 
-    const header = titles.map((k, i) => (
-        <div key={k} className={headStyles}>{k}</div>
+    const header = titles.map(k => (
+        <div key={uuid()} className={headStyles}>{k}</div>
     ))
     const body = data.map((item, i) => {
 
@@ -57,12 +75,12 @@ const Table = ({
 
         return (
             [
-                ...keys.map((k, j) => (
-                    <div key={i.toString() + j.toString()} className={cellStyles}>
-                        {_fmt ? _fmt(k, item[k]) : fmt(item[k])}
+                ...keys.map(k => (
+                    <div key={uuid()} className={cellStyles}>
+                        {_fmt ? _fmt(k, item[k]) : specFmt(fmt(item[k]))}
                     </div>
                 )),
-                ...(rowActions ? [<div className={classNames(cellStyles, classes.actions)}>{rowActions(item)}</div>] : [])
+                ...(rowActions ? [<div key={uuid()} className={classNames(cellStyles, classes.actions)}>{rowActions(item)}</div>] : [])
             ]
         )
     })

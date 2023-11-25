@@ -46,17 +46,24 @@ const CreateTicketModal = ({
         onSubmit(inputs)
     }
 
+    const isDisabled = (
+        inputs.name.length === 0 ||
+        inputs.price.length === 0 ||
+        inputs.capacity.length === 0
+    )
+
     return (
         <Modal title="Create new ticket"
             textProceed="Save"
             textCancel="Cancel"
             onClose={onClose}
             onSubmit={__onSubmit}
-            icon={icons.pen}
+            icon={icons.plus}
+            disabled={isDisabled}
         type={ModalStyles.Inputs}>
-            <Input label='Name' name='name' value={inputs.name} onChange={onChange} />
-            <Input label='Price' name='price' value={inputs.price} onChange={onChange} />
-            <Input label='Capacity' name='capacity' value={inputs.capacity} onChange={onChange} />
+            <Input required label='Name' name='name' value={inputs.name} onChange={onChange} />
+            <Input required label='Price' name='price' value={inputs.price} min={0} type='number' onChange={onChange} />
+            <Input required label='Capacity' name='capacity' value={inputs.capacity} min={1} type='number' onChange={onChange} />
             <Textarea label='Description' name='description' value={inputs.description} onChange={onChange} />
         </Modal>
     )

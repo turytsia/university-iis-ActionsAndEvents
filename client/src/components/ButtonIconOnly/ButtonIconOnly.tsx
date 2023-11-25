@@ -11,7 +11,8 @@ type PropsType = {
     onClick?: MouseEventHandler<HTMLButtonElement>
     className?: string,
     iconWidth?: number,
-    iconHeight?: number
+    iconHeight?: number,
+    to?: string
 }
 
 const ButtonIconOnly = ({
@@ -19,10 +20,11 @@ const ButtonIconOnly = ({
     className = "",
     onClick,
     iconWidth = 20,
-    iconHeight = 20
+    iconHeight = 20,
+    to
 }: PropsType, ref: React.Ref<HTMLButtonElement>) => {
   return (
-      <Button ref={ref} className={classNames(className, classes.button)} onClick={onClick}>
+      <Button ref={ref} to={to} className={classNames(className, classes.button)} onClick={onClick}>
           <Icon icon={icon} width={iconWidth} height={iconHeight} />
       </Button>
   )

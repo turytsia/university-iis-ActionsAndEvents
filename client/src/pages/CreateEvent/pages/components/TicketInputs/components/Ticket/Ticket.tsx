@@ -8,8 +8,11 @@ import { Icon } from '@iconify/react'
 import classNames from 'classnames'
 import Button from '../../../../../../../components/Button/Button'
 import ConfirmTicketModal from './ConfirmTicketModal/ConfirmTicketModal'
-import { AppContext } from '../../../../../../../context/AppContextProvider'
+import { AppContext, LoadingType } from '../../../../../../../context/AppContextProvider'
 import { TicketTypeWithRegister } from '../../../../Tickets/Tickets'
+import { status } from '../../../../../../../utils/common'
+import Popover from '../../../../../../../components/Popover/Popover'
+import DeleteModal from '../../../../../../../modals/DeleteModal/DeleteModal'
 
 type PropsType = {
     ticket: TicketTypeWithRegister
@@ -18,15 +21,17 @@ type PropsType = {
 }
 
 const Ticket = ({
-    ticket,
+    ticket: defaultTicket,
     deleteTicket,
     updateTicket,
 }: PropsType) => {
-
+    const [ticket, setTicket] = useState(defaultTicket)
+ 
     const context = useContext(AppContext)
 
     const [isActive, setIsAcitve] = useState(false)
     const [isGetActive, setIsGetActive] = useState(false)
+    const [isDeleteActive, setIsDeleteActive] = useState(false)
     const [authorId, setAuthorId] = useState<number | null>(null)
 
     const fetchEvent = async () => {
@@ -44,17 +49,25 @@ const Ticket = ({
         onClose()
     }
 
+    const submitDeletion = () => {
+        deleteTicket!()
+        setIsDeleteActive(false)
+    }
+
     const onClose = () => {
         setIsAcitve(false)
     }
 
     const getTicket = async () => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.get(`/event/ticket/${ticket.id}/register/${context.user.id}`)
-            console.log(response.data)
+            setTicket(prev => ({ ...prev, status: status.PENDING }))
             setIsGetActive(false)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
@@ -62,42 +75,90 @@ const Ticket = ({
         fetchEvent()
     }, [])
 
+    useEffect(() => {
+        setTicket(defaultTicket)
+    }, [defaultTicket])
+
     const btnAction = (status: string) => {
         if (!ticket.id || context.user.id === authorId) {
-            return null
+            return (
+                <>
+                    {updateTicket && (
+                        <Popover element={<ButtonIconOnly icon={icons.pen} onClick={() => setIsAcitve(true)}></ButtonIconOnly>}>
+                            Update
+                        </Popover>
+                    )}
+                    {deleteTicket && (
+                        <Popover element={<ButtonIconOnly icon={icons.trash} onClick={() => setIsDeleteActive(true)}></ButtonIconOnly>}>
+                            Delete
+                        </Popover>
+                    )}
+                </>
+            )
         }
         switch (status) {
             case "Rejected":
-                return <>Rejected...</>
+                return <>
+                    <Popover element={
+                        <ButtonIconOnly to={`/event/${ticket.eventId}`} icon={icons.link} iconWidth={20} iconHeight={20} />
+                    }>
+                        Open event
+                    </Popover>
+                    <Popover element={<Icon className={classes.rejected} icon={icons.cancel} width={25} height={25} />}>
+                        You were rejected for this event
+                    </Popover>
+                </>
             case "Pending":
-                return <>Pending...</>
+                return (
+                    <>
+                        <Popover element={
+                            <ButtonIconOnly to={`/event/${ticket.eventId}`} icon={icons.link} iconWidth={20} iconHeight={20} />
+                        }>
+                            Open event
+                        </Popover>
+                        <Popover element={<Icon className={classes.pending} icon={icons.time} width={25} height={25} />}>
+                            Pending...
+                        </Popover>
+                    </>
+                )
             case "Accepted":
-                return <>Accepted...</>
+                return <>
+                    <Popover element={
+                        <ButtonIconOnly to={`/event/${ticket.eventId}`} icon={icons.link} iconWidth={20} iconHeight={20} />
+                    }>
+                        Open event
+                    </Popover>
+                    <Popover element={<Icon className={classes.accepted} icon={icons.checkCircle} width={25} height={25} />}>
+                        You were accepted for this event
+                    </Popover>
+                </>
             default:
-                return <Button style='invert' onClick={() => setIsGetActive(true)}>Get</Button>
+                return (
+                    <Button style='invert' onClick={() => setIsGetActive(true)}>Get</Button>
+                )
         }
     }
 
     return (
         <div className={classes.ticket}>
 
-            <div className={classes.actions}>
-                {updateTicket && <ButtonIconOnly icon={icons.pen} onClick={() => setIsAcitve(true)}></ButtonIconOnly>}
-                {deleteTicket && <ButtonIconOnly icon={icons.trash} onClick={deleteTicket}></ButtonIconOnly>}
-                {btnAction(ticket.status)}
-            </div>
-
             <div className={classes.content}>
                 <span className={classes.name}>{ticket.name}</span>
-                <p className={classes.description}>{ticket.description}</p>
+                <div className={classes.actions}>
+                    {btnAction(ticket.status)}
+                </div>
             </div>
+            <p className={classes.description}>{ticket.description}</p>
             <div className={classes.footer}>
                 <span className={classes.price}>
-                    $ {ticket.price}
+                    <Icon icon={icons.dollar} width={20} height={20} />
+                    {ticket.price}
                 </span>
                 <span className={classes.capacity}>
+                    <Popover element={<Icon icon={icons.users} width={20} height={20} />}>
+                        Capacity
+                    </Popover>
                     {ticket.capacity}
-                    <Icon icon={icons.users} width={20} height={20} />
                 </span>
             </div>
             <div>
@@ -112,6 +173,9 @@ const Ticket = ({
             )}
             {isGetActive && (
                 <ConfirmTicketModal onSubmit={getTicket} onClose={() => setIsGetActive(false)} ticketName={ticket.name} eventName={'...'} />
+            )}
+            {isDeleteActive && (
+                <DeleteModal title={`Delete ticket "${ticket.name}"?`} onSubmit={submitDeletion} onClose={() => setIsDeleteActive(false)} />
             )}
         </div>
     )
