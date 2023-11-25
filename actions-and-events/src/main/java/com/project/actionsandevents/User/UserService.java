@@ -108,7 +108,9 @@ public class UserService implements UserDetailsService {
      * @return
      * @throws UserNotFoundException
      */
-    public User patchUserById(Long id, UserPatchRequest patchRequest) throws UserNotFoundException {
+    public void patchUserById(Long id, UserPatchRequest patchRequest) 
+        throws UserNotFoundException, DuplicateUserException
+    {
         Optional<User> user = repository.findById(id);
 
         if (!user.isPresent()) {
@@ -117,14 +119,28 @@ public class UserService implements UserDetailsService {
 
         User existingUser = user.get();
 
-        existingUser.setEmail(patchRequest.getEmail());
-        existingUser.setFirstname(patchRequest.getFirstname());
-        existingUser.setLastname(patchRequest.getLastname());
-        existingUser.setPhone(patchRequest.getPhone());
+        if (patchRequest.getEmail() != null) {
+            existingUser.setEmail(patchRequest.getEmail());
+        }
 
-        repository.save(existingUser);
+        if (patchRequest.getFirstname() != null) {
+            existingUser.setFirstname(patchRequest.getFirstname());
+        }
 
-        return existingUser;
+        if (patchRequest.getLastname() != null) {
+            existingUser.setLastname(patchRequest.getLastname());
+        }
+
+        if (patchRequest.getPhone() != null) {
+            existingUser.setPhone(patchRequest.getPhone());
+        }
+
+        try {
+            repository.save(existingUser);
+        } catch (DataIntegrityViolationException e) {
+            // Handle the exception here. For example, you might want to log the error and throw a custom exception.
+            throw new DuplicateUserException("A user with this email or username already exists.");
+        }
     }
 
     /**

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,10 +21,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.actionsandevents.Place.exceptions.PlaceNotFoundException;
+import com.project.actionsandevents.Place.exceptions.DuplicatePlaceException;
+
 import com.project.actionsandevents.Place.requests.PlacePatchRequest;
+
 import com.project.actionsandevents.Place.responses.PlacePostResponse;
 import com.project.actionsandevents.Place.responses.PlaceResponse;
 import com.project.actionsandevents.Place.responses.PlacesResponse;
+
 import com.project.actionsandevents.common.ResponseMessage;
 
 import jakarta.validation.Valid;
@@ -53,13 +58,19 @@ public class PlaceController {
                 @PathVariable Long id,
                 @Valid @RequestBody PlacePatchRequest patchRequest,
                 BindingResult bindingResult,
-                Authentication authentication) throws PlaceNotFoundException {
+                Authentication authentication) throws PlaceNotFoundException 
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                         "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
-        placeService.patchPlaceById(id, patchRequest);
+        try {
+            placeService.patchPlaceById(id, patchRequest);
+        } catch (PlaceNotFoundException | DuplicatePlaceException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                        ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
 
         return ResponseEntity.ok(new ResponseMessage("Place was successfully updated", ResponseMessage.Status.SUCCESS));
     }
@@ -69,13 +80,21 @@ public class PlaceController {
     public ResponseEntity<Object> addPlace(
                 @Valid @RequestBody Place place,
                 BindingResult bindingResult,
-                Authentication authentication) {
+                Authentication authentication) 
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new PlacePostResponse(null, 
                             "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
-        
-        return ResponseEntity.ok(new PlacePostResponse(placeService.addPlace(place), "Place was successfully added", ResponseMessage.Status.SUCCESS));
+
+        try {
+            Long placeId = placeService.addPlace(place);
+            return ResponseEntity.ok(new PlacePostResponse(placeId, 
+                    "Place was successfully added", ResponseMessage.Status.SUCCESS));
+        } catch (DuplicatePlaceException ex) {
+            return ResponseEntity.badRequest().body(new PlacePostResponse(null, 
+                            ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @DeleteMapping("/place/{id}")

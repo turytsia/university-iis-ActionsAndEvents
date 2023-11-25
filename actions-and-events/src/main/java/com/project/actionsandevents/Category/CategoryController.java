@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.actionsandevents.Category.exceptions.CategoryNotFoundException;
+import com.project.actionsandevents.Category.exceptions.CategoryParentException;
+import com.project.actionsandevents.Category.exceptions.DuplicateCategoryException;
 import com.project.actionsandevents.Category.requests.CategoryPatchRequest;
 import com.project.actionsandevents.Category.requests.CategoryPostRequest;
 import com.project.actionsandevents.Category.responses.CategoriesResponse;
@@ -36,10 +38,15 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping("/category/{id}")
-    public ResponseEntity<Object> getCategoryById(@PathVariable Long id, Authentication authentication) throws CategoryNotFoundException {
-        Category category = categoryService.getCategoryById(id);
-
-        return ResponseEntity.ok(new CategoryResponse(category));
+    public ResponseEntity<Object> getCategoryById(@PathVariable Long id, Authentication authentication)
+    {
+        try {
+            Category category = categoryService.getCategoryById(id);
+            return ResponseEntity.ok(new CategoryResponse(category));
+        } catch (CategoryNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                        ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @GetMapping("/categories")
@@ -54,15 +61,20 @@ public class CategoryController {
             @PathVariable Long id,
             @Valid @RequestBody CategoryPatchRequest patchRequest,
             BindingResult bindingResult,
-            Authentication authentication) throws CategoryNotFoundException {
+            Authentication authentication) 
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
-        categoryService.patchCategoryById(id, patchRequest);
-
-        return ResponseEntity.ok(new ResponseMessage("Category was successfully updated", ResponseMessage.Status.SUCCESS));
+        try {
+            categoryService.patchCategoryById(id, patchRequest);
+            return ResponseEntity.ok(new ResponseMessage("Category was successfully updated", ResponseMessage.Status.SUCCESS));
+        } catch (CategoryNotFoundException | DuplicateCategoryException | CategoryParentException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                        ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @PostMapping("/category")
@@ -70,13 +82,21 @@ public class CategoryController {
     public ResponseEntity<Object> addCategory(
                 @Valid @RequestBody CategoryPostRequest category,
                 BindingResult bindingResult,
-                Authentication authentication) throws CategoryNotFoundException {
+                Authentication authentication) 
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new CategoryPostResponse(null, 
                             "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
-        return ResponseEntity.ok(new CategoryPostResponse(categoryService.addCategory(category), "Category was successfully added", ResponseMessage.Status.SUCCESS));
+        try {
+            Long categoryId = categoryService.addCategory(category);
+            return ResponseEntity.ok(new CategoryPostResponse(categoryId, 
+                            "Category was successfully added", ResponseMessage.Status.SUCCESS));
+        } catch (CategoryNotFoundException | DuplicateCategoryException | CategoryParentException ex) {
+            return ResponseEntity.badRequest().body(new CategoryPostResponse(null, 
+                            ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @PostMapping("/category/{id}")
@@ -85,20 +105,32 @@ public class CategoryController {
                 @PathVariable Long id,
                 @Valid @RequestBody Category category,
                 BindingResult bindingResult,
-                Authentication authentication) throws CategoryNotFoundException{
+                Authentication authentication) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new CategoryPostResponse(null, 
                             "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
-        return ResponseEntity.ok(new CategoryPostResponse(categoryService.addCategoryWithParent(category, id), "Category was successfully added", ResponseMessage.Status.SUCCESS));
+        try {
+            Long categoryId = categoryService.addCategoryWithParent(category, id);
+            return ResponseEntity.ok(new CategoryPostResponse(categoryId, 
+                            "Category was successfully added", ResponseMessage.Status.SUCCESS));
+        } catch (CategoryNotFoundException | DuplicateCategoryException | CategoryParentException ex) {
+            return ResponseEntity.badRequest().body(new CategoryPostResponse(null, 
+                            ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 
     @DeleteMapping("/category/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteCategory(@PathVariable Long id, Authentication authentication) throws CategoryNotFoundException {
-        categoryService.deleteCategoryById(id);
-
-        return ResponseEntity.ok(new ResponseMessage("Category was successfully removed", ResponseMessage.Status.SUCCESS));
+    public ResponseEntity<Object> deleteCategory(@PathVariable Long id, Authentication authentication)
+    {
+        try {
+            categoryService.deleteCategoryById(id);
+            return ResponseEntity.ok(new ResponseMessage("Category was successfully removed", ResponseMessage.Status.SUCCESS));
+        } catch (CategoryNotFoundException ex) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(
+                        ex.getMessage(), ResponseMessage.Status.ERROR));
+        }
     }
 }

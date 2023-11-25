@@ -13,10 +13,12 @@ public class PlacePatchRequest {
 
     private String description;
     
+    @NotBlank(message = "Address is required")
     private String address;
     
     @NotBlank(message = "Name is required")
     private String name;
 
+    //@NotBlank(message = "Status is required")
     private PlaceStatus status;
 }

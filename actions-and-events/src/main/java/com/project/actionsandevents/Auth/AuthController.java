@@ -48,7 +48,7 @@ public class AuthController {
                         "User was successfully registered", ResponseMessage.Status.SUCCESS));
         } catch (DuplicateUserException ex) {
             return ResponseEntity.badRequest().body(new UserPostResponse(null,
-                    "User with such parameters already exists", ResponseMessage.Status.ERROR));
+                    ex.getMessage(), ResponseMessage.Status.ERROR));
         }
     }
 

@@ -308,20 +308,7 @@ public class EventService {
         return "User was successfully registered";
     }
 
-    
-    // public List<Registers> getTicketRegistrations(Long ticketId) throws TicketNotFoundException {
-    //     Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
 
-    //     if (!ticketType.isPresent()) {
-    //         throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
-    //     }
-
-    //     List<Registers> registers = registersRepository.findByTicketType(ticketType.get());
-    //     System.out.println("************** ids **************");
-    //     System.out.println(registers);
-
-    //     return registers;
-    // }
 
     public List<Long> getTicketRegistrations(Long ticketId) throws TicketNotFoundException {
         Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
@@ -330,21 +317,7 @@ public class EventService {
             throw new TicketNotFoundException("Ticket type not found with id: " + ticketId);
         }
 
-        // List<Object[]> rows = registersRepository.findAllIdsByTicketType(ticketType.get());
-
-        // List<RegistersId> result = new ArrayList<>();
-        // for (Object[] row : rows) {
-        //     Long userId = ((Number) row[0]).longValue();
-        //     Long ticketTypeId = ((Number) row[1]).longValue();
-        //     result.add(new RegistersId(userId, ticketTypeId));
-        // }
-
         List<Long> ids = registersRepository.findAllIdsByTicketType(ticketType.get());
-
-        // List<RegistersId> ids = new ArrayList<RegistersId>();
-        // for (Registers register : registers) {
-        //     ids.add(new RegistersId(register.getUser().getId(), register.getTicketType().getId()));
-        // }
 
 
         System.out.println("************** ids **************");
@@ -377,95 +350,6 @@ public class EventService {
 
         return "Ticket registration was successfully updated";
     }
-
-
-
-
-
-
-    // public List<EventUserRegisters> getRegisteredUsersByEventId(Long eventId) throws EventNotFoundException {
-    //     Optional<Event> event = repository.findById(eventId);
-
-    //     if (!event.isPresent()) {
-    //         throw new EventNotFoundException("Event not found with id: " + eventId);
-    //     }
-
-    //     List<EventUserRegisters> usersRegisters = new ArrayList<EventUserRegisters>();
-
-    //     List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
-
-    //     for (TicketType ticketType : ticketTypes) {
-    //         List<Registers> registers = registersRepository.findByTicketType(ticketType);
-
-    //         for (Registers register : registers) {
-    //             //if (register.getStatus() == RegistersStatus.ACCEPTED) {
-    //             usersRegisters.add(new EventUserRegisters(register.getUser().getId(), register.getStatus()));
-    //             //}
-    //         }
-    //     }
-
-    //     return usersRegisters;
-    // }
-
-    // public User getRegisteredUserById(Long eventId, Long userId) 
-    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException 
-    // {
-    //     Optional<Event> event = repository.findById(eventId);
-    //     Optional<User>  user  = userRepository.findById(userId);
-
-    //     if (!event.isPresent()) {
-    //         throw new EventNotFoundException("Event not found with id: " + eventId);
-    //     }
-
-    //     if (!user.isPresent()) {
-    //         throw new UserNotFoundException("User not found with id: " + userId);
-    //     }
-
-    //     List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
-
-    //     for (TicketType ticketType : ticketTypes) {
-    //         Optional<Registers> registers = registersRepository.findByUserAndTicketType(user.get(), ticketType);
-
-    //         if (registers.isPresent()) {
-    //             return user.get();
-    //         }
-    //     }
-
-    //     throw new UserNotRegisteredException("User not found with id: " + userId);
-    // }
-
-    // public String unregisterUserFromEvent(Long eventId, Long userId) 
-    //         throws EventNotFoundException, UserNotFoundException, UserNotRegisteredException {
-    //     Optional<Event> event = repository.findById(eventId);
-    //     Optional<User> user = userRepository.findById(userId);
-
-    //     if (!event.isPresent()) {
-    //         throw new EventNotFoundException("Event not found with id: " + eventId);
-    //     }
-
-    //     if (!user.isPresent()) {
-    //         throw new UserNotFoundException("User not found with id: " + userId);
-    //     }
-
-    //     List<TicketType> ticketTypes = ticketTypeRepository.findAllByEvent(event.get());
-
-    //     // TODO: check if user is registered to multiple tickets? Is that allowed??
-    //     for (TicketType ticketType : ticketTypes) {
-    //         Optional<Registers> registers = registersRepository.findByUserAndTicketType(user.get(), ticketType);
-
-    //         if (registers.isPresent()) {
-    //             registersRepository.delete(registers.get());
-    //             return "User was successfully unregistered";
-    //         }
-    //     }
-
-    //     throw new UserNotRegisteredException("User with id " + userId + 
-    //         " not registered for this event with id " + eventId);
-    // }
-
-    
-
-
 
 
 
