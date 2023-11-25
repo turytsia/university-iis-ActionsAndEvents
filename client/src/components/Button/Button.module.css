@@ -19,7 +19,16 @@
     background-color: black;
     color: white;
 }
+.button:disabled{
+    background-color: #e5e5e5;
+    color: #a1a1a1;
+    cursor:not-allowed;
+}
 
+.button:disabled:hover{
+    background-color: #e5e5e5;
+    color: #a1a1a1;
+}
 .invert:hover {
     background-color: #292929;
 }

@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import classes from "./NewTicket.module.css"
 import CreateTicketModal, { TicketType } from '../../../../Tickets/modals/CreateTicketModal/CreateTicketModal'
 import { TicketTypeWithRegister } from '../../../../Tickets/Tickets'
+import { Icon } from '@iconify/react'
+import icons from '../../../../../../../utils/icons'
 
 type PropsType = {
     createTicket: (inputs: TicketTypeWithRegister) => void
@@ -24,7 +26,7 @@ const NewTicket = ({
       <>
           <button className={classes.empty} onClick={() => setIsActive(true)}>
               <span className={classes.border}>
-                  <span>+</span>
+                  <Icon icon={icons.add} width={60} height={60} />
               </span>
           </button>
           {isActive && (

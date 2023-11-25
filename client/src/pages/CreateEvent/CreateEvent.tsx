@@ -16,9 +16,7 @@ const CreateEvent = () => {
     return (
         <PageView scroll title='Create Event'>
             <Tabs prefix='/events/create' tabs={tabs} />
-            <div className={classes.outlet}>
-                <Outlet />
-            </div>
+            <Outlet />
         </PageView>
     )
 }

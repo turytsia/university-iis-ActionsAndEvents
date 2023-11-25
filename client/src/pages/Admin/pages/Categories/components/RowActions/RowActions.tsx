@@ -3,8 +3,9 @@ import { CategoryType } from '../../Categories'
 import ButtonIconOnly from '../../../../../../components/ButtonIconOnly/ButtonIconOnly'
 import icons from '../../../../../../utils/icons'
 import CreateCategoryModal, { CategoryInput } from '../../modals/CreateCategoryModal/CreateCategoryModal'
-import { AppContext } from '../../../../../../context/AppContextProvider'
+import { AppContext, LoadingType } from '../../../../../../context/AppContextProvider'
 import DeleteModal from '../../../../../../modals/DeleteModal/DeleteModal'
+import Popover from '../../../../../../components/Popover/Popover'
 
 type PropsType = {
     category: CategoryType
@@ -24,6 +25,7 @@ const RowActions = ({
     const [isDeleteActive, setIsDeleteActive] = useState(false)
 
     const updateCategory = async (inputs: CategoryInput) => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const newCategory = {
                 ...category,
@@ -35,24 +37,34 @@ const RowActions = ({
             setIsUpdateActive(false)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
     const deleteCategory = async () => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.delete(`/category/${category.id}`)
 
-            setCategories(prev => prev.filter(({ id }) => id !== category.id))
+            setCategories(prev => prev.filter(({ id, parentCategory }) => id !== category.id && parentCategory !== category.id))
             setIsDeleteActive(false)
         } catch (error) {
             console.error(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
     
   return (
       <>
-          <ButtonIconOnly icon={icons.pen} onClick={() => setIsUpdateActive(true)}></ButtonIconOnly>
-          <ButtonIconOnly icon={icons.trash} onClick={() => setIsDeleteActive(true)}></ButtonIconOnly>
+          <Popover element={<ButtonIconOnly icon={icons.pen} onClick={() => setIsUpdateActive(true)}></ButtonIconOnly>}>
+              Update
+          </Popover>
+          <Popover element={<ButtonIconOnly icon={icons.trash} onClick={() => setIsDeleteActive(true)}></ButtonIconOnly>}>
+              Delete
+          </Popover>
+          
           {isDeleteActive && (
               <DeleteModal
                   title='Delete category?'
@@ -62,6 +74,7 @@ const RowActions = ({
           )}
           {isUpdateActive && (
               <CreateCategoryModal
+                  icon={icons.pen}
                   title='Update category'
                   textProceed='Update'
                   inputs={category}

@@ -11,21 +11,23 @@ type PropsType = {
     value: string,
     onChange?: DateChangeType,
     label?: string,
-    name: string
+    name: string,
+    required?: boolean
 }
 
 const DateInput = ({
     value,
     onChange: __onChange = () => { },
     label,
-    name
+    name,
+    required
 }: PropsType) => {
     const ref = useRef<HTMLInputElement>(null)
     const onChange = (date: Date | null, event: SyntheticEvent<any, Event> | undefined) => {
         __onChange(name, date)
     }
   return (
-      <InputLabel htmlFor={classes.input} value={label}>
+      <InputLabel required={required} htmlFor={classes.input} value={label}>
           <div style={{ position: 'relative' }}>
               <input ref={ref} style={{ display: "none" }} />
               <ReactDatePicker

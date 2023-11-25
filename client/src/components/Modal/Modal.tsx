@@ -16,6 +16,7 @@ import icons from '../../utils/icons'
 // import Button from '../Button/Button'
 import classNames from 'classnames'
 import Button from '../Button/Button'
+import StarRequire from '../StarRequire/StarRequire'
 
 type PropsType = {
     title: string
@@ -27,6 +28,7 @@ type PropsType = {
     error?: string
     icon: icons
     type?: ModalStyles
+    disabled?: boolean
 }
 
 export enum ModalStyles {
@@ -66,6 +68,7 @@ const Modal = ({
     onClose,
     onSubmit,
     type,
+    disabled
 }: PropsType) => {
 
     // const { isDark } = useContext(AppContext)
@@ -93,7 +96,12 @@ const Modal = ({
                             <Icon icon={icons.close} height={25} width={25} />
                         </button>
                     </header>
-                    <div className={contentStyles}>{children}</div>
+                    <div className={contentStyles}>
+                        {/* {type === ModalStyles.Inputs && (
+                            <div className={classes.requireText}>Fields with <StarRequire /> are required</div>
+                        )} */}
+                        {children}
+                    </div>
                     <footer className={classes.footer}>
                         <div className={classes.errorContainer}>
                             {error && (
@@ -106,7 +114,7 @@ const Modal = ({
                             <Button onClick={onClose}>
                                 {textCancel}
                             </Button>
-                            <Button style='invert' onClick={onSubmit}>
+                            <Button disabled={disabled} style='invert' onClick={onSubmit}>
                                 {textProceed}
                             </Button>
                         </div>

@@ -132,7 +132,7 @@ public class PlaceService {
             throw new PlaceNotFoundException("Place not found with ID: " + placeId);
         }
 
-        place.get().setStatus(PlaceStatus.APPROVED);
+        place.get().setStatus(PlaceStatus.ACCEPTED);
 
         return "Place was successfully approved";
     }

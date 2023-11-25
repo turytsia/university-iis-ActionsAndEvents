@@ -1,13 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react'
 import classes from "./Places.module.css"
 import Input from '../../../../components/Input/Input'
-import { AppContext } from '../../../../context/AppContextProvider'
+import { AppContext, LoadingType } from '../../../../context/AppContextProvider'
 import { SpringResponseType } from '../../../../utils/common'
 import TableView from '../../../../components/TableView/TableView'
 import Table, { TableHeaderType } from '../../../../components/Table/Table'
 import Button from '../../../../components/Button/Button'
 import CreatePlaceModal from './modals/CreatePlaceModal/CreatePlaceModal'
 import RowActions from './components/RowActions/RowActions'
+import { Icon } from '@iconify/react'
+import icons from '../../../../utils/icons'
 
 export type PlaceType = {
     id: number,
@@ -37,6 +39,7 @@ const Places = () => {
     const [isCreateActive, setIsCreateActive] = useState(false)
 
     const fetchPlaces = async () => {
+        context.setLoading(LoadingType.FETCHING)
         try {
             const response = await context.request!.get("/places")
 
@@ -52,10 +55,13 @@ const Places = () => {
             setPlaces(fulfilledResponses.map(({ data }) => data))
         } catch (error) {
             console.log(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
     const onSubmit = async (inputs: PlaceType) => {
+        context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.post("/place", {
                 ...inputs
@@ -64,6 +70,8 @@ const Places = () => {
             setIsCreateActive(false)
         } catch (error) {
             console.log(error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
         }
     }
 
@@ -88,7 +96,10 @@ const Places = () => {
                 )}
                 actions={
                     <>
-                        <Button style='invert' onClick={() => setIsCreateActive(true)}>Create place</Button>
+                        <Button style='invert' onClick={() => setIsCreateActive(true)}>
+                            <Icon icon={icons.plus} width={20} height={20} />
+                            Create place
+                        </Button>
                         {isCreateActive && (
                             <CreatePlaceModal
                                 textProceed='Create'

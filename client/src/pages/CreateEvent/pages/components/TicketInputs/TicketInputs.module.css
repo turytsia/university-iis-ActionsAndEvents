@@ -1,5 +1,5 @@
 .container {
-    display: grid;
-    grid-template-columns: repeat(5, 200px);
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
 }

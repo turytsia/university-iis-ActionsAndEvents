@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import TableView from '../../../../components/TableView/TableView'
 import Table from '../../../../components/Table/Table'
-import { AppContext } from '../../../../context/AppContextProvider'
+import { AppContext, LoadingType } from '../../../../context/AppContextProvider'
 import { SpringResponseType } from '../../../../utils/common'
 import RowActions from './components/RowActions/RowActions'
 
@@ -31,6 +31,7 @@ const Users = () => {
   const [users, setUsers] = useState<UserType[]>([])
 
   const fetchCategories = async () => {
+    context.setLoading(LoadingType.FETCHING)
     try {
       const response = await context.request!.get("/users")
 
@@ -45,6 +46,8 @@ const Users = () => {
       setUsers(fulfilledResponses.map(({ data }) => data))
     } catch (error) {
       console.error(error)
+    } finally {
+      context.setLoading(LoadingType.NONE)
     }
   }
 
@@ -65,7 +68,7 @@ const Users = () => {
             users={users}
           />
         )}
-        />
+      />
     </TableView>
   )
 }

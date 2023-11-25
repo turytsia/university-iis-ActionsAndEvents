@@ -39,3 +39,26 @@
     gap: 8px;
     align-items: center;
 }
+
+.status {
+    font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 16px;
+}
+
+.accepted{
+    
+    background-color: #5bc05c;
+    color: #ecffed;
+}
+
+.pending{
+    background-color: #EAAB35;
+    color: #FFF4E0;
+}
+
+.rejected{
+    
+    background-color: #c45a5a;
+    color: #ffecec;
+}

@@ -50,7 +50,12 @@ enum icons {
     trash = 'material-symbols:delete',
     star = 'bi:star-fill',
     manager = 'clarity:administrator-solid',
-    check = 'uil:check'
+    check = 'uil:check',
+    add = 'icon-park-outline:add',
+    dollar = 'mdi:dollar',
+    link = 'mingcute:link-line',
+    cancel = 'material-symbols:cancel-outline',
+    checkCircle = 'gg:check-o'
 }
 
 export default icons

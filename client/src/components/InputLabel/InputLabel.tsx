@@ -1,17 +1,23 @@
 import React from 'react'
 import classes from "./InputLabel.module.css"
+import StarRequire from '../StarRequire/StarRequire'
+import classNames from 'classnames'
 
 type PropsType = {
     htmlFor?: string,
     children: React.ReactNode,
     value?: string // TODO add vertical alignment
+    required?: boolean,
+    flexStart?: boolean
 }
 
 const InputLabel = ({
     htmlFor,
     children,
-    value
-}: PropsType, ref: React.Ref<HTMLDivElement>) => {
+    value,
+    required,
+    flexStart
+}: PropsType, ref: React.Ref<HTMLLabelElement>) => {
     if (!value) {
         return (
             <div>
@@ -21,10 +27,13 @@ const InputLabel = ({
     }
 
     return (
-        <div ref={ref} className={classes.container}>
-            <label htmlFor={htmlFor ?? classes.container}>{value}</label>
+        <>
+            <label ref={ref} className={classes.label} htmlFor={htmlFor ?? classes.container}>
+                {value}
+                {required && <StarRequire />}
+            </label>
             {children}
-        </div>
+        </>
     )
 }
 
