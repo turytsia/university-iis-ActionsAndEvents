@@ -54,12 +54,14 @@ const EventCard = ({
                 <h2>{event.title}</h2>
             </div>
             <div className={classes.location}>
-                <span className={classes.info}>
-                    <Popover element={<Icon icon={icons.tag} width={20} height={20} />}>
-                        Category
-                    </Popover>
-                    {event.categoryId.name}
-                </span>
+                {event.categoryId && (
+                    <span className={classes.info}>
+                        <Popover element={<Icon icon={icons.tag} width={20} height={20} />}>
+                            Category
+                        </Popover>
+                        {event.categoryId.name}
+                    </span>
+                )}
             </div>
             <div className={classes.date}>
                 <span className={classes.info}>
@@ -73,14 +75,16 @@ const EventCard = ({
                     )}
                 </span>
             </div>
-            <div className={classes.location}>
-                <span className={classes.info}>
-                    <Popover element={<Icon icon={icons.location} width={20} height={20} />}>
-                        Location
-                    </Popover>
-                    {event.placeId.name}
-                </span>
-            </div>
+            {event.placeId && (
+                <div className={classes.location}>
+                    <span className={classes.info}>
+                        <Popover element={<Icon icon={icons.location} width={20} height={20} />}>
+                            Location
+                        </Popover>
+                        {event.placeId.name}
+                    </span>
+                </div>
+            )}
             <div className={classes.actions}>
                 <Button style='invert' to={`/events/${event.id}`}>Details</Button>
             </div>
