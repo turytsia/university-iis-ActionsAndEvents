@@ -3,6 +3,7 @@ import { Outlet, useParams } from 'react-router-dom'
 import Tabs, { TabsType } from '../../components/Tabs/Tabs'
 import PageView from '../../components/PageView/PageView'
 import { AppContext } from '../../context/AppContextProvider'
+import { roles } from '../../utils/common'
 
 const EventView = () => {
   const { id } = useParams()
@@ -33,9 +34,15 @@ const EventView = () => {
       text: "Event"
     },
     ...(
-      context.user.id === authorId ? [{
+      (context.isAuth && context.user.id === authorId) ? [{
         to: "users",
         text: "Users"
+      }] : []
+    ),
+    ...(
+      (context.isAuth && context.user.role === roles.ADMIN) ? [{
+        to: "logs",
+        text: "Logs"
       }] : []
     )
   ]

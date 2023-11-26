@@ -42,9 +42,13 @@ const EventUpdateModal = ({
             onSubmit={__onSubmit}
             icon={icons.pen}
             type={ModalStyles.Inputs}
+            disabled={
+                inputs.dateFrom.length === 0 ||
+                inputs.title.length === 0
+            }
             >
-            <Input label='Title' name='title' value={inputs.title} onChange={onChange} />
-            <DateInput label='Start date' name='dateFrom' value={inputs.dateFrom} onChange={onDateChange} />
+            <Input required label='Title' name='title' value={inputs.title} onChange={onChange} />
+            <DateInput required label='Start date' name='dateFrom' value={inputs.dateFrom} onChange={onDateChange} />
             <DateInput label='End date' name='dateTo' value={inputs.dateTo} onChange={onDateChange} />
             <Textarea label='Description' name='description' value={inputs.description} onChange={onChange} />
         </Modal>

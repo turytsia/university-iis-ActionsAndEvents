@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import PageView from '../../components/PageView/PageView'
 import { useNavigate, useParams } from 'react-router-dom'
-import AppContextProvider, { AppContext, LoadingType, UserType } from '../../context/AppContextProvider'
+import AppContextProvider, { AppContext, LoadingType, UserType, timeAgo } from '../../context/AppContextProvider'
 import { EventType } from '../../utils/types'
 
 import classes from "./EventDetail.module.css"
@@ -10,7 +10,7 @@ import { Icon } from '@iconify/react'
 import icons from '../../utils/icons'
 import Textarea from '../../components/Textarea/Textarea'
 import ProfileCard from '../../components/ProfileCard/ProfileCard'
-import { SpringResponseType, formatDate } from '../../utils/common'
+import { SpringResponseType, formatDate, roles, status } from '../../utils/common'
 import { TicketType } from '../CreateEvent/pages/Tickets/modals/CreateTicketModal/CreateTicketModal'
 import Ticket from '../CreateEvent/pages/components/TicketInputs/components/Ticket/Ticket'
 import EventUpdateModal from './modals/EventUpdateModal/EventUpdateModal'
@@ -20,13 +20,18 @@ import { TicketTypeWithRegister } from '../CreateEvent/pages/Tickets/Tickets'
 import axios from 'axios'
 import styles from './EventDetail.module.css';
 import TicketInputs from '../CreateEvent/pages/components/TicketInputs/TicketInputs'
+import Stars from './components/Stars/Stars'
+import Popover from '../../components/Popover/Popover'
+import ButtonIconOnly from '../../components/ButtonIconOnly/ButtonIconOnly'
+import Comment from './components/Comment/Comment'
+import uuid from 'react-uuid'
 
 
-type CommentType = {
+export type CommentType = {
     "id": number,
     // "user": UserType,
     // "event": EventType,
-    "user": string,
+    "user": UserType,
     "date": string,
     "rating": number,
     "text": string
@@ -194,24 +199,46 @@ const EventDetail = () => {
         }
     }
 
-    const handleRatingChange = (newRating: number) => {
-        setRating(newRating)
-    }
-
     const handleCommentChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setComment(e.target.value)
     }
 
     const handleCommentSubmit = async () => {
+
         context.setLoading(LoadingType.LOADING)
         try {
-            await context.request!.post(`/event/${id}/comment`, {
+            const payload = {
                 text: comment,
                 date: new Date(),
                 rating: rating
-            })
+            }
+            const response = await context.request!.post(`/event/${id}/comment`, payload)
+
+            const newComment: CommentType = {
+                ...payload,
+                id: response.data.id,
+                date: payload.date.toISOString(),
+                user: context.user!
+            }
+
+            setComments(prev => [...prev, newComment])
         } catch (error) {
             console.error('Failed to submit comment:', error)
+        } finally {
+            context.setLoading(LoadingType.NONE)
+        }
+    }
+
+    const getTicket = async (ticket: TicketType) => {
+        context.setLoading(LoadingType.LOADING)
+        try {
+            const response = await context.request!.get(`/event/ticket/${ticket.id}/register/${context.user.id}`)
+            if (response.status === 200) {
+                setTickets(prev => prev.reduce((a, t) => [...a, (t.id === ticket.id ? { ...ticket, date: new Date().toISOString(), status: ticket.price ? status.PENDING : status.ACCEPTED }: t) ], [] as TicketTypeWithRegister[]))
+            }
+            return response
+        } catch (error) {
+            console.error(error)
         } finally {
             context.setLoading(LoadingType.NONE)
         }
@@ -230,7 +257,7 @@ const EventDetail = () => {
     return (
         <>
             <div className={classes.container}>
-                <div className={classes.preview} style={{ backgroundColor: "purple" }} />
+                <div className={classes.preview} style={{ backgroundImage: `url(${event.image})` }} />
                 <div className={classes.content}>
                     <div className={classes.header}>
                         <h2>{event.title}</h2>
@@ -266,10 +293,12 @@ const EventDetail = () => {
                     <div className={classes.section}>
                         <h3 className={classes.title}>Tickets</h3>
                         <TicketInputs
+                            event={event}
                             tickets={tickets}
                             createTicket={createTicket}
                             updateTicket={updateTicket}
                             deleteTicket={deleteTicket}
+                            getTicket={getTicket}
                             enableNewTicket={context.user.id === event.authorId}
                         />
                     </div>
@@ -279,74 +308,38 @@ const EventDetail = () => {
                     </div>
                 </div>
             </div>
-            <div className={classes.comment}>
-                {context.isAuth && (
-                    <>
-                        <h3 className={classes.title}>Comment as {context.user.email}</h3>
+            {context.isAuth && (
+                <div className={classes.comment}>
+                    <h3 className={classes.title}>Leave your feedback</h3>
+                    <div className={classes.commentInner}>
+                        <Textarea value={comment} onChange={handleCommentChange} />
+                        <Stars rating={rating} setRating={setRating} />
                         <div>
-                            <Textarea value={comment} onChange={handleCommentChange} />
-                            <div>
-                                {
-                                    [...Array(5)].map((star, i) => {
-                                        const ratingValue = i + 1;
-                                        return (
-                                            <label key={i} style={{ cursor: 'pointer' }}>
-                                                <input
-                                                    type="radio"
-                                                    value={ratingValue}
-                                                    onClick={() => handleRatingChange(ratingValue)}
-                                                    style={{ display: 'none' }}
-                                                />
-                                                <span className={ratingValue <= rating ? styles['filled-star'] : styles['empty-star']}
-                                                    style={{ fontSize: '2em' }}
-                                                >
-                                                    &#9733;
-                                                </span>
-                                            </label>
-                                        );
-                                    }
-                                    )}
-                            </div>
-                            <Button onClick={handleCommentSubmit}>Submit</Button>
+                            <Button
+                                style='invert'
+                                className={classes.btnComment}
+                                onClick={handleCommentSubmit}
+                                disabled={comment.length===0}>
+                                Submit
+                            </Button>
                         </div>
-                    </>
-                )}
-                <div>
-                    {comments.map((comment) => (
-                        <div className={classes.comment} key={comment.id}>
-                            <div className={classes.commentHeader}>
-                                <p>{formatDate(comment.date)}</p>
-                                <h4>{comment.user}</h4>
-                                <div className={classes.stars}>
-                                    {[...Array(5)].map((star, i) => {
-                                        const ratingValue = i + 1;
-                                        return (
-                                            <label key={i} style={{ cursor: 'pointer' }}>
-                                                <input
-                                                    type="radio"
-                                                    value={ratingValue}
-                                                    checked={ratingValue === comment.rating}
-                                                    readOnly
-                                                    style={{ display: 'none' }}
-                                                />
-                                                <span
-                                                    className={ratingValue <= comment.rating ? styles['filled-star'] : styles['empty-star']}
-                                                    style={{ fontSize: '2em' }}
-                                                >
-                                                    &#9733;
-                                                </span>
-                                            </label>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                            <div>
-                                <Textarea value={comment.text} readOnly />
-                            </div>
-                        </div>
-                    ))}
+                    </div>
                 </div>
-            </div>
+            )}
+            {comments.length > 0 && (
+                <div className={classes.comment}>
+                    <div>
+                        <h3 className={classes.commentsTitle}>Comments ({comments.length})</h3>
+                        {comments.map((comment) => (
+                            <Comment
+                                key={uuid()}
+                                comment={comment}
+                                setComments={setComments}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
             {isUpdateActive && (
                 <EventUpdateModal event={event} onClose={() => setIsUpdateActive(false)} onSubmit={updateEvent} />
             )}

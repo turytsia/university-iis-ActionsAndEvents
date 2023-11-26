@@ -70,3 +70,19 @@
 .accepted{
     color: #5bc05c;
 }
+
+.free{
+    color: #daffda;
+    background-color: #5bc05c;
+    border-radius: 9px;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+.unlimited {
+    color: #fad2fb;
+    background-color: #9B25A0;
+    border-radius: 9px;
+    padding: 2px 6px;
+    font-size: 12px;
+}

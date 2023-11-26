@@ -5,6 +5,7 @@ import java.util.Date;
 import com.project.actionsandevents.Event.Comment;
 import com.project.actionsandevents.Event.Event;
 import com.project.actionsandevents.User.User;
+import com.project.actionsandevents.User.responses.UserResponse;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +15,7 @@ import lombok.Setter;
 public class CommentResponse {
     private Long id;
     // private User user;
-    private String user;
+    private UserResponse user;
     // private Event event;
     private Date date;
     private int rating;
@@ -24,7 +25,7 @@ public class CommentResponse {
         this.id = comments.getId();
         // this.user = comments.getUser();
         // this.event = comments.getEvent();
-        this.user = comments.getUser().getLogin();
+        this.user = new UserResponse(comments.getUser());
         this.date = comments.getDate();
         this.rating = comments.getRating();
         this.text = comments.getText();

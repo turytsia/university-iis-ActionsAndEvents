@@ -33,9 +33,15 @@ const UserSettingsModal = ({
             onClose={onClose}
             onSubmit={__onSubmit}
             icon={icons.settings}
-            type={ModalStyles.Inputs}>
-            <Input label='Name' name='firstname' value={inputs.firstname ?? ""} onChange={onChange} />
-            <Input label='Surname' name='lastname' value={inputs.lastname ?? ""} onChange={onChange} />
+            type={ModalStyles.Inputs}
+            disabled={(
+                inputs.firstname === null ||
+                inputs.lastname === null ||
+                inputs.firstname?.length === 0 ||
+                inputs.lastname?.length === 0
+        )}>
+            <Input required label='Name' name='firstname' value={inputs.firstname ?? ""} onChange={onChange} />
+            <Input required label='Surname' name='lastname' value={inputs.lastname ?? ""} onChange={onChange} />
             <Input label='Phone' name='phone' value={inputs.phone ?? ""} onChange={onChange} />
             
         </Modal>

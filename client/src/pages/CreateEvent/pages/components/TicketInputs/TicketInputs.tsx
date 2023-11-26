@@ -5,13 +5,16 @@ import Ticket from './components/Ticket/Ticket'
 import NewTicket from './components/NewTicket/NewTicket'
 import { TicketTypeWithRegister } from '../../Tickets/Tickets'
 import uuid from 'react-uuid'
+import { EventType } from '../../../../../utils/types'
 
 type PropsType = {
     tickets: TicketTypeWithRegister[],
     createTicket: (inputs: TicketTypeWithRegister) => void
     deleteTicket: (i: number) => () => void
     updateTicket: (i: number) => (input: TicketTypeWithRegister) => void
-    enableNewTicket?: boolean
+    enableNewTicket?: boolean,
+    event?: EventType
+    getTicket?: (ticket: TicketType ) => Promise<any>
 }
 
 const TicketInputs = ({
@@ -19,12 +22,23 @@ const TicketInputs = ({
     createTicket,
     deleteTicket,
     updateTicket,
-    enableNewTicket
+    enableNewTicket,
+    event,
+    getTicket
 }: PropsType) => {
     
     return (
         <div className={classes.container}>
-            {tickets.map((ticket, i) => <Ticket key={uuid()} ticket={ticket} deleteTicket={deleteTicket(ticket.id!)} updateTicket={updateTicket(ticket.id!)} />)}
+            {tickets.map((ticket, i) => (
+                <Ticket
+                    key={uuid()}
+                    event={event}
+                    ticket={ticket}
+                    deleteTicket={deleteTicket(ticket.id!)}
+                    updateTicket={updateTicket(ticket.id!)}
+                    getTicket={getTicket}
+                />
+            ))}
             {enableNewTicket && <NewTicket createTicket={createTicket} />}
         </div>
     )

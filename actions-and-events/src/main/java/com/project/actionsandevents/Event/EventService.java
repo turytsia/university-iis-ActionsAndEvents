@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
 import com.project.actionsandevents.Event.exceptions.ManagelogNotFoundException;
+import com.project.actionsandevents.Event.exceptions.RegistrationAlreadyExists;
 import com.project.actionsandevents.Event.exceptions.DuplicateEventException;
 import com.project.actionsandevents.Event.exceptions.DuplicateRegistrationException;
 import com.project.actionsandevents.Event.exceptions.RegistrationNotFoundException;
@@ -302,7 +303,7 @@ public class EventService {
 
 
     public String registerUserForTicketType(Long ticketId, Long userId) 
-        throws TicketNotFoundException, UserNotFoundException 
+        throws TicketNotFoundException, UserNotFoundException, RegistrationAlreadyExists 
     {
         Optional<TicketType> ticketType = ticketTypeRepository.findById(ticketId);
         Optional<User> user = userRepository.findById(userId);
@@ -318,15 +319,20 @@ public class EventService {
         Optional<Registers> reg = registersRepository.findByUserAndTicketType(user.get(), ticketType.get());
 
         if (reg.isPresent()) {
-            return "User already registered for this ticket";
+            throw new RegistrationAlreadyExists("User already registered for this event");
         }
 
         Registers newRegister = new Registers();
         newRegister.setUser(user.get());
         newRegister.setTicketType(ticketType.get());
         // Registration will be completed after it is accepted by event creator
-        newRegister.setStatus(RegistersStatus.PENDING);
         newRegister.setDate(new Date());
+
+        if (ticketType.get().getPrice() == null) {
+            newRegister.setStatus(RegistersStatus.ACCEPTED);
+        } else {
+            newRegister.setStatus(RegistersStatus.PENDING);
+        }
 
         try {
             registersRepository.save(newRegister);
@@ -408,7 +414,7 @@ public class EventService {
     }
 
     // add comment
-    public String addComment(Long id, Comment comment) throws EventNotFoundException {
+    public Long addComment(Long id, Comment comment) throws EventNotFoundException {
         Optional<Event> event = eventRepository.findById(id);
 
         if (!event.isPresent()) {
@@ -416,9 +422,9 @@ public class EventService {
         }
 
         comment.setEvent(event.get());
-        commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
 
-        return "Comment was successfully added";
+        return savedComment.getId();
     }
 
     public String patchCommentById(Long id, Comment comment) throws EventNotFoundException {

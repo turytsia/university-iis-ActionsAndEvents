@@ -9,6 +9,8 @@
     border-radius: 3px 3px 0;
     height: 250px;
     box-shadow: inset 0 -20px 60px -20px rgba(0, 0, 0, 0.5);
+    background-position: center;
+    background-size: cover;
 }
 
 .header{
@@ -16,11 +18,11 @@
 }
 
 .date{
-    padding: 0 16px;
+    padding: 16px;
 }
 
 .location{
-    padding: 16px;
+    padding: 0 16px;
 }
 
 .actions{
@@ -52,4 +54,15 @@
 
 .profile:hover {
     /* background-color: #414141 !important; */
+}
+
+.dateFrom{
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background-color: #fff;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #E6A92F;
 }

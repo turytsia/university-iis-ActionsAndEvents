@@ -13,36 +13,40 @@ import { TicketTypeWithRegister } from '../../../../Tickets/Tickets'
 import { status } from '../../../../../../../utils/common'
 import Popover from '../../../../../../../components/Popover/Popover'
 import DeleteModal from '../../../../../../../modals/DeleteModal/DeleteModal'
+import { EventType } from '../../../../../../../utils/types'
 
 type PropsType = {
     ticket: TicketTypeWithRegister
     deleteTicket?: () => void,
     updateTicket?: (inputs: TicketTypeWithRegister) => void
+    event?: EventType
+    getTicket?: (ticket: TicketType) => Promise<any>
 }
 
 const Ticket = ({
-    ticket: defaultTicket,
+    ticket,
     deleteTicket,
     updateTicket,
+    event,
+    getTicket
 }: PropsType) => {
-    const [ticket, setTicket] = useState(defaultTicket)
  
     const context = useContext(AppContext)
 
     const [isActive, setIsAcitve] = useState(false)
     const [isGetActive, setIsGetActive] = useState(false)
     const [isDeleteActive, setIsDeleteActive] = useState(false)
-    const [authorId, setAuthorId] = useState<number | null>(null)
+    const [authorId, setAuthorId] = useState<number | null>(event?.authorId!)
 
-    const fetchEvent = async () => {
-        if (!ticket.eventId) return
-        try {
-            const response = await context.request!.get(`/event/${ticket.eventId}`)
-            setAuthorId(response.data.authorId)
-        } catch (error) {
-            console.error(error)
-        }
-    }
+    // const fetchEvent = async () => {
+    //     if (!ticket.eventId) return
+    //     try {
+    //         const response = await context.request!.get(`/event/${ticket.eventId}`)
+    //         setAuthorId(response.data.authorId)
+    //     } catch (error) {
+    //         console.error(error)
+    //     }
+    // }
 
     const onSubmit = (inputs: TicketTypeWithRegister) => {
         updateTicket!(inputs)
@@ -58,26 +62,18 @@ const Ticket = ({
         setIsAcitve(false)
     }
 
-    const getTicket = async () => {
-        context.setLoading(LoadingType.LOADING)
-        try {
-            const response = await context.request!.get(`/event/ticket/${ticket.id}/register/${context.user.id}`)
-            setTicket(prev => ({ ...prev, status: status.PENDING }))
+    const __getTicket = async () => {
+        const response = await getTicket!(ticket)
+        if (response?.status === 200) {
             setIsGetActive(false)
-        } catch (error) {
-            console.error(error)
-        } finally {
-            context.setLoading(LoadingType.NONE)
         }
     }
 
-    useEffect(() => {
-        fetchEvent()
-    }, [])
+    
 
-    useEffect(() => {
-        setTicket(defaultTicket)
-    }, [defaultTicket])
+    // useEffect(() => {
+    //     fetchEvent()
+    // }, [])
 
     const btnAction = (status: string) => {
         if (!ticket.id || context.user.id === authorId) {
@@ -150,16 +146,24 @@ const Ticket = ({
             </div>
             <p className={classes.description}>{ticket.description}</p>
             <div className={classes.footer}>
-                <span className={classes.price}>
-                    <Icon icon={icons.dollar} width={20} height={20} />
-                    {ticket.price}
-                </span>
-                <span className={classes.capacity}>
-                    <Popover element={<Icon icon={icons.users} width={20} height={20} />}>
-                        Capacity
-                    </Popover>
-                    {ticket.capacity}
-                </span>
+                {ticket.price ? (
+                    <span className={classes.price}>
+                        <Icon icon={icons.dollar} width={20} height={20} />
+                        {ticket.price}
+                    </span>
+                ) : (
+                        <span className={classes.free}>Free</span>
+                )}
+                {ticket.capacity ? (
+                    <span className={classes.capacity}>
+                        <Popover element={<Icon icon={icons.users} width={20} height={20} />}>
+                            Capacity
+                        </Popover>
+                        {ticket.capacity}
+                    </span>
+                ) : (
+                        <span className={classes.unlimited}>Unlimited</span>
+                )}
             </div>
             <div>
 
@@ -179,7 +183,7 @@ const Ticket = ({
                 />
             )}
             {isGetActive && (
-                <ConfirmTicketModal onSubmit={getTicket} onClose={() => setIsGetActive(false)} ticketName={ticket.name} eventName={'...'} />
+                <ConfirmTicketModal onSubmit={__getTicket} onClose={() => setIsGetActive(false)} ticketName={ticket.name} eventName={'...'} />
             )}
             {isDeleteActive && (
                 <DeleteModal title={`Delete ticket "${ticket.name}"?`} onSubmit={submitDeletion} onClose={() => setIsDeleteActive(false)} />

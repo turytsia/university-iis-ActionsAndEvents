@@ -22,6 +22,9 @@ import ButtonIconOnly from '../../../../components/ButtonIconOnly/ButtonIconOnly
 import icons from '../../../../utils/icons'
 import CreateCategoryModal, { CategoryInput } from '../../../Admin/pages/Categories/modals/CreateCategoryModal/CreateCategoryModal'
 import CreatePlaceModal from '../../../Admin/pages/Places/modals/CreatePlaceModal/CreatePlaceModal'
+import Popover from '../../../../components/Popover/Popover'
+
+import images from "./images.json"
 
 const initialInputs = {
     title: "",
@@ -46,10 +49,12 @@ const isTicketsEmpty = (tickets: TicketTypeWithRegister[]): boolean => {
     if (tickets.length === 0) return true
 
     return tickets.some(ticket => (
-        ticket.name.length === 0 ||
-        ticket.price.length === 0 ||
-        ticket.capacity.length === 0
+        ticket.name.length === 0
     ))
+}
+
+const getRandomImage = () => {
+    return images[Math.round(Math.random() * images.length)]
 }
 
 const CreateEventForm = () => {
@@ -133,8 +138,9 @@ const CreateEventForm = () => {
                 "description": inputs.title,
                 "dateFrom": inputs.dateFrom,
                 "dateTo": inputs.dateTo,
-                "category": categories.find(({ id }) => id === Number(inputs.category)),
-                "place": places.find(({ id }) => id === Number(inputs.place)),
+                "categoryId": Number(inputs.category),
+                "placeId": Number(inputs.place),
+                "image": getRandomImage()
             })
 
             const eventId = response.data.eventId
@@ -157,8 +163,10 @@ const CreateEventForm = () => {
             const response = await context.request!.post("/category", {
                 ...inputs
             })
-            setCategories(prev => [...prev, { id: response.data.categoryId, ...inputs } as CategoryType])
-            setIsNewCategoryActive(false)
+            if (response.status === 200) {
+                setCategories(prev => [...prev, { id: response.data.categoryId, ...inputs } as CategoryType])
+                setIsNewCategoryActive(false)
+            }
         } catch (error) {
             console.error(error)
         } finally {
@@ -172,8 +180,10 @@ const CreateEventForm = () => {
             const response = await context.request!.post("/place", {
                 ...inputs
             })
-            setPlaces(prev => [...prev, { ...inputs, id: response.data.placeId }])
-            setIsNewPlaceActive(false)
+            if (response.status === 200) {
+                setPlaces(prev => [...prev, { ...inputs, id: response.data.placeId }])
+                setIsNewPlaceActive(false)
+            }
         } catch (error) {
             console.error(error)
         } finally {
@@ -208,7 +218,11 @@ const CreateEventForm = () => {
                     items={categoriesToDropdown(categories)}
                     onChange={onDropdownChange}
                     actions={
-                        <ButtonIconOnly icon={icons.plus} onClick={() => setIsNewCategoryActive(true)} />
+                        <Popover element={
+                            <ButtonIconOnly icon={icons.plus} onClick={() => setIsNewCategoryActive(true)} />
+                        }>
+                            Create new category
+                        </Popover>
                     }
                 />
             </InputLabel>
@@ -221,7 +235,11 @@ const CreateEventForm = () => {
                     items={placesToDropdown(places)}
                     onChange={onDropdownChange}
                     actions={
-                        <ButtonIconOnly icon={icons.plus} onClick={() => setIsNewPlaceActive(true)} />
+                        <Popover element={
+                            <ButtonIconOnly icon={icons.plus} onClick={() => setIsNewPlaceActive(true)} />
+                        }>
+                            Create new place
+                        </Popover>
                     }
                 />
             </InputLabel>

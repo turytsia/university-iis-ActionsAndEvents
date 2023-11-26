@@ -47,7 +47,7 @@ const CreateCategoryModal = ({
     }
 
     const onDropdownChange = (value: string | number, name: string) => {
-        setInputs(prev => ({ ...prev, parentCategory: +value }))
+        setInputs(prev => ({ ...prev, parentCategory: value === null ? value : +value }))
     }
 
     const __onSubmit = () => {

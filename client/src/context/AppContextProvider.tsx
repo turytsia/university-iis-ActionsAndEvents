@@ -5,6 +5,15 @@ import Loading from '../components/Loading/Loading'
 import { useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
 
+import TimeAgo from 'javascript-time-ago'
+
+// English.
+import en from 'javascript-time-ago/locale/en'
+
+TimeAgo.addDefaultLocale(en)
+
+export const timeAgo = new TimeAgo('en-US')
+
 type PropsType = {
   children: React.ReactNode
 }

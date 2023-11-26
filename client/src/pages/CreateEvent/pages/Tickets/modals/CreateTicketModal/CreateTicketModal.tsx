@@ -53,9 +53,7 @@ const CreateTicketModal = ({
     }
 
     const isDisabled = (
-        inputs.name.length === 0 ||
-        inputs.price.length === 0 ||
-        inputs.capacity.length === 0
+        inputs.name.length === 0
     )
 
     return (
@@ -69,8 +67,8 @@ const CreateTicketModal = ({
             disabled={isDisabled}
         type={ModalStyles.Inputs}>
             <Input required label='Name' name='name' value={inputs.name} onChange={onChange} />
-            <Input required label='Price' name='price' value={inputs.price} min={0} type='number' onChange={onChange} />
-            <Input required label='Capacity' name='capacity' value={inputs.capacity} min={1} type='number' onChange={onChange} />
+            <Input label='Price' name='price' value={inputs.price} min={0} type='number' onChange={onChange} />
+            <Input label='Capacity' name='capacity' value={inputs.capacity} min={1} type='number' onChange={onChange} />
             <Textarea label='Description' name='description' value={inputs.description} onChange={onChange} />
         </Modal>
     )

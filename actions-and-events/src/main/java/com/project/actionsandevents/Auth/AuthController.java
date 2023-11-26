@@ -46,7 +46,7 @@ public class AuthController {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .orElse("Validation failed");
 
-            return ResponseEntity.badRequest().body(new UserPostResponse(null, firstErrorMessage, ResponseMessage.Status.ERROR));
+            return ResponseEntity.badRequest().body(new ResponseMessage(firstErrorMessage, ResponseMessage.Status.ERROR));
         }
 
         try {
@@ -55,8 +55,7 @@ public class AuthController {
                 new UserPostResponse(userId,
                         "User was successfully registered", ResponseMessage.Status.SUCCESS));
         } catch (DuplicateUserException ex) {
-            return ResponseEntity.badRequest().body(new UserPostResponse(null,
-                    ex.getMessage(), ResponseMessage.Status.ERROR));
+            return ResponseEntity.badRequest().body(new ResponseMessage(ex.getMessage(), ResponseMessage.Status.ERROR));
         }
     }
 

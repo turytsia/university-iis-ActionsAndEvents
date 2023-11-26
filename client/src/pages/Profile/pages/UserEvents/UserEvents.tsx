@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { AppContext, LoadingType } from '../../../../context/AppContextProvider'
 
 import classes from "./UserEvents.module.css"
-import EventCard from '../../../Events/components/EventCard/EventCard'
+import EventCard, { EventTypeFull } from '../../../Events/components/EventCard/EventCard'
 import { EventType } from '../../../../utils/types'
 
 const UserEvents = () => {
@@ -12,7 +12,7 @@ const UserEvents = () => {
 
   const context = useContext(AppContext)
 
-  const [events,setEvents] = useState<EventType[]>([])
+  const [events,setEvents] = useState<EventTypeFull[]>([])
   const fetchEvents = async () => {
     context.setLoading(LoadingType.FETCHING)
     try {

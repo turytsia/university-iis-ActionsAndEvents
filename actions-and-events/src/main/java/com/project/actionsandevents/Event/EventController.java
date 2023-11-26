@@ -5,6 +5,8 @@
  */
 package com.project.actionsandevents.Event;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,23 +15,33 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.project.actionsandevents.Category.Category;
+import com.project.actionsandevents.Category.CategoryService;
+import com.project.actionsandevents.Category.exceptions.CategoryNotFoundException;
 import com.project.actionsandevents.Event.exceptions.DuplicateEventException;
 import com.project.actionsandevents.Event.exceptions.DuplicateRegistrationException;
 import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
 import com.project.actionsandevents.Event.exceptions.ManagelogNotFoundException;
+import com.project.actionsandevents.Event.exceptions.RegistrationAlreadyExists;
 import com.project.actionsandevents.Event.exceptions.RegistrationNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
 
 import com.project.actionsandevents.Event.requests.EventPatchRequest;
-
+import com.project.actionsandevents.Event.requests.EventPostRequest;
 import com.project.actionsandevents.Event.responses.EventResponse;
 import com.project.actionsandevents.Event.responses.EventsResponse;
 import com.project.actionsandevents.Event.responses.RegisterListResponse;
 import com.project.actionsandevents.Event.responses.TicketResponse;
 import com.project.actionsandevents.Event.responses.TicketsResponse;
+import com.project.actionsandevents.Place.Place;
+import com.project.actionsandevents.Place.PlaceService;
+import com.project.actionsandevents.Place.exceptions.PlaceNotFoundException;
+import com.project.actionsandevents.Event.responses.CommentPostResponse;
 import com.project.actionsandevents.Event.responses.CommentResponse;
 import com.project.actionsandevents.Event.responses.CommentsResponse;
+import com.project.actionsandevents.Event.responses.EventLogResponse;
+import com.project.actionsandevents.Event.responses.EventLogsResponse;
 import com.project.actionsandevents.Event.responses.EventPostResponse;
 
 import com.project.actionsandevents.User.UserInfoDetails;
@@ -50,6 +62,15 @@ public class EventController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private PlaceService placeService;
+
     private boolean hasElevatedPrivileges(Authentication authentication) {
 
         for (GrantedAuthority auth : authentication.getAuthorities()) {
@@ -68,6 +89,15 @@ public class EventController {
         UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
 
         boolean isAuthor = userDetails.getId() == event.getAuthor().getId();
+
+        return isAuthor || hasElevatedPrivileges(authentication);
+    }
+
+    private boolean hasPrivilegesOnComment(Authentication authentication, Comment comment) {
+        // Among regular users only author of the event can modify it or its tickets
+        UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
+
+        boolean isAuthor = userDetails.getId() == comment.getUser().getId();
 
         return isAuthor || hasElevatedPrivileges(authentication);
     }
@@ -120,31 +150,54 @@ public class EventController {
     @PostMapping("/event")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> addEvent(
-            @Valid @RequestBody Event event,
+            @Valid @RequestBody EventPostRequest event,
             BindingResult bindingResult,
             Authentication authentication) 
     {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(new EventPostResponse(null,
+            return ResponseEntity.badRequest().body(new ResponseMessage(
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
         UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
 
         try {
+            if (event.getDateFrom().getTime() < new Date().getTime()) {
+                return ResponseEntity.badRequest()
+                        .body(new ResponseMessage("You cannot set start date as today or in the past", ResponseMessage.Status.ERROR));
+            }
+            
+            if (event.getDateTo() != null && event.getDateFrom().getTime() > event.getDateTo().getTime()) {
+                return ResponseEntity.badRequest().body(new ResponseMessage("Start date cannot be greater than end date", ResponseMessage.Status.ERROR));
+            }
+
             User author = userService.getUserById(userDetails.getId());
-            event.setAuthor(author);
+
+            Category category = categoryService.getCategoryById(event.getCategoryId());
+
+            Place place = placeService.getPlaceById(event.getPlaceId());
+
+            Event newEvent = new Event();
+
+            newEvent.setTitle(event.getTitle());
+            newEvent.setDescription(event.getDescription());
+            newEvent.setDateFrom(event.getDateFrom());
+            newEvent.setDateTo(event.getDateTo());
+            newEvent.setImage(event.getImage());
+            newEvent.setPlace(place);
+            newEvent.setCategory(category);
+            newEvent.setAuthor(author);
 
             if (author.getRoles().equals("ROLE_USER")) {
-                event.setStatus(EventStatus.PENDING);
+                newEvent.setStatus(EventStatus.PENDING);
             } else {
-                event.setStatus(EventStatus.ACCEPTED);
+                newEvent.setStatus(EventStatus.ACCEPTED);
             }
 
             return ResponseEntity.ok(
-                new EventPostResponse(eventService.addEvent(event),
+                new EventPostResponse(eventService.addEvent(newEvent),
                                 "Event was successfully added", ResponseMessage.Status.SUCCESS));
-        } catch (UserNotFoundException | DuplicateEventException ex) {
+        } catch (UserNotFoundException | DuplicateEventException | CategoryNotFoundException | PlaceNotFoundException ex) {
             return ResponseEntity.badRequest().body(new EventPostResponse(null,
                     ex.getMessage(), ResponseMessage.Status.ERROR));
         }
@@ -204,13 +257,23 @@ public class EventController {
                     "Validation failed: " + bindingResult.getAllErrors(), ResponseMessage.Status.ERROR));
         }
 
+        
+
         UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
 
         try {
+            if (commentRepository.findCommentByEventAndUser(eventService.getEventById(id), userService.getUserById(userDetails.getId())).size() != 0) {
+                return ResponseEntity.badRequest().body(new ResponseMessage("User can only leave 1 feedback", ResponseMessage.Status.ERROR));
+            }
+
             comment.setUser(userService.getUserById(userDetails.getId()));
-        
-            return ResponseEntity
-                    .ok(new ResponseMessage(eventService.addComment(id, comment), ResponseMessage.Status.SUCCESS));
+
+            Long commentId = eventService.addComment(id, comment);
+
+            ResponseMessage message = new ResponseMessage("Comment was successfuly created",
+                    ResponseMessage.Status.SUCCESS);
+
+            return ResponseEntity.ok(new CommentPostResponse(commentId, message));
         } catch (UserNotFoundException | EventNotFoundException ex) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     ex.getMessage(), ResponseMessage.Status.ERROR));
@@ -218,6 +281,7 @@ public class EventController {
     }
 
     @PatchMapping("/event/comment/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> patchEventCommentById(
             @PathVariable Long id,
             @Valid @RequestBody Comment comment,
@@ -230,7 +294,7 @@ public class EventController {
         }
 
         try {
-            if (!hasPrivilegesOnEvent(authentication, eventService.getCommentById(id).getEvent())) {
+            if (!hasPrivilegesOnComment(authentication, eventService.getCommentById(id))) {
                 return ResponseEntity.badRequest().body(new ResponseMessage(
                         "You are not allowed to patch this comment", ResponseMessage.Status.ERROR));
             }
@@ -372,7 +436,7 @@ public class EventController {
             return ResponseEntity.ok(
                     new ResponseMessage(eventService.registerUserForTicketType(id, userId),
                             ResponseMessage.Status.SUCCESS));
-        } catch (TicketNotFoundException | UserNotFoundException ex) {
+        } catch (TicketNotFoundException | UserNotFoundException | RegistrationAlreadyExists ex) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     ex.getMessage(), ResponseMessage.Status.ERROR));
         }
@@ -455,7 +519,7 @@ public class EventController {
     public ResponseEntity<Object> getEventLogs(@PathVariable Long id, Authentication authentication)
     {
         try {
-            return ResponseEntity.ok(eventService.getEventLogs(id));
+            return ResponseEntity.ok(new EventLogsResponse(eventService.getEventLogs(id)));
         } catch (EventNotFoundException ex) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     ex.getMessage(), ResponseMessage.Status.ERROR));
@@ -469,7 +533,7 @@ public class EventController {
             throws EventLogNotFoundException 
     {
         try {
-            return ResponseEntity.ok(eventService.getEventLogById(id));
+            return ResponseEntity.ok(new EventLogResponse(eventService.getEventLogById(id)));
         } catch (EventLogNotFoundException ex) {
             return ResponseEntity.badRequest().body(new ResponseMessage(
                     ex.getMessage(), ResponseMessage.Status.ERROR));

@@ -55,7 +55,8 @@ enum icons {
     dollar = 'mdi:dollar',
     link = 'mingcute:link-line',
     cancel = 'material-symbols:cancel-outline',
-    checkCircle = 'gg:check-o'
+    checkCircle = 'gg:check-o',
+    tag = 'material-symbols:tag'
 }
 
 export default icons

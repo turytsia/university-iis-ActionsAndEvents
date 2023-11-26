@@ -1,6 +1,7 @@
 import React from 'react'
 import classes from "./Textarea.module.css"
 import InputLabel from '../InputLabel/InputLabel'
+import uuid from 'react-uuid'
 
 type PropsType = {
     value: string,
@@ -17,10 +18,11 @@ const Textarea = ({
     name,
     readOnly
 }: PropsType) => {
-  return (
-      <InputLabel htmlFor={classes.input} value={label}>
+    const id = uuid()
+    return (
+        <InputLabel htmlFor={id} value={label}>
           <textarea
-              id={classes.input}
+                id={id}
               name={name}
               value={value}
               onChange={onChange}

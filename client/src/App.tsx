@@ -11,7 +11,6 @@ import Admin from './pages/Admin/Admin';
 import Container from './components/Container/Container';
 import Categories from './pages/Admin/pages/Categories/Categories';
 import Users from './pages/Admin/pages/Users/Users';
-import Managers from './pages/Admin/pages/Managers/Managers';
 import Places from './pages/Admin/pages/Places/Places';
 import Profile from './pages/Profile/Profile';
 import User from './pages/Profile/pages/User/User';
@@ -29,6 +28,8 @@ import EventDetail from './pages/EventDetail/EventDetail';
 import EventUsers from './pages/EventUsers/EventUsers';
 import EventView from './pages/EventView/EventView';
 import { ToastContainer } from 'react-toastify';
+import Logs from './pages/Admin/pages/Logs/Logs';
+import EventLogs from './pages/EventView/Pages/EventLogs/EventLogs';
 
 function App() {
 
@@ -44,19 +45,27 @@ function App() {
             <Route path="/events/:id" element={<EventView />}>
               <Route index element={<EventDetail />} />
               <Route path="users" element={<EventUsers />} />
+              {
+                (context.isAuth && context.user.role === roles.ADMIN) && (
+                  <Route path="logs" element={<EventLogs />} />
+                )
+              }
             </Route>
             <Route path="profile/:id" element={<Profile />}>
               <Route path="" element={<User />} />
               <Route path="events" element={<UserEvents />} />
             </Route>
             {
-              (context.isAuth && context.user && context.user.role === roles.ADMIN) && (
+              (context.isAuth && context.user && context.user.role !== roles.USER) && (
                 <>
                   <Route path="admin" element={<Admin />} >
                     <Route path="" element={<AdminEvents />} />
                     <Route path="categories" element={<Categories />} />
                     <Route path="places" element={<Places />} />
                     <Route path="users" element={<Users />} />
+                    {context.user.role === roles.ADMIN && (
+                      <Route path="logs" element={<Logs />} />
+                    )}
                   </Route>
                 </>
               )

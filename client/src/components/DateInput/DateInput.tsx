@@ -4,6 +4,7 @@ import ReactDatePicker from 'react-datepicker'
 import classes from "./DateInput.module.css"
 import InputLabel from '../InputLabel/InputLabel'
 import { formatDate } from '../../utils/common'
+import uuid from 'react-uuid'
 
 export type DateChangeType = (name: string, date: Date | null) => void
 
@@ -23,15 +24,16 @@ const DateInput = ({
     required
 }: PropsType) => {
     const ref = useRef<HTMLInputElement>(null)
+    const id = uuid()
     const onChange = (date: Date | null, event: SyntheticEvent<any, Event> | undefined) => {
         __onChange(name, date)
     }
   return (
-      <InputLabel required={required} htmlFor={classes.input} value={label}>
+      <InputLabel required={required} htmlFor={id} value={label}>
           <div style={{ position: 'relative' }}>
               <input ref={ref} style={{ display: "none" }} />
               <ReactDatePicker
-                  id={classes.input}
+                  id={id}
                   name={name}
                   value={formatDate(value)}
                   onChange={onChange}

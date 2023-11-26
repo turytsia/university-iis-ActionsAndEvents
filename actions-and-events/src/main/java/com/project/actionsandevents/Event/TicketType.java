@@ -32,11 +32,9 @@ public class TicketType {
     private String name;
 
     @Range(min = 0, max = 1000000)
-    @Column(nullable = false)
     private Float price;
 
     @Range(min = 0, max = 1000000)
-    @Column(nullable = false)
     private Long capacity;
 
     @Column

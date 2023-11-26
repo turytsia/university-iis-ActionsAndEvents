@@ -22,7 +22,7 @@ const Menu = ({
           {context.isAuth && (
               <Button alignLeft to="/tickets">My tickets</Button>
           )}
-          {(context.isAuth && context.user && context.user.role === roles.ADMIN) && (
+          {(context.isAuth && context.user && context.user.role !== roles.USER) && (
               <>
                   <Button alignLeft to="/admin">Admin</Button>
               </>

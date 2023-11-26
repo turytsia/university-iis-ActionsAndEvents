@@ -2,6 +2,7 @@ import React from 'react'
 import classes from "./Input.module.css"
 import InputLabel from '../InputLabel/InputLabel'
 import classNames from 'classnames'
+import uuid from 'react-uuid'
 
 type PropsType = {
     value: string,
@@ -29,11 +30,12 @@ const Input = ({
     min
 
 }: PropsType) => {
+    const id = uuid()
     return (
-        <InputLabel required={required} htmlFor={classes.input} value={label}>
+        <InputLabel required={required} htmlFor={id} value={label}>
             <input
                 min={min}
-                id={classes.input}
+                id={id}
                 name={name}
                 type={type}
                 value={value}

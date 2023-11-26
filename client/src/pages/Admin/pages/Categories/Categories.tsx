@@ -46,8 +46,10 @@ const Categories = () => {
             const response = await context.request!.post("/category", {
                 ...inputs
             })
-            setCategories(prev => [...prev, { id: response.data.categoryId, ...inputs } as CategoryType])
-            setIsCreateActive(false)
+            if (response.status === 200) {
+                setCategories(prev => [...prev, { id: response.data.categoryId, ...inputs } as CategoryType])
+                setIsCreateActive(false)
+            }
         } catch (error) {
             console.error(error)
         } finally {

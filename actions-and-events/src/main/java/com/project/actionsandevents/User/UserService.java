@@ -111,11 +111,20 @@ public class UserService implements UserDetailsService {
             throw new UserNotFoundException("User with ID " + id + " not found");
         }
 
-        userRepository.deleteById(id);
-
         Optional<User> admin = userRepository.findById(adminId);
+        if(!admin.isPresent()){
+            throw new UserNotFoundException("Admin with id " + adminId + " was not found");
+        }
+
         Optional<User> user = userRepository.findById(id);
-        addAdministersLog(admin.get(), user.get().getLogin(), "User deleted");
+        if (!user.isPresent()) {
+            throw new UserNotFoundException("User with id " + id + " was not found");
+        }
+        
+
+        addAdministersLog(admin.get(), user.get().getLogin(), "User \"" + user.get().getLogin() + "\" deleted");
+
+        userRepository.deleteById(id);
     }
 
     /**
