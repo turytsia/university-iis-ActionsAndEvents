@@ -71,6 +71,10 @@ public class SecurityConfig {
                                         "/user/{id}",
                                         "/user/{id}/events",
                                         "/event/{id}/comments",
+                                        "/categories",
+                                        "/category/**",
+                                        "/places",
+                                        "/place/**",
                                         "/event/comment/{id}")
                                 .permitAll()
                                 .anyRequest()

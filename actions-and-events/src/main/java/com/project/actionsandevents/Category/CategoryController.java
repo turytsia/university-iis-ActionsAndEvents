@@ -57,7 +57,6 @@ public class CategoryController {
     }
 
     @GetMapping("/categories")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getCategoryIds(Authentication authentication) {
         return ResponseEntity.ok(new CategoriesResponse(categoryService.getCategoryIds()));
     }

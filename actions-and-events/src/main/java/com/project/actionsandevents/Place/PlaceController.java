@@ -54,7 +54,6 @@ public class PlaceController {
     }
 
     @GetMapping("/places")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> getPlaceIds(Authentication authentication) {
         return ResponseEntity.ok(new PlacesResponse(placeService.getPlaceIds()));
     }
