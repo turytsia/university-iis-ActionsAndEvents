@@ -113,6 +113,7 @@ const AppContextProvider = ({ children }: PropsType) => {
   }
 
   const register = async (login: string, email: string, password: string, role: roles) => {
+    setLoading(LoadingType.LOADING)
     try {
       const response = await request.post<typeof initialUser>("/auth/register", {
         ...initialUser,
@@ -128,10 +129,13 @@ const AppContextProvider = ({ children }: PropsType) => {
       // localStorage.setItem("user", JSON.stringify(response.data))
     } catch (error) {
       setUser(initialUser)
+    } finally {
+      setLoading(LoadingType.NONE)
     }
   }
 
   const login = async (login: string, password: string) => {
+    setLoading(LoadingType.LOADING)
     try {
       const response = await request.post<{ token: string }>("/auth/login", {
         login,
@@ -142,6 +146,8 @@ const AppContextProvider = ({ children }: PropsType) => {
       localStorage.setItem("user", JSON.stringify(response.data.token))
     } catch (error) {
       logout()
+    } finally {
+      setLoading(LoadingType.NONE)
     }
   }
 
