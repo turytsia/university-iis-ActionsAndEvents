@@ -296,7 +296,7 @@ public class EventService {
         // Registration will be completed after it is accepted by event creator
         newRegister.setDate(new Date());
 
-        if (ticketType.get().getPrice() == null) {
+        if (ticketType.get().getPrice() == null || ticketType.get().getPrice() == 0) {
             newRegister.setStatus(RegistersStatus.ACCEPTED);
         } else {
             newRegister.setStatus(RegistersStatus.PENDING);
