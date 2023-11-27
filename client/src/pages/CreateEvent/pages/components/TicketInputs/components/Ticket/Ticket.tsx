@@ -130,7 +130,7 @@ const Ticket = ({
                 </>
             default:
                 return (
-                    <Button style='invert' onClick={() => setIsGetActive(true)}>Get</Button>
+                    <Button style='invert' disabled={!context.isAuth} onClick={() => setIsGetActive(true)}>Get</Button>
                 )
         }
     }
