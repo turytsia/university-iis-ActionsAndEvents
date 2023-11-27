@@ -88,7 +88,7 @@ const AppContextProvider = ({ children }: PropsType) => {
 
   const request = useMemo(
     () => axios.create({
-      baseURL: 'https://actions-and-events.azurewebsites.net',
+      baseURL: 'http://localhost:8080',
       headers: token ? {
         "Authorization": `Bearer ${token}`
       } : {}
