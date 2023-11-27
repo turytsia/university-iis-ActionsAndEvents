@@ -1,7 +1,6 @@
 /**
- * This file contains class that represents Category in SQL database.
- *
  * @author Aleksandr Shevchenko (xshevc01)
+ * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.Category;
 
@@ -46,7 +45,6 @@ public class Category {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CategoryStatus status;
-
 
     // Delete all child categories when parent category is deleted
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)

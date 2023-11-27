@@ -1,3 +1,6 @@
+/**
+ * @author Vadim Goncearenco (xgonce00)
+ */
 package com.project.actionsandevents.Place;
 
 import com.fasterxml.jackson.annotation.JsonValue;

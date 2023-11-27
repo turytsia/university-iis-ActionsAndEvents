@@ -1,3 +1,6 @@
+/**
+ * @author Oleksandr Turytsia (xturyt00)
+ */
 package com.project.actionsandevents.config;
 
 import org.springframework.http.HttpStatus;

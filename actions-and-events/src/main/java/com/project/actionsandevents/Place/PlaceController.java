@@ -1,7 +1,6 @@
 /**
- * This file contains class that implements place controller.
- *
  * @author Aleksandr Shevchenko (xshevc01)
+ * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.Place;
 
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.actionsandevents.Place.exceptions.PlaceNotFoundException;
-import com.project.actionsandevents.Category.CategoryStatus;
 import com.project.actionsandevents.Place.exceptions.DuplicatePlaceException;
 
 import com.project.actionsandevents.Place.requests.PlacePatchRequest;

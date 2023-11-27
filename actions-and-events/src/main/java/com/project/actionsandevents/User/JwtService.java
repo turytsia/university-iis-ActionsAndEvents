@@ -31,12 +31,6 @@ public class JwtService {
   
     public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
-    /**
-     * TODO нахуя здесь функция которая похожа на следующую - я не придумал решение получше
-     * 
-     * @param userName
-     * @return
-     */
     public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userName);

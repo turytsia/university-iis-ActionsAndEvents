@@ -1,3 +1,6 @@
+/**
+ * @author Aleksandr Shevchenko (xshevc01)
+ */
 package com.project.actionsandevents.Place.responses;
 
 import lombok.Getter;

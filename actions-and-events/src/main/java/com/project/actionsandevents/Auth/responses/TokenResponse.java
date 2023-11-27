@@ -1,3 +1,6 @@
+/**
+ * @author Oleksandr Turytsia (xturyt00)
+ */
 package com.project.actionsandevents.Auth.responses;
 
 import lombok.Getter;

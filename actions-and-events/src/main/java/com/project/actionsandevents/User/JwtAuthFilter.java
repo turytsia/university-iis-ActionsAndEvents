@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.actionsandevents.common.ResponseMessage;
 import com.project.actionsandevents.common.ResponseMessage.Status;
 
 import java.io.IOException;

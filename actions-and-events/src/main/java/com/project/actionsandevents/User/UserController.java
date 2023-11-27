@@ -2,6 +2,7 @@
  * This file contains class that implements user controller.
  *
  * @author Oleksandr Turytsia (xturyt00)
+ * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.User;
 

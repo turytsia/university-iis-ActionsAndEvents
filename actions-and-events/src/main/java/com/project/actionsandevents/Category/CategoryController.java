@@ -1,7 +1,6 @@
 /**
- * This file contains class that implements category controller.
- *
  * @author Aleksandr Shevchenko (xshevc01)
+ * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.Category;
 
@@ -27,11 +26,12 @@ import com.project.actionsandevents.Category.requests.CategoryPostRequest;
 import com.project.actionsandevents.Category.responses.CategoriesResponse;
 import com.project.actionsandevents.Category.responses.CategoryPostResponse;
 import com.project.actionsandevents.Category.responses.CategoryResponse;
-import com.project.actionsandevents.Event.EventStatus;
+
 import com.project.actionsandevents.User.User;
 import com.project.actionsandevents.User.UserInfoDetails;
 import com.project.actionsandevents.User.UserService;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
+
 import com.project.actionsandevents.common.ResponseMessage;
 
 import jakarta.validation.Valid;

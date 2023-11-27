@@ -1,3 +1,6 @@
+/**
+ * @author Vadim Goncearenco (xgonce00)
+ */
 package com.project.actionsandevents.Event.requests;
 
 import java.util.Date;
@@ -33,9 +36,6 @@ public class EventPostRequest {
     private Long categoryId;
 
     private Long placeId;
-
-    // private Place place;
-    // private Set<Category> categories;
 
     private EventStatus status;
 }

@@ -1,9 +1,6 @@
 /**
- * This file contains class that implements AdministersRepository class.
- *
  * @author Vadim Goncearenco (xgonce00)
  */
-
 package com.project.actionsandevents.Administers;
 
 import java.util.List;

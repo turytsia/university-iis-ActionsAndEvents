@@ -2,6 +2,7 @@
  * This file contains class that represents User in SQL database.
  *
  * @author Oleksandr Turytsia (xturyt00)
+ * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.User;
 
@@ -9,7 +10,6 @@ import java.util.Set;
 
 import org.hibernate.validator.constraints.Length;
 
-import com.project.actionsandevents.Administers.Administers;
 import com.project.actionsandevents.Event.Event;
 
 import jakarta.persistence.CascadeType;
@@ -37,9 +37,6 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    // @OneToMany(mappedBy = "user")
-    // private Set<Administers> administrators;
-
     @NotBlank(message = "Login is mandatory")
     
     @Column(nullable = false, unique = true)
@@ -65,7 +62,6 @@ public class User {
     private String password;
 
     private String roles;
-
 
     // Delete all events when user is deleted
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)

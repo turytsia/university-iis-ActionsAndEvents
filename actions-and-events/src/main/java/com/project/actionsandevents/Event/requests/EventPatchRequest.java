@@ -1,10 +1,10 @@
+/**
+ * @author Vadim Goncearenco (xgonce00)
+ */
 package com.project.actionsandevents.Event.requests;
 
 import java.util.Date;
-// import java.util.Set;
 
-// import com.project.actionsandevents.Category.Category;
-// import com.project.actionsandevents.Place.Place;
 import com.project.actionsandevents.Event.EventStatus;
 
 import jakarta.persistence.Temporal;
@@ -32,9 +32,6 @@ public class EventPatchRequest {
     private String icon;
 
     private String image;
-
-    // private Place place;
-    // private Set<Category> categories;
 
     private EventStatus status;
 }

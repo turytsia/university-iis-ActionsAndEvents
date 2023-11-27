@@ -1,9 +1,6 @@
 /**
- * This file contains class that implements Administers class.
- *
  * @author Vadim Goncearenco (xgonce00)
  */
-
 package com.project.actionsandevents.Administers;
 
 import jakarta.persistence.Column;
@@ -38,9 +35,6 @@ public class Administers {
     @ManyToOne
     private User admin;
     
-    // @ManyToOne
-    // private User user;
-
     @NotNull(message = "User login cannot be null")
     private String userLogin;
 
@@ -53,7 +47,6 @@ public class Administers {
 
     public Administers(User admin, String userLogin, String text) {
         this.admin = admin;
-        // this.user = user;
         this.userLogin = userLogin;
         this.date = new Date();
         this.text = text;

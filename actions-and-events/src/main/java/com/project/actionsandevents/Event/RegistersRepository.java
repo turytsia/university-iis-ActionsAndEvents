@@ -1,6 +1,4 @@
 /**
- * This file contains class that implements RegistersRepository class.
- *
  * @author Vadim Goncearenco (xgonce00)
  */
 
@@ -27,15 +25,4 @@ public interface RegistersRepository extends JpaRepository<Registers, Long> {
     List<Long> findAllIdsByTicketType(TicketType ticketType);
 
     Optional<Registers> findByUserAndTicketType(User user, TicketType ticketType);
-
-
-    // List<Registers> findByTicketType(TicketType ticketType);
-
-
-
-    // @Query("SELECT new RegistersId(r.user, r.ticketType) FROM Registers r WHERE r.ticketType = ?1")
-    // List<RegistersId> findAllIdsByTicketType(TicketType ticketType);
-
-    // @Query("SELECT r.user, r.ticketType FROM Registers r WHERE r.ticketType = ?1")
-    // List<Object[]> findAllIdsByTicketType(TicketType ticketType);
 }

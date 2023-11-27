@@ -1,3 +1,6 @@
+/**
+ * @author Oleksandr Turytsia (xturyt00)
+ */
 package com.project.actionsandevents;
 
 import org.springframework.boot.SpringApplication;

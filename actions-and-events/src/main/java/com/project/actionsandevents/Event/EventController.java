@@ -1,7 +1,6 @@
 /**
- * This file contains class that implements user controller.
- *
  * @author Vadim Goncearenco (xgonce00)
+ * @author Oleksandr Turytsia (xturyt00)
  */
 package com.project.actionsandevents.Event;
 
@@ -22,7 +21,6 @@ import com.project.actionsandevents.Event.exceptions.DuplicateEventException;
 import com.project.actionsandevents.Event.exceptions.DuplicateRegistrationException;
 import com.project.actionsandevents.Event.exceptions.EventLogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.EventNotFoundException;
-import com.project.actionsandevents.Event.exceptions.ManagelogNotFoundException;
 import com.project.actionsandevents.Event.exceptions.RegistrationAlreadyExists;
 import com.project.actionsandevents.Event.exceptions.RegistrationNotFoundException;
 import com.project.actionsandevents.Event.exceptions.TicketNotFoundException;
@@ -553,42 +551,4 @@ public class EventController {
                     ex.getMessage(), ResponseMessage.Status.ERROR));
         }
     }
-
-
-
-
-    @GetMapping("/event/{id}/managelogs/")
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> getManagelogIds(@PathVariable Long id, Authentication authentication) {
-        try {
-            return ResponseEntity.ok(new EventsResponse(eventService.getManagelogIds(id)));
-        } catch (EventNotFoundException ex) {
-            return ResponseEntity.badRequest().body(new ResponseMessage(
-                    ex.getMessage(), ResponseMessage.Status.ERROR));
-        }
-    }
-
-    @GetMapping("/event/managelog/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
-    public ResponseEntity<Object> getManagelogById(@PathVariable Long id, Authentication authentication) {
-        try {
-            return ResponseEntity.ok(eventService.getManagelogById(id));
-        } catch (ManagelogNotFoundException ex) {
-            return ResponseEntity.badRequest().body(new ResponseMessage(
-                    ex.getMessage(), ResponseMessage.Status.ERROR));
-        }
-    }
-
-    @DeleteMapping("/event/managelog/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteManagelogById(@PathVariable Long id, Authentication authentication) {
-        try {
-            return ResponseEntity
-                    .ok(new ResponseMessage(eventService.deleteManagelogById(id), ResponseMessage.Status.SUCCESS));
-        } catch (ManagelogNotFoundException ex) {
-            return ResponseEntity.badRequest().body(new ResponseMessage(
-                    ex.getMessage(), ResponseMessage.Status.ERROR));
-        }
-    }
-    
 }

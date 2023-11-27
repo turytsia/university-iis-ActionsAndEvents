@@ -1,7 +1,6 @@
 /**
- * This file contains class that represents Place in SQL database.
- *
  * @author Aleksandr Shevchenko (xshevc01)
+ * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.Place;
 
