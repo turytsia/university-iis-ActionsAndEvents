@@ -1,3 +1,6 @@
+/**
+ * @author Oleksandr Turytsia (xturyt00)
+ */
 package com.project.actionsandevents.Auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +22,6 @@ import com.project.actionsandevents.User.User;
 import com.project.actionsandevents.User.UserService;
 import com.project.actionsandevents.User.exceptions.DuplicateUserException;
 import com.project.actionsandevents.User.responses.UserPostResponse;
-import com.project.actionsandevents.User.responses.UserResponse;
 import com.project.actionsandevents.common.ResponseMessage;
 
 import jakarta.validation.Valid;

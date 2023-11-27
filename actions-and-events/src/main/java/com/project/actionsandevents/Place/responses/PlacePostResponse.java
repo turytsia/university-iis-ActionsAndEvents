@@ -1,6 +1,4 @@
 /**
- * This file contains class that implements PlacePostResponse.
- *
  * @author Aleksandr Shevchenko (xshevc01)
  */
 package com.project.actionsandevents.Place.responses;

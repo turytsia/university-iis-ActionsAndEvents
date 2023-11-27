@@ -2,6 +2,7 @@
  * This file contains class that implements user services.
  *
  * @author Oleksandr Turytsia (xturyt00)
+ * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.User;
 
@@ -24,9 +25,6 @@ import com.project.actionsandevents.Event.TicketTypeRepository;
 import com.project.actionsandevents.User.exceptions.UserNotFoundException;
 import com.project.actionsandevents.User.exceptions.DuplicateUserException;
 import com.project.actionsandevents.User.requests.UserPatchRequest;
-
-
-
 
 import java.util.List;
 import java.util.Objects;
@@ -69,12 +67,7 @@ public class UserService implements UserDetailsService {
         administersRepository.save(administers);
     }
 
-    /**
-     * Insert user to a database and hash his password
-     * 
-     * @param user User
-     * @return Message
-     */
+    
     public Long addUser(User user) throws DuplicateUserException {
     try {
         user.setPassword(encoder.encode(user.getPassword()));
@@ -85,12 +78,7 @@ public class UserService implements UserDetailsService {
     }
 }
 
-    /**
-     * TODO
-     * @param id
-     * @return
-     * @throws UserNotFoundException
-     */
+
     public User getUserById(Long id) throws UserNotFoundException {
         Optional<User> user = userRepository.findById(id);
 
@@ -101,11 +89,7 @@ public class UserService implements UserDetailsService {
         return user.get();
     }
     
-    /**
-     * TODO
-     * @param id
-     * @throws UserNotFoundException
-     */
+
     public void deleteUserById(Long id, Long adminId) throws UserNotFoundException {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User with ID " + id + " not found");
@@ -127,13 +111,7 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    /**
-     * TODO
-     * @param id
-     * @param patchRequest
-     * @return
-     * @throws UserNotFoundException
-     */
+
     public void patchUserById(Long id, UserPatchRequest patchRequest, Long adminId) 
         throws UserNotFoundException, DuplicateUserException
     {
@@ -171,10 +149,7 @@ public class UserService implements UserDetailsService {
         addAdministersLog(userRepository.findById(adminId).get(), existingUser.getLogin(), "User updated");
     }
 
-    /**
-     * TODO
-     * @return
-     */
+
     public List<Long> getUserIds() {
         return userRepository.findAllIds();
     }
@@ -200,7 +175,6 @@ public class UserService implements UserDetailsService {
         return ticketTypeRepository
                 .findAllIdsByUser(user.get()).stream()
                 .map(_id -> ticketTypeRepository.findById(_id).orElse(null)) // Assuming findById returns an
-                // Optional<TicketType>
                 .filter(Objects::nonNull)
                 .map(TicketType::getId).collect(Collectors.toList());
     }

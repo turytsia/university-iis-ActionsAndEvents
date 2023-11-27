@@ -1,6 +1,4 @@
 /**
- * This file contains class that implements CategoryPostResponse.
- *
  * @author Aleksandr Shevchenko (xshevc01)
  */
 package com.project.actionsandevents.Category.responses;

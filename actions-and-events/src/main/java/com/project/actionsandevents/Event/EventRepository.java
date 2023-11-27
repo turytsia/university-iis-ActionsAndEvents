@@ -1,6 +1,4 @@
 /**
- * This file contains class that implements EventRepository class.
- *
  * @author Vadim Goncearenco (xgonce00)
  */
 

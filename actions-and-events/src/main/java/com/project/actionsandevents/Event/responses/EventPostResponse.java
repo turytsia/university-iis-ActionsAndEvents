@@ -1,14 +1,8 @@
 /**
- * This file contains class that implements EventResponse.
- *
  * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.Event.responses;
 
-// import java.util.Date;
-
-// import com.project.actionsandevents.Event.Event;
-// import com.project.actionsandevents.Event.EventStatus;
 import com.project.actionsandevents.common.ResponseMessage;
 
 import lombok.Getter;

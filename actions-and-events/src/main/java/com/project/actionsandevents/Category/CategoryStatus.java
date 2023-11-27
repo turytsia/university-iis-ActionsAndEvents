@@ -1,3 +1,7 @@
+/**
+ * @author Aleksandr Shevchenko (xshevc01)
+ * @author Vadim Goncearenco (xgonce00)
+ */
 package com.project.actionsandevents.Category;
 
 import com.fasterxml.jackson.annotation.JsonValue;

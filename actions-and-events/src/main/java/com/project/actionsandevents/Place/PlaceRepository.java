@@ -1,7 +1,6 @@
 /**
- * This file contains class that implements repository for the place.
- *
  * @author Aleksandr Shevchenko (xshevc01)
+ * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.Place;
 

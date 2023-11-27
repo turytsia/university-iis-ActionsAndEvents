@@ -1,3 +1,6 @@
+/**
+ * @author Oleksandr Turytsia (xturyt00)
+ */
 package com.project.actionsandevents.common;
 
 import lombok.Getter;

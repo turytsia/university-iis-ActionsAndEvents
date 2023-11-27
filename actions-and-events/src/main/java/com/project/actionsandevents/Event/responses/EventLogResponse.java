@@ -1,3 +1,6 @@
+/**
+ * @author Vadim Goncearenco (xgonce00)
+ */
 package com.project.actionsandevents.Event.responses;
 
 import java.util.Date;

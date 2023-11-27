@@ -1,7 +1,6 @@
 /**
- * This file contains class that implements category services.
- *
  * @author Aleksandr Shevchenko (xshevc01)
+ * @author Vadim Goncearenco (xgonce00)
  */
 
 package com.project.actionsandevents.Category;
@@ -26,12 +25,6 @@ public class CategoryService {
     @Autowired
     private CategoryRepository repository;
 
-    /**
-     * TODO
-     * @param id
-     * @return
-     * @throws CategoryNotFoundException
-     */
     public Category getCategoryById(Long id) throws CategoryNotFoundException {
         Optional<Category> category = repository.findById(id);
 
@@ -42,20 +35,11 @@ public class CategoryService {
         return category.get();
     }
 
-    /**
-     * TODO
-     * @return
-     */
     public List<Long> getCategoryIds() {
         return repository.findAllIds();
     }
 
-    /**
-     * TODO
-     * @param id
-     * @param patchRequest
-     * @throws CategoryNotFoundException
-     */
+
     public void patchCategoryById(Long id, CategoryPatchRequest patchRequest) 
         throws CategoryNotFoundException, DuplicateCategoryException, CategoryParentException
     {
@@ -68,8 +52,6 @@ public class CategoryService {
         Category categoryToPatch = category.get();
 
 
-        //System.out.println("*****Before null check: Parent category: " + patchRequest.getParentCategory());
-        
         if (patchRequest.getParentCategory() != null) {
             Long parentId = patchRequest.getParentCategory();
             Optional<Category> parent = repository.findById(parentId);
@@ -77,9 +59,6 @@ public class CategoryService {
             if (!parent.isPresent()) {
                 throw new CategoryNotFoundException("Parent category not found with ID: " + parentId);
             }
-
-            // System.out.println("*****This category: " + id);
-            // System.out.println("*****Parent category: " + patchRequest.getParentCategory());
 
             // Check if parent category is not the same as the category to patch
             if (parent.get().getId() == categoryToPatch.getId()) {
@@ -102,7 +81,6 @@ public class CategoryService {
                 }
             }
 
-
             categoryToPatch.setParentCategory(parent.get());
         }
 
@@ -121,12 +99,6 @@ public class CategoryService {
         }
     }
 
-    /**
-     * TODO
-     * @param category
-     * @return
-     * @throws CategoryNotFoundException
-     */
     public Long addCategory(CategoryPostRequest category) 
         throws CategoryNotFoundException, DuplicateCategoryException 
     {
@@ -138,9 +110,6 @@ public class CategoryService {
             if (!parent.isPresent()) {
                 throw new CategoryNotFoundException("Category not found with ID: " + category.getParentCategory());
             }
-
-            System.out.println("*****This category: " + newCategory.getId());
-            System.out.println("*****Parent category: " + parent.get().getId());
 
             // Check if parent category is not the same as the category to patch
             if (parent.get().getId() == newCategory.getId()) {
@@ -167,13 +136,6 @@ public class CategoryService {
         }
     }
 
-    /**
-     * TODO
-     * @param category
-     * @param id
-     * @return
-     * @throws CategoryNotFoundException
-     */
     public Long addCategoryWithParent(Category category, Long id) 
         throws CategoryNotFoundException, DuplicateCategoryException 
     {
@@ -204,11 +166,6 @@ public class CategoryService {
         }
     }
 
-    /**
-     * TODO
-     * @param id
-     * @throws CategoryNotFoundException
-     */
     public void deleteCategoryById(Long id) throws CategoryNotFoundException {
         if (repository.existsById(id)) {
             repository.deleteById(id);
@@ -217,12 +174,6 @@ public class CategoryService {
         }
     }
 
-    /**
-     * TODO
-     * @param categoryId
-     * @return
-     * @throws CategoryNotFoundException
-     */
     public String approveCategory(Long categoryId) throws CategoryNotFoundException {
         Optional<Category> category = repository.findById(categoryId);
 

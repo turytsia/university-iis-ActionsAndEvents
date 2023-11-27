@@ -1,6 +1,4 @@
 /**
- * This file contains class that implements Event class.
- *
  * @author Vadim Goncearenco (xgonce00)
  */
 

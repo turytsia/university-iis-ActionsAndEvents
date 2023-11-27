@@ -1,7 +1,6 @@
 /**
- * This file contains class that implements place services.
- *
  * @author Aleksandr Shevchenko (xshevc01)
+ * @author Vadim Goncearenco (xgonce00)
  */
 
 package com.project.actionsandevents.Place;
@@ -24,12 +23,6 @@ public class PlaceService {
     @Autowired
     private PlaceRepository repository;
 
-    /**
-     * TODO
-     * @param id
-     * @return
-     * @throws PlaceNotFoundException
-     */
     public Place getPlaceById(Long id) throws PlaceNotFoundException {
         Optional<Place> place = repository.findById(id);
 
@@ -40,20 +33,10 @@ public class PlaceService {
         return place.get();
     }
 
-    /**
-     * TODO
-     * @return
-     */
     public List<Long> getPlaceIds() {
         return repository.findAllIds();
     }
 
-    /**
-     * TODO
-     * @param id
-     * @param patchRequest
-     * @throws PlaceNotFoundException
-     */
     public void patchPlaceById(Long id, PlacePatchRequest patchRequest) 
         throws PlaceNotFoundException, DuplicatePlaceException 
     {
@@ -91,11 +74,6 @@ public class PlaceService {
         }
     }
 
-    /**
-     * TODO
-     * @param place
-     * @return
-     */
     public Long addPlace(Place place) 
         throws DuplicatePlaceException
     {
@@ -106,11 +84,6 @@ public class PlaceService {
         }
     }
 
-    /**
-     * TODO
-     * @param id
-     * @throws PlaceNotFoundException
-     */
     public void deletePlaceById(Long id) throws PlaceNotFoundException {
         if (repository.existsById(id)) {
             repository.deleteById(id);
@@ -119,12 +92,6 @@ public class PlaceService {
         }
     }
 
-    /**
-     * TODO
-     * @param placeId
-     * @return
-     * @throws PlaceNotFoundException
-     */
     public String approvePlace(Long placeId) throws PlaceNotFoundException {
         Optional<Place> place = repository.findById(placeId);
 

@@ -1,3 +1,6 @@
+/**
+ * @author Vadim Goncearenco (xgonce00)
+ */
 package com.project.actionsandevents.User.requests;
 
 import jakarta.validation.constraints.Email;

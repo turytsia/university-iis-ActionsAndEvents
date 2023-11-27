@@ -1,6 +1,4 @@
 /**
- * This file contains class that implements CommentsRepository class.
- *
  * @author Aleksandr Shevchenko (xshevc01)
  */
 package com.project.actionsandevents.Event;

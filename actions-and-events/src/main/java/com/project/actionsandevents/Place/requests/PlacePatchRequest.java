@@ -1,3 +1,6 @@
+/**
+ * @author Vadim Goncearenco (xgonce00)
+ */
 package com.project.actionsandevents.Place.requests;
 
 import com.project.actionsandevents.Place.PlaceStatus;
@@ -19,6 +22,5 @@ public class PlacePatchRequest {
     @NotBlank(message = "Name is required")
     private String name;
 
-    //@NotBlank(message = "Status is required")
     private PlaceStatus status;
 }

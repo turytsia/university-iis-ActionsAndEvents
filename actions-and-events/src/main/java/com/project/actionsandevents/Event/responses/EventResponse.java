@@ -1,6 +1,4 @@
 /**
- * This file contains class that implements EventResponse.
- *
  * @author Vadim Goncearenco (xgonce00)
  */
 package com.project.actionsandevents.Event.responses;
@@ -9,11 +7,6 @@ import java.util.Date;
 
 import com.project.actionsandevents.Event.Event;
 import com.project.actionsandevents.Event.EventStatus;
-import com.project.actionsandevents.User.User;
-
-import com.project.actionsandevents.Category.Category;
-import com.project.actionsandevents.Place.Place;
-
 
 import lombok.Getter;
 import lombok.Setter;
@@ -29,12 +22,9 @@ public class EventResponse {
     private String icon;
     private String image;
     private EventStatus status;
-    //private Place place;
-    private Long placeId; // avoid recursion
-    //private User author;
-    private Long authorId; // avoid recursion
-    //private Category category;
-    private Long categoryId; // avoid recursion
+    private Long placeId; // to avoid recursion
+    private Long authorId; // to avoid recursion
+    private Long categoryId; // to avoid recursion
 
     public EventResponse(Event event) {
         this.id = event.getId();

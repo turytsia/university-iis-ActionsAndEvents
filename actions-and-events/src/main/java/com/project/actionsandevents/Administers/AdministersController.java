@@ -1,3 +1,6 @@
+/**
+ * @author Vadim Goncearenco (xgonce00)
+ */
 package com.project.actionsandevents.Administers;
 
 import org.springframework.beans.factory.annotation.Autowired;
