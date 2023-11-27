@@ -116,7 +116,7 @@ public class CategoryController {
     }
 
     @PostMapping("/category/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public ResponseEntity<Object> addCategoryWithParent(
             @PathVariable Long id,
             @Valid @RequestBody Category category,

@@ -97,7 +97,7 @@ const Events = () => {
 
   const filteredEvents = events.filter(({ title, categoryId }) => (
     title.trim().toLowerCase().includes(search.trim().toLowerCase()) &&
-    category ? categoryId!.id! === category : true
+      category ? (categoryId!.id! === category || categoryId!.parentCategory === category) : true
   ))
 
   return (
