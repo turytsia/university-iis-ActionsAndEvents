@@ -1,0 +1,1 @@
+DELETE FROM registers BY id = 5;

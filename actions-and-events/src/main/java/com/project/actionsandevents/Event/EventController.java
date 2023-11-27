@@ -86,7 +86,7 @@ public class EventController {
         // Among regular users only author of the event can modify it or its tickets
         UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
 
-        boolean isAuthor = userDetails.getId() == event.getAuthor().getId();
+        boolean isAuthor = userDetails.getId().equals(event.getAuthor().getId());
 
         return isAuthor || hasElevatedPrivileges(authentication);
     }
@@ -95,7 +95,7 @@ public class EventController {
         // Among regular users only author of the event can modify it or its tickets
         UserInfoDetails userDetails = (UserInfoDetails) authentication.getPrincipal();
 
-        boolean isAuthor = userDetails.getId() == comment.getUser().getId();
+        boolean isAuthor = userDetails.getId().equals(comment.getUser().getId());
 
         return isAuthor || hasElevatedPrivileges(authentication);
     }
@@ -136,6 +136,16 @@ public class EventController {
         }
 
         try {
+
+            if (patchRequest.getDateFrom().getTime() < new Date().getTime()) {
+                return ResponseEntity.badRequest()
+                        .body(new ResponseMessage("You cannot set start date as today or in the past", ResponseMessage.Status.ERROR));
+            }
+            
+            if (patchRequest.getDateTo() != null && patchRequest.getDateFrom().getTime() > patchRequest.getDateTo().getTime()) {
+                return ResponseEntity.badRequest().body(new ResponseMessage("Start date cannot be greater than end date", ResponseMessage.Status.ERROR));
+            }
+
             eventService.patchEventById(id, patchRequest);
             return ResponseEntity.ok(new ResponseMessage(
                             "Event was successfully updated", ResponseMessage.Status.SUCCESS));
@@ -310,7 +320,7 @@ public class EventController {
     public ResponseEntity<Object> deleteEventComment(@PathVariable Long id, Authentication authentication)
     {
         try {
-            if (!hasPrivilegesOnEvent(authentication, eventService.getCommentById(id).getEvent())) {
+            if (!hasPrivilegesOnComment(authentication, eventService.getCommentById(id))) {
                 return ResponseEntity.badRequest().body(new ResponseMessage(
                         "You are not allowed to delete this comment", ResponseMessage.Status.ERROR));
             }

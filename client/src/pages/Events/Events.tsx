@@ -33,6 +33,19 @@ const Events = () => {
         .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
         .map((r) => r.value)
         .filter((v) => v);
+      
+      const allCategoriesResponse = await context.request!.get("/categories")
+
+      const allCategoriesResponses = await Promise.allSettled(
+        allCategoriesResponse.data.categories.map(async (id: number) => await context.request!.get(`/category/${id}`))
+      );
+
+      const fulfilledAllCategoriesResponses = allCategoriesResponses
+        .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
+        .map((r) => r.value)
+        .filter((v) => v);
+      
+      setCategories(fulfilledAllCategoriesResponses.map(({data}) => data))
 
       const authorIds = Array.from(new Set(fulfilledResponses.map(({ data }) => data.authorId)))
       const placeIds = Array.from(new Set(fulfilledResponses.map(({ data }) => data.placeId)))
@@ -69,8 +82,6 @@ const Events = () => {
       const places = fulfilledPlaceResponses.map(({ data }) => data)
       const categories = fulfilledCategoryResponses.map(({ data }) => data)
 
-      setCategories(categories)
-
       setEvents(fulfilledResponses.map(({ data }) => {
         return {
           ...data,
@@ -95,9 +106,15 @@ const Events = () => {
     fetchEvents()
   }, [])
 
+  const hasCategory = (c: CategoryType | null): boolean => {
+    if (c === null) return false
+    
+    return hasCategory(categories.find(({ id }) => c.parentCategory === id) ?? null) || c.id === category
+  }
+
   const filteredEvents = events.filter(({ title, categoryId }) => (
-    title.trim().toLowerCase().includes(search.trim().toLowerCase()) &&
-      category ? (categoryId!.id! === category || categoryId!.parentCategory === category) : true
+      title.trim().toLowerCase().includes(search.trim().toLowerCase()) &&
+      (category ? hasCategory(categoryId) : true)
   ))
 
   return (

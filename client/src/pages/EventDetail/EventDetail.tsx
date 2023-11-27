@@ -128,8 +128,10 @@ const EventDetail = () => {
         context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.patch(`/event/${id}`, event)
-            setEvent(event)
-            setIsUpdateActive(false)
+            if (response.status === 200) {
+                setEvent(event)
+                setIsUpdateActive(false)
+            }
         } catch (error) {
             console.error(error)
         } finally {
@@ -142,8 +144,10 @@ const EventDetail = () => {
         try {
             const response = await context.request!.delete(`/event/${id}`)
 
-            setIsDeleteActive(false)
-            navigate("/")
+            if (response.status === 200) {
+                setIsDeleteActive(false)
+                navigate("/")
+            }
         } catch (error) {
             console.error(error)
         } finally {
@@ -160,7 +164,9 @@ const EventDetail = () => {
                 price: Number(inputs.price),
                 description: inputs.description,
             })
-            setTickets(prev => prev.map((ticket) => ticket.id === inputs.id ? inputs : ticket))
+            if (response.status === 200) {
+                setTickets(prev => prev.map((ticket) => ticket.id === inputs.id ? inputs : ticket))
+            }
         } catch (error) {
             console.error(error)
         } finally {
@@ -177,7 +183,9 @@ const EventDetail = () => {
                 price: Number(inputs.price),
                 description: inputs.description,
             })
-            setTickets(prev => [...prev, inputs])
+            if (response.status === 200) {
+                setTickets(prev => [...prev, inputs])
+            }
         } catch (error) {
             console.error(error)
         } finally {
@@ -190,7 +198,9 @@ const EventDetail = () => {
             context.setLoading(LoadingType.LOADING)
             try {
                 const response = await context.request!.delete(`/event/ticket/${id}`)
-                setTickets(prev => prev.filter((ticket) => ticket.id !== id))
+                if (response.status === 200) {
+                    setTickets(prev => prev.filter((ticket) => ticket.id !== id))
+                }
             } catch (error) {
                 console.error(error)
             } finally {
@@ -221,7 +231,9 @@ const EventDetail = () => {
                 user: context.user!
             }
 
-            setComments(prev => [...prev, newComment])
+            if (response.status === 200) {
+                setComments(prev => [...prev, newComment])
+            }
         } catch (error) {
             console.error('Failed to submit comment:', error)
         } finally {

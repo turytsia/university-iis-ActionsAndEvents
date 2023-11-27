@@ -25,13 +25,15 @@ const RowActions = ({
         return null;
     }
 
-    const deleteCategory = async () => {
+    const deleteUser = async () => {
         context.setLoading(LoadingType.LOADING)
         try {
             const response = await context.request!.delete(`/user/${user.id}`)
 
-            setUsers(prev => prev.filter(({ id }) => id !== user.id))
-            setIsDeleteActive(false)
+            if (response.status === 200) {
+                setUsers(prev => prev.filter(({ id }) => id !== user.id))
+                setIsDeleteActive(false)
+            }
         } catch (error) {
             console.error(error)
         } finally {
@@ -48,7 +50,7 @@ const RowActions = ({
             {isDeleteActive && (
                 <DeleteModal
                     title={`Delete user "${user.login}"?`}
-                    onSubmit={deleteCategory}
+                    onSubmit={deleteUser}
                     onClose={() => setIsDeleteActive(false)}
                 />
             )}

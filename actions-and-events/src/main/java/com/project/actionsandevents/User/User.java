@@ -10,7 +10,10 @@ import java.util.Set;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.project.actionsandevents.Administers.Administers;
+import com.project.actionsandevents.Event.Comment;
 import com.project.actionsandevents.Event.Event;
+import com.project.actionsandevents.Event.Registers;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -66,4 +69,13 @@ public class User {
     // Delete all events when user is deleted
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Event> createdEvents;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments;
+
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Administers> administers;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Registers> registers;
 }
