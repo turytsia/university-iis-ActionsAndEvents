@@ -38,7 +38,7 @@ Aplikaci jsme implementovali pomocí frameworku Java Spring Boot. Základní kom
 | User        | Správa (ne)autorizovaných uživatelů a rolí       |
 
 ## Databáze
-![ER Diagram](docs/er-diagram.jpg)
+![ER Diagram](doc/er-diagram.jpg)
 
 ## Instalace
 Na začátku se musí nastartovat Docker pro databázi:
