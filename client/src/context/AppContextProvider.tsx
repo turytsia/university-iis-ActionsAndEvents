@@ -82,10 +82,7 @@ const AppContextProvider = ({ children }: PropsType) => {
   const [loading, setLoading] = useState<LoadingType>(LoadingType.NONE)
   const [token, setToken] = useState(localStorage.getItem("token"))
   const [user, setUser] = useState<UserType>(localUser ? JSON.parse(localUser) : initialUser)
-
-  // http://localhost:8080
-  // https://actions-and-events.azurewebsites.net
-
+  
   const request = useMemo(
     () => axios.create({
       baseURL: 'http://localhost:8080',

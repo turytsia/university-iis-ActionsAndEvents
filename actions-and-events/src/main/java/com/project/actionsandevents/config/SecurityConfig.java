@@ -86,8 +86,7 @@ public class SecurityConfig {
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-    // http://localhost:3000
-    // https://blue-mud-0f3bd8b03.4.azurestaticapps.net
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
